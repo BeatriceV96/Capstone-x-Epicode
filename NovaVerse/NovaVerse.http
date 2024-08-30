@@ -1,0 +1,6 @@
+@NovaVerse_HostAddress = http://localhost:5034
+
+GET {{NovaVerse_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
