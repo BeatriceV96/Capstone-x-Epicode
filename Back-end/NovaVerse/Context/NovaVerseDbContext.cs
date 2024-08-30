@@ -26,79 +26,100 @@ namespace NovaVerse.Context
             // Relazione uno-a-molti tra Transaction e User (Buyer)
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Buyer)
-                .WithMany(u => u.Transactions) // Considera di rimuovere se non necessario
+                .WithMany(u => u.Transactions)
                 .HasForeignKey(t => t.BuyerId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione uno-a-molti tra Transaction e User (Seller)
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Seller)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(t => t.SellerId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevenzione di cicli
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione uno-a-molti tra Artwork e User (Artist)
             modelBuilder.Entity<Artwork>()
                 .HasOne(a => a.Artist)
                 .WithMany(u => u.Artworks)
                 .HasForeignKey(a => a.ArtistId)
-                .OnDelete(DeleteBehavior.Restrict); // Evita eliminazioni a cascata che potrebbero causare cicli
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione opzionale uno-a-molti tra Artwork e User (Buyer)
             modelBuilder.Entity<Artwork>()
                 .HasOne(a => a.Buyer)
-                .WithMany() // Non mappato su Buyer navigational property per evitare cicli
+                .WithMany()
                 .HasForeignKey(a => a.BuyerId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione uno-a-uno tra ShoppingCart e User
             modelBuilder.Entity<ShoppingCart>()
                 .HasOne(c => c.User)
                 .WithOne(u => u.ShoppingCart)
                 .HasForeignKey<ShoppingCart>(c => c.UserId)
-                .OnDelete(DeleteBehavior.Cascade); // Consentito poiché si tratta di una relazione uno-a-uno
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Relazione uno-a-molti tra ShoppingCartItem e ShoppingCart
             modelBuilder.Entity<ShoppingCartItem>()
                 .HasOne(ci => ci.ShoppingCart)
                 .WithMany(c => c.ShoppingCartItems)
                 .HasForeignKey(ci => ci.ShoppingCartId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Relazione uno-a-molti tra ShoppingCartItem e Artwork
             modelBuilder.Entity<ShoppingCartItem>()
                 .HasOne(ci => ci.Artwork)
                 .WithMany(a => a.ShoppingCartItems)
                 .HasForeignKey(ci => ci.ArtworkId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione uno-a-uno tra Artwork e NFTMetadata
             modelBuilder.Entity<Artwork>()
                 .HasOne(a => a.NFTMetadata)
                 .WithOne(nft => nft.Artwork)
                 .HasForeignKey<NFTMetadata>(nft => nft.ArtworkId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Relazione uno-a-uno tra Artwork e Transaction
             modelBuilder.Entity<Artwork>()
                 .HasOne(a => a.Transaction)
                 .WithOne(t => t.Artwork)
                 .HasForeignKey<Artwork>(a => a.TransactionId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Relazione uno-a-molti tra TransactionArtworks e Transaction
             modelBuilder.Entity<TransactionArtworks>()
                 .HasOne(ta => ta.Transaction)
                 .WithMany()
                 .HasForeignKey(ta => ta.TransactionId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Relazione uno-a-molti tra TransactionArtworks e Artwork
             modelBuilder.Entity<TransactionArtworks>()
                 .HasOne(ta => ta.Artwork)
                 .WithMany()
                 .HasForeignKey(ta => ta.ArtworkId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relazione uno-a-molti tra Favorite e User (l'utente che aggiunge ai favoriti)
+            modelBuilder.Entity<Favorite>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.Favorites)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relazione opzionale uno-a-uno tra Favorite e Artwork
+            modelBuilder.Entity<Favorite>()
+                .HasOne(f => f.Artwork)
+                .WithMany(a => a.Favorites)
+                .HasForeignKey(f => f.ArtworkId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relazione opzionale uno-a-uno tra Favorite e User (Artista)
+            modelBuilder.Entity<Favorite>()
+                .HasOne(f => f.Artist)
+                .WithMany()
+                .HasForeignKey(f => f.ArtistId)
+                .OnDelete(DeleteBehavior.Restrict); 
 
             base.OnModelCreating(modelBuilder);
         }
