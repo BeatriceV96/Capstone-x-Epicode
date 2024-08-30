@@ -14,8 +14,8 @@ namespace NovaVerse.Controllers
     {
         private readonly IArtworkService _artworkService;
 
-            public ArtistArtworkController(IArtworkService artworkService)
-            {
+            public ArtistArtworkController(IArtworkService artworkService) //Dependency Injection
+        {
                 _artworkService = artworkService;
             }
 
