@@ -38,6 +38,8 @@ namespace NovaVerse.Models
 
         public DateTime CreateDate { get; set; }
 
+        public int ViewCount { get; set; } = 0;
+
         // Proprietà di navigazione per NFTMetadata
         public virtual NFTMetadata NFTMetadata { get; set; }
 
@@ -47,5 +49,6 @@ namespace NovaVerse.Models
         public virtual ICollection<ShoppingCartItem> ShoppingCartItems { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<Favorite> Favorites { get; set; }
+        public virtual ICollection<TransactionArtworks> TransactionArtworks { get; set; }
     }
 }

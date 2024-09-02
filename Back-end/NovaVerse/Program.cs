@@ -42,6 +42,11 @@ builder.Services.AddScoped<IPasswordEncoder, PasswordEncoder>();
 builder.Services.AddScoped<IArtworkService, ArtworkService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
+builder.Services.AddScoped<IArtistDashboardService, ArtistDashboardService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
