@@ -38,7 +38,7 @@ namespace NovaVerse.Services
             return result > 0;
         }
 
-        public async Task<User> Login(LoginDto loginDto)
+        public async Task<UserDto> Login(LoginDto loginDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.Username && x.Password == loginDto.Password);
             if (user == null) return null;
@@ -56,8 +56,18 @@ namespace NovaVerse.Services
 
             await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return user;  // Ritorna l'oggetto User
+            // Restituisci UserDto al posto di User
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            };
+
+            return userDto;
         }
+
 
         public async Task Logout()
         {

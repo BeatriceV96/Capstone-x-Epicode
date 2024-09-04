@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NovaVerse.Interfaces;
 using NovaVerse.Dto;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace NovaVerse.Controllers
 {
@@ -9,12 +11,13 @@ namespace NovaVerse.Controllers
     public class AuthController : Controller
     {
         private readonly IUserService _userService;
-        
-        public AuthController(IUserService userService) 
+
+        public AuthController(IUserService userService)
         {
             _userService = userService;
         }
 
+        // Registrazione
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
@@ -26,23 +29,47 @@ namespace NovaVerse.Controllers
             return BadRequest("User registration failed.");
         }
 
+        // Login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var user = await _userService.Login(loginDto);
-            if (user == null)
+            var userDto = await _userService.Login(loginDto);
+            if (userDto == null)
             {
-                return Unauthorized("Invalid username or password");  //se password o username sbagliati
+                return Unauthorized("Invalid username or password");
             }
 
-            return Ok(user);  // Ritorna l'oggetto User come risposta
+            return Ok(userDto);  // Ritorna l'oggetto UserDto
         }
 
+        // Logout
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await _userService.Logout();
             return Ok();
+        }
+
+        // Metodo per ottenere l'utente corrente autenticato
+        [Authorize]  // Assicura che l'utente sia autenticato
+        [HttpGet("currentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userId != null)
+                {
+                    var user = await _userService.GetUserById(int.Parse(userId));
+                    if (user != null)
+                    {
+                        return Ok(user);  // Ritorna i dettagli dell'utente autenticato
+                    }
+                }
+            }
+
+            return Unauthorized();
         }
     }
 }

@@ -1,0 +1,11 @@
+<h1>Login</h1>
+
+<form>
+
+  <input type="email" name="email" [(ngModel)]="authData.email" placeholder="email" class="form-control">
+  <input type="password" name="password" [(ngModel)]="authData.password" placeholder="password" class="form-control mt-3">
+
+  <button (click)="login()" class="btn btn-primary mt-3">Accedi</button>
+
+</form>
+
