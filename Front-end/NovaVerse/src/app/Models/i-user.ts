@@ -1,7 +1,7 @@
 export interface iUser {
   id: number;
-  nome: string;
+  username: string;
   email: string;
   password: string;
-  role: string;  //  campo per il ruolo (Artista o Cliente)
+  role: string;  //  campo per il ruolo (Artista o Buyer)
 }

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -16,7 +17,7 @@ export class AuthService {
 
   private userLoggedIn = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   // Metodo per inizializzare l'utente quando l'app parte
   initializeUser(): void {
@@ -24,14 +25,11 @@ export class AuthService {
   }
 
   // Login
+
   login(authData: IAuthData): Observable<iAuthResponse> {
-    return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData).pipe(
-      tap((res) => {
-        this.authSubject.next(res.user);  // Memorizza l'utente nel BehaviorSubject
-        this.userLoggedIn = true;  // Imposta lo stato dell'utente come loggato
-      })
-    );
+    return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData);
   }
+
 
   // Registrazione
   register(newUser: Partial<iUser>): Observable<any> {
