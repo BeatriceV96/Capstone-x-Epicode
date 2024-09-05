@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { IAuthData } from '../Models/i-auth-data'; //  Definisci l'interfaccia di IAuthData con username, email, password, etc.
-import { iAuthResponse } from '../Models/i-auth-response'; // Definisci la struttura della risposta del backend con l'utente e eventuali cookie
-import { iUser } from '../Models/i-user'; // Interfaccia per gestire l'utente
-
+import { IAuthData } from '../Models/i-auth-data';
+import { iAuthResponse } from '../Models/i-auth-response';
+import { iUser } from '../Models/i-user';
 
 @Injectable({
   providedIn: 'root',
@@ -14,27 +13,41 @@ import { iUser } from '../Models/i-user'; // Interfaccia per gestire l'utente
 export class AuthService {
   private authSubject = new BehaviorSubject<null | iUser>(null);
   private baseUrl = 'http://localhost:5034/api';  // URL del backend
-
   private userLoggedIn = false;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {
+    this.initializeUser();
+  }
 
   // Metodo per inizializzare l'utente quando l'app parte
   initializeUser(): void {
-    this.restoreUser();
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      this.authSubject.next(JSON.parse(storedUser));
+      this.userLoggedIn = true;
+    } else {
+      this.userLoggedIn = false;  // Se non c'è nessun utente in localStorage, lo stato è sloggato
+    }
+  }
+
+  register(newUser: Partial<iUser>): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/register`, newUser);
   }
 
   // Login
   login(authData: IAuthData): Observable<iAuthResponse> {
     return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData).pipe(
       tap((res) => {
-        this.authSubject.next({
+        const user = {
           id: res.user.id,
           username: res.user.username,
           email: res.user.email,
           password: "",  // Non salviamo la password qui
           role: res.user.role
-        });
+        };
+        // Salva l'utente sia in authSubject che in localStorage
+        this.authSubject.next(user);
+        localStorage.setItem('user', JSON.stringify(user));
         this.userLoggedIn = true;
 
         // Redirigi l'utente in base al ruolo
@@ -47,24 +60,21 @@ export class AuthService {
     );
   }
 
-
-
-  // Registrazione
-  register(newUser: Partial<iUser>): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/register`, newUser);
-  }
-
-
   // Logout
   logout(): void {
     this.authSubject.next(null);  // Resetta lo stato dell'utente
     this.userLoggedIn = false;  // Imposta l'utente come sloggato
-    this.http.post(`${this.baseUrl}/auth/logout`, {}).subscribe();  // Logout lato backend
+    localStorage.removeItem('user');  // Rimuovi l'utente dal localStorage
+
+    // Effettua il logout dal backend
+    this.http.post(`${this.baseUrl}/auth/logout`, {}).subscribe(() => {
+      this.router.navigate(['/']);  // Reindirizza alla home dopo il logout
+    });
   }
 
-  // Controlla se l'utente è loggato
-  isAuthenticated(): boolean {
-    return this.userLoggedIn;
+   // Controlla se l'utente è loggato
+   isAuthenticated(): boolean {
+    return !!localStorage.getItem('user');  // Verifica la presenza dell'utente nel localStorage
   }
 
   // Restituisce l'utente corrente
@@ -72,8 +82,8 @@ export class AuthService {
     return this.authSubject.value;
   }
 
-  // Metodo per ripristinare l'utente (da completare in base al tuo backend)
-  private restoreUser(): void {
+  // Metodo per ripristinare l'utente al ricaricamento della pagina
+  restoreUser(): void {
     this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`).subscribe(
       (user) => {
         this.authSubject.next(user);

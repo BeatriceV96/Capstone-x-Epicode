@@ -9,8 +9,13 @@ import { AuthService } from '../../services/auth.service'; // Assicurati che il 
 export class NavbarComponent {
   constructor(private authService: AuthService) {}
 
-  isArtist(): boolean {
-    const user = this.authService.getCurrentUser();
-    return user?.role === 'Artista';  // Verifica se l'utente ha il ruolo di 'Artista'
+  // Metodo per controllare se l'utente è loggato
+  isLoggedIn(): boolean {
+    return this.authService.isAuthenticated(); // Verifica se l'utente è autenticato
+  }
+
+  // Metodo per eseguire il logout
+  onLogout(): void {
+    this.authService.logout();  // Esegui il logout
   }
 }

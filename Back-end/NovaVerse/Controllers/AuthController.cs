@@ -63,6 +63,7 @@ namespace NovaVerse.Controllers
             return Ok();
         }
 
+
         [Authorize]
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUser()

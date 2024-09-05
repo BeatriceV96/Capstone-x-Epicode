@@ -102,6 +102,8 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap-reboot.min.css",
               "node_modules/swiper/swiper-bundle.min.css",
+              "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css",
+  "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css",
               "src/styles.scss"
             ],
             "scripts": []
