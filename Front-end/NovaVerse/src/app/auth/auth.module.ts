@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthRoutingModule } from './auth-routing.module'; // Corretto import
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule, // Importazione corretta di FormsModule per ngModel
-    AuthRoutingModule // Importazione corretta del modulo di routing
+    ReactiveFormsModule, // Per formGroup e formControlName
+    AuthRoutingModule, // Importazione corretta del modulo di routing
   ],
   exports: [
     LoginComponent,

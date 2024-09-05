@@ -1,27 +1,29 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';  // Assicurati che il percorso sia corretto
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
-  authData = { email: '', password: '' };
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private fb: FormBuilder, private authService: AuthService) {}
 
-  login(): void {
-    this.authService.login(this.authData).subscribe(
-      () => {
-        Swal.fire('Success', 'Login effettuato con successo!', 'success');
-        this.router.navigate(['/dashboard']);
-      },
-      () => {
-        Swal.fire('Error', 'Email o Password errati', 'error');
-      }
-    );
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.valid) {
+      this.authService.login(this.loginForm.value).subscribe(
+        success => console.log('Login successful!'),
+        error => console.error('Login failed.')
+      );
+    }
   }
 }
