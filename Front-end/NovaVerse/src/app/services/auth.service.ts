@@ -25,10 +25,28 @@ export class AuthService {
   }
 
   // Login
-
   login(authData: IAuthData): Observable<iAuthResponse> {
-    return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData);
+    return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData).pipe(
+      tap((res) => {
+        this.authSubject.next({
+          id: res.user.id,
+          username: res.user.username,
+          email: res.user.email,
+          password: "",  // Non salviamo la password qui
+          role: res.user.role
+        });
+        this.userLoggedIn = true;
+
+        // Redirigi l'utente in base al ruolo
+        if (res.user.role === 'Artist') {
+          this.router.navigate(['/artist-dashboard']);
+        } else if (res.user.role === 'Buyer') {
+          this.router.navigate(['/buyer-dashboard']);
+        }
+      })
+    );
   }
+
 
 
   // Registrazione

@@ -40,23 +40,17 @@ namespace NovaVerse.Services
 
         public async Task<UserDto> Login(LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.Username && x.Password == loginDto.Password);
+            // Controlla se l'input è un'email o un nome utente
+            bool isEmail = loginDto.Username.Contains('@');
+
+            // Cerca l'utente per email o nome utente
+            var user = isEmail
+                ? await _context.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Username && x.Password == loginDto.Password)
+                : await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.Username && x.Password == loginDto.Password);
+
             if (user == null) return null;
 
-            var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.Username),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Role, user.Role.ToString()),
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-    };
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties();
-
-            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-            // Restituisci UserDto al posto di User
+            // Restituisci i dettagli dell'utente come UserDto
             var userDto = new UserDto
             {
                 Id = user.Id,

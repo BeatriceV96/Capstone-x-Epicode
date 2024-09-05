@@ -1,4 +1,4 @@
 export interface IAuthData {
-  username: string;
+  username: string; // Il nome utente o l'email
   password: string;
 }
