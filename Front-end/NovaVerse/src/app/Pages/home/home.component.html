@@ -1,0 +1,38 @@
+<div class="bg-gray-900 text-white min-h-screen">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="text-lg font-bold">MyWebsite</div>
+      <div class="flex space-x-4">
+        <a routerLink="/auth/login">
+          <button class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Login</button>
+        </a>
+        <a routerLink="/auth/register">
+          <button class="bg-green-600 px-4 py-2 rounded hover:bg-green-700">Register</button>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Carosello (Swiper) -->
+  <div class="swiper-container mt-8">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide bg-gray-800 flex items-center justify-center h-64">
+        <p>Slide 1</p>
+      </div>
+      <div class="swiper-slide bg-gray-800 flex items-center justify-center h-64">
+        <p>Slide 2</p>
+      </div>
+      <div class="swiper-slide bg-gray-800 flex items-center justify-center h-64">
+        <p>Slide 3</p>
+      </div>
+    </div>
+
+    <!-- Pagine del carosello -->
+    <div class="swiper-pagination"></div>
+
+    <!-- Pulsanti di navigazione -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+  </div>
+</div>

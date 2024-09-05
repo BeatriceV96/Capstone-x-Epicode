@@ -3,6 +3,8 @@ using NovaVerse.Interfaces;
 using NovaVerse.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace NovaVerse.Controllers
 {
@@ -17,41 +19,49 @@ namespace NovaVerse.Controllers
             _userService = userService;
         }
 
-        // Registrazione
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var result = await _userService.Register(registerDto);
-            if (result)
+            if (!result)
             {
-                return Ok();
-            }
-            return BadRequest("User registration failed.");
-        }
-
-        // Login
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
-        {
-            var userDto = await _userService.Login(loginDto);
-            if (userDto == null)
-            {
-                return Unauthorized("Invalid username or password");
+                return BadRequest("Registration failed");
             }
 
-            return Ok(userDto);  // Ritorna l'oggetto UserDto
-        }
-
-        // Logout
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            await _userService.Logout();
             return Ok();
         }
 
-        // Metodo per ottenere l'utente corrente autenticato
-        [Authorize]  // Assicura che l'utente sia autenticato
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            var user = await _userService.Login(loginDto);
+            if (user == null)
+            {
+                return Unauthorized("Invalid credentials");
+            }
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
+            return Ok(new { user });
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok();
+        }
+
+        [Authorize]
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {
@@ -64,7 +74,7 @@ namespace NovaVerse.Controllers
                     var user = await _userService.GetUserById(int.Parse(userId));
                     if (user != null)
                     {
-                        return Ok(user);  // Ritorna i dettagli dell'utente autenticato
+                        return Ok(user);
                     }
                 }
             }
@@ -73,3 +83,4 @@ namespace NovaVerse.Controllers
         }
     }
 }
+

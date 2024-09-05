@@ -1,75 +1,71 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { iUser } from '../Models/i-user';
 import { IAuthData } from '../Models/i-auth-data';
+import { iAuthResponse } from '../Models/i-auth-response';
+import { iUser } from '../Models/i-user';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private authSubject = new BehaviorSubject<null | iUser>(null);
-  user$ = this.authSubject.asObservable(); // Observable per i componenti
-  private isLoggedIn = false; // Stato per il login
+  private baseUrl = 'http://localhost:5034/api';  // URL del backend
+  private userLoggedIn = false;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient) {}
+
+  // Metodo per inizializzare l'utente quando l'app parte
+  initializeUser(): void {
     this.restoreUser();
   }
 
-  // URL delle API del backend ASP.NET Core
-  loginUrl: string = 'https://localhost:5034/api/auth/login';
-  registerUrl: string = 'https://localhost:5034/api/auth/register';
-  logoutUrl: string = 'https://localhost:5034/api/auth/logout'; // endpoint di logout dal backend
-
-  // Metodo di login
-  login(authData: IAuthData): Observable<iUser> {
-    return this.http.post<iUser>(this.loginUrl, authData).pipe(
-      tap(user => {
-        this.authSubject.next(user); // Aggiorna lo stato dell'utente
-        this.isLoggedIn = true; // Imposta lo stato come loggato
+  // Login
+  login(authData: IAuthData): Observable<iAuthResponse> {
+    return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData).pipe(
+      tap((res) => {
+        this.authSubject.next(res.user);  // Memorizza l'utente nel BehaviorSubject
+        this.userLoggedIn = true;  // Imposta lo stato dell'utente come loggato
       })
     );
   }
 
-  // Metodo di registrazione
-  register(newUser: Partial<iUser>): Observable<iUser> {
-    return this.http.post<iUser>(this.registerUrl, newUser).pipe(
-      tap(user => {
-        this.authSubject.next(user); // Dopo la registrazione, effettua il login automatico
-        this.isLoggedIn = true;
-      })
-    );
+  // Registrazione
+  register(newUser: Partial<iUser>): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/register`, newUser);
   }
 
-  // Metodo di logout
+  // Logout
   logout(): void {
-    this.http.post(this.logoutUrl, {}).subscribe(() => {
-      this.authSubject.next(null); // Reset dello stato dell'utente
-      this.isLoggedIn = false; // Imposta lo stato come non loggato
-      this.router.navigate(['/auth/login']); // Reindirizza alla pagina di login
-    });
+    this.authSubject.next(null);  // Resetta lo stato dell'utente
+    this.userLoggedIn = false;  // Imposta l'utente come sloggato
+    // Se necessario, puoi anche fare una chiamata al backend per gestire il logout
+    this.http.post(`${this.baseUrl}/auth/logout`, {}).subscribe();
   }
 
-  // Metodo per ripristinare l'utente autenticato dal backend (se esiste una sessione attiva)
-  restoreUser(): void {
-    this.http.get<iUser>('https://localhost:5034/api/auth/currentUser').subscribe(
-      user => {
-        if (user) {
-          this.authSubject.next(user); // Ripristina l'utente se c'è una sessione attiva
-          this.isLoggedIn = true;
-        }
+  // Controlla se l'utente è loggato
+  isAuthenticated(): boolean {
+    return this.userLoggedIn;
+  }
+
+  // Restituisce l'utente corrente
+  getCurrentUser(): iUser | null {
+    return this.authSubject.value;
+  }
+
+  // Metodo per ripristinare l'utente (da completare in base al tuo backend)
+  private restoreUser(): void {
+    this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`).subscribe(
+      (user) => {
+        this.authSubject.next(user);
+        this.userLoggedIn = true;
       },
       () => {
-        this.authSubject.next(null); // Se non ci sono sessioni attive, resetta lo stato
+        this.authSubject.next(null);
+        this.userLoggedIn = false;
       }
     );
   }
-
-  // Metodo per sapere se l'utente è loggato
-  isAuthenticated(): boolean {
-    return this.isLoggedIn;
-  }
 }
+

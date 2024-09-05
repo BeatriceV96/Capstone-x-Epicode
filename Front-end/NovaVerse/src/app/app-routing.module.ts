@@ -1,25 +1,19 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GuestGuard } from './auth/guest.guard';
-import { AuthComponent } from './auth/auth.component';
+
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { HomeComponent } from './Pages/home/home.component';
 
 const routes: Routes = [
-  // Rotte accessibili solo ai non autenticati (ospiti)
-  {
-    path: 'auth',
-    component: AuthComponent,
-    canActivate: [GuestGuard],  // Proteggiamo queste rotte per i non autenticati
-    children: [
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent }
-    ]
-  },
+  { path: '', component: HomeComponent },
+  { path: 'auth/login', component: LoginComponent },
+  { path: 'auth/register', component: RegisterComponent },
+  { path: '**', redirectTo: '' }, // Default redirect for invalid routes
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

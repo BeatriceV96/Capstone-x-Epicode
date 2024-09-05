@@ -68,6 +68,21 @@ namespace NovaVerse.Services
             return userDto;
         }
 
+        public async Task<UserDto> GetUserById(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return null;
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role.ToString()
+            };
+
+            return userDto;
+        }
 
         public async Task Logout()
         {

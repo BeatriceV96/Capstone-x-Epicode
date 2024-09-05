@@ -1,30 +1,30 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';  // Usa provideHttpClient
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { AuthComponent } from './auth/auth.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { FormsModule } from '@angular/forms';
+import { HomeComponent } from './Pages/home/home.component';
+import { AuthModule } from './auth/auth.module';
+import { NavbarComponent } from './Main-component/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    RegisterComponent,
-    AuthComponent
+    HomeComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
-    FormsModule
+    FormsModule,
+    AuthModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    provideHttpClient(withInterceptorsFromDi()),   //QUESTO IMPORTANTISSIMO, VERSIONE RECENTE
   ],
   bootstrap: [AppComponent]
 })

@@ -1,26 +1,27 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { IAuthData } from '../../Models/i-auth-data';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
+  authData = { email: '', password: '' };
 
-  authData:IAuthData = {
-    email:'',
-    password:''
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private authSvc:AuthService, private router:Router) { }
-
-  login(){
-    this.authSvc.login(this.authData)
-    .subscribe(()=>{
-      this.router.navigate(['/dashboard'])
-    })
+  login(): void {
+    this.authService.login(this.authData).subscribe(
+      () => {
+        Swal.fire('Success', 'Login effettuato con successo!', 'success');
+        this.router.navigate(['/dashboard']);
+      },
+      () => {
+        Swal.fire('Error', 'Email o Password errati', 'error');
+      }
+    );
   }
 }

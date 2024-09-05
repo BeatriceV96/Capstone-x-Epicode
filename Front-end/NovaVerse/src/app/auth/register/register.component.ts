@@ -1,21 +1,28 @@
 import { Component } from '@angular/core';
+
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
-import { iUser } from '../../Models/i-user';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
+  newUser = { nome: '', email: '', password: '', role: 'Cliente' };  // Valore di default per il ruolo
 
-  newUser:Partial<iUser> = {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(private authSvc:AuthService){}
-
-  register(){
-    this.authSvc.register(this.newUser).subscribe(()=>{
-      //avviso o redireziono l'utente
-    })
+  register(): void {
+    this.authService.register(this.newUser).subscribe(
+      () => {
+        Swal.fire('Success', 'Registrazione completata!', 'success');
+        this.router.navigate(['/login']);  // Reindirizza al login dopo la registrazione
+      },
+      () => {
+        Swal.fire('Error', 'Errore nella registrazione', 'error');
+      }
+    );
   }
 }
