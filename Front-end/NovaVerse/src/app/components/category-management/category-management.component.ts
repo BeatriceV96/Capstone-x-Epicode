@@ -44,6 +44,8 @@ export class CategoryManagementComponent implements OnInit {
         () => {
           this.message = 'Categoria creata con successo';
           this.success = true;
+
+          // Ricarica la lista delle categorie
           this.loadCategories();
           this.resetForm();
         },
@@ -54,6 +56,7 @@ export class CategoryManagementComponent implements OnInit {
       ).add(() => this.loading = false);  // Fine del caricamento
     }
   }
+
 
   // Modifica una categoria esistente
   editCategory(category: Category): void {
