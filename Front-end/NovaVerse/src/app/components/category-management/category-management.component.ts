@@ -67,10 +67,18 @@ export class CategoryManagementComponent implements OnInit {
     if (this.selectedCategoryId && this.categoryForm.name && this.categoryForm.description) {
       this.loading = true;
       this.categoryService.updateCategory(this.selectedCategoryId, this.categoryForm).subscribe(
-        () => {
+        (updatedCategory) => {
           this.message = 'Categoria aggiornata con successo';
           this.success = true;
-          this.loadCategories();
+
+          // Trova l'indice della categoria da aggiornare
+          const index = this.categories.findIndex(cat => cat.id === this.selectedCategoryId);
+
+          // Aggiorna la categoria nell'array locale
+          if (index !== -1) {
+            this.categories[index] = updatedCategory;
+          }
+
           this.resetForm();
         },
         (error) => {
@@ -86,10 +94,12 @@ export class CategoryManagementComponent implements OnInit {
     if (confirm('Sei sicuro di voler eliminare questa categoria?')) {
       this.loading = true;
       this.categoryService.deleteCategory(id).subscribe(
-        () => {
+        (response) => {
           this.message = 'Categoria eliminata con successo';
           this.success = true;
-          this.loadCategories();
+
+          // Rimuovi la categoria dall'array locale
+          this.categories = this.categories.filter(cat => cat.id !== id);
         },
         (error) => {
           this.message = 'Errore nell\'eliminazione della categoria';
@@ -99,7 +109,7 @@ export class CategoryManagementComponent implements OnInit {
     }
   }
 
-  // Resetta il form
+  // Resetta il form e lo stato
   resetForm(): void {
     this.categoryForm = { name: '', description: '' };
     this.selectedCategoryId = null;

@@ -1,4 +1,4 @@
-<div class="container mx-auto mt-4">
+<div class="container mx-auto mt-4"></div>
   <h2 class="text-2xl font-semibold mb-4">Gestione delle Categorie</h2>
 
   <!-- Notifica di successo o errore -->
@@ -55,11 +55,9 @@
             </button>
           </td>
         </tr>
-        <!-- Mostra messaggio se non ci sono categorie -->
         <tr *ngIf="categories.length === 0">
           <td colspan="3" class="px-4 py-2 text-center text-gray-500">Non ci sono categorie disponibili.</td>
         </tr>
       </tbody>
     </table>
   </div>
-</div>

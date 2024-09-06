@@ -22,13 +22,13 @@ export class CategoryService {
     return this.http.post<Category>(`${this.baseUrl}/create`, category, { withCredentials: true });
   }
 
-  // Aggiorna una categoria (solo per Artist)
+  // Aggiorna una categoria esistente
   updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${this.baseUrl}/update/${id}`, category);
+    return this.http.put<Category>(`${this.baseUrl}/update/${id}`, category, { withCredentials: true });
   }
 
-  // Cancella una categoria (solo per Artist)
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true });
-  }
+ // Cancella una categoria
+ deleteCategory(id: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true });
+}
 }

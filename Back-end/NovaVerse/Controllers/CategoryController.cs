@@ -57,9 +57,10 @@ namespace NovaVerse.Controllers
             var result = await _categoryService.DeleteCategoryAsync(id);
             if (!result)
             {
-                return BadRequest("Failed to delete category.");
+                return BadRequest(new { message = "Failed to delete category." });
             }
-            return Ok("Category deleted successfully.");
+            // Forzare una risposta JSON
+            return Ok(new { message = "Category deleted successfully." });
         }
     }
 }
