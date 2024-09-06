@@ -41,12 +41,13 @@ export class CategoryManagementComponent implements OnInit {
     if (this.categoryForm.name && this.categoryForm.description) {
       this.loading = true;
       this.categoryService.createCategory(this.categoryForm).subscribe(
-        () => {
+        (newCategory) => {
           this.message = 'Categoria creata con successo';
           this.success = true;
 
-          // Ricarica la lista delle categorie
-          this.loadCategories();
+          // Reindirizza alla pagina della categoria appena creata
+          this.router.navigate([`/categories/${newCategory.id}`]);
+
           this.resetForm();
         },
         (error) => {

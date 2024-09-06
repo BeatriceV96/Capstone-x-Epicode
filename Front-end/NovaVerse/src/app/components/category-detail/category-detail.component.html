@@ -1,0 +1,10 @@
+<div *ngIf="category">
+  <h2 class="text-2xl font-semibold mb-4">{{ category.name }}</h2>
+  <p>{{ category.description }}</p>
+
+  <!-- Aggiungi qui la logica per visualizzare le opere associate alla categoria -->
+</div>
+
+<div *ngIf="!category">
+  <p>Caricamento categoria...</p>
+</div>

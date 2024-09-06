@@ -12,6 +12,7 @@ import { NavbarComponent } from './Main-component/navbar/navbar.component';
 import { CategoryManagementComponent } from './components/category-management/category-management.component';
 import { RouterModule } from '@angular/router';
 import { CategoryListComponent } from './components/category-list/category-list.component';
+import { CategoryDetailComponent } from './components/category-detail/category-detail.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { CategoryListComponent } from './components/category-list/category-list.
     NavbarComponent,
     CategoryManagementComponent,
     CategoryListComponent,
+    CategoryDetailComponent,
   ],
   imports: [
     BrowserModule,

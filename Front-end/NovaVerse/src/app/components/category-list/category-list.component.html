@@ -23,7 +23,10 @@
   <!-- Elenco delle categorie -->
   <div *ngIf="categories.length > 0 && !loading; else noCategories">
     <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg p-4 mb-4">
-      <h2 class="text-xl font-semibold">{{ category.name }}</h2>
+      <!-- Aggiungi il routerLink per rendere cliccabili le categorie -->
+      <a [routerLink]="['/categories', category.id]" class="block hover:underline text-xl font-semibold text-blue-600">
+        {{ category.name }}
+      </a>
       <p>{{ category.description }}</p>
     </div>
   </div>
