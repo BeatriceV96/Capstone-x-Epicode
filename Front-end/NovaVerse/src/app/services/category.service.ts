@@ -7,27 +7,28 @@ import { Category } from '../Models/category';
   providedIn: 'root',
 })
 export class CategoryService {
-  private apiUrl = 'http://localhost:5034/api/category';  // URL del backend
+  // Definisci qui il baseUrl
+  private baseUrl = 'http://localhost:5034/api/category'; // Modifica l'URL del backend se necessario
 
   constructor(private http: HttpClient) {}
 
   // Ottieni tutte le categorie
   getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/all`, { withCredentials: true });
+    return this.http.get<Category[]>(`${this.baseUrl}/all`);
   }
 
-  // Crea una nuova categoria
+  // Crea una nuova categoria (solo per Artist)
   createCategory(category: Partial<Category>): Observable<Category> {
-    return this.http.post<Category>(`${this.apiUrl}/create`, category, { withCredentials: true });
+    return this.http.post<Category>(`${this.baseUrl}/create`, category, { withCredentials: true });
   }
 
-  // Aggiorna una categoria esistente
+  // Aggiorna una categoria (solo per Artist)
   updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/update/${id}`, category, { withCredentials: true });
+    return this.http.put<Category>(`${this.baseUrl}/update/${id}`, category);
   }
 
-  // Elimina una categoria
+  // Cancella una categoria (solo per Artist)
   deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/delete/${id}`, { withCredentials: true });
+    return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true });
   }
 }

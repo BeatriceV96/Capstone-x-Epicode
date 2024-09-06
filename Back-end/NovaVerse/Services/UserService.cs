@@ -27,8 +27,8 @@ namespace NovaVerse.Services
                 Username = registerDto.Username,
                 Password = registerDto.Password,
                 Email = registerDto.Email,
-                ProfilePictureUrl = registerDto.ProfilePictureUrl,  
-                Bio = registerDto.Bio,  
+                ProfilePictureUrl = registerDto.ProfilePictureUrl,
+                Bio = registerDto.Bio,
                 Role = Enum.Parse<User.UserRole>(registerDto.Role),  //Parsing per enum
                 CreateDate = DateTime.Now
             };

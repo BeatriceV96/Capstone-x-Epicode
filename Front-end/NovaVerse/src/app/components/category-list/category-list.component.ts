@@ -12,6 +12,8 @@ import { AuthService } from '../../services/auth.service';  // Per controllare i
 export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
   isArtist: boolean = false;
+  loading: boolean = true;  // Variabile per indicare lo stato di caricamento
+  errorMessage: string | null = null;  // Variabile per gestire eventuali errori
 
   constructor(
     private categoryService: CategoryService,
@@ -20,21 +22,27 @@ export class CategoryListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.checkRole();  // Verifica il ruolo dell'utente prima di caricare le categorie
     this.loadCategories();
-    this.checkRole();  // Controlla se l'utente è un artista
   }
 
+  // Carica le categorie
   loadCategories(): void {
+    this.loading = true;
     this.categoryService.getAllCategories().subscribe(
       (data: Category[]) => {
         this.categories = data;
+        this.loading = false;  // Fine caricamento
       },
       (error) => {
-        console.error('Failed to load categories:', error);  // Aggiungi gestione degli errori
+        this.errorMessage = 'Errore durante il caricamento delle categorie.';
+        console.error('Failed to load categories:', error);
+        this.loading = false;  // Fine caricamento, ma con errore
       }
     );
   }
 
+  // Verifica il ruolo dell'utente e reindirizza se non autenticato
   checkRole(): void {
     const user = this.authService.getCurrentUser();
     if (user) {

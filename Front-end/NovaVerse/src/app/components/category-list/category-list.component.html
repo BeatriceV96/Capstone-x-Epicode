@@ -10,8 +10,18 @@
     </ng-container>
   </div>
 
+  <!-- Mostra un loader se i dati sono in fase di caricamento -->
+  <div *ngIf="loading" class="flex justify-center items-center h-20">
+    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+  </div>
+
+  <!-- Mostra un messaggio di errore se c'è stato un errore durante il caricamento -->
+  <div *ngIf="errorMessage" class="text-red-500 font-semibold text-center">
+    {{ errorMessage }}
+  </div>
+
   <!-- Elenco delle categorie -->
-  <div *ngIf="categories.length > 0; else noCategories">
+  <div *ngIf="categories.length > 0 && !loading; else noCategories">
     <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg p-4 mb-4">
       <h2 class="text-xl font-semibold">{{ category.name }}</h2>
       <p>{{ category.description }}</p>

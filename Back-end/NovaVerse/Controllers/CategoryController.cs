@@ -8,7 +8,7 @@ namespace NovaVerse.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Policy = "ArtistOnly")]
-    public class CategoryController : Controller
+    public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
 
@@ -29,7 +29,7 @@ namespace NovaVerse.Controllers
         }
 
         [HttpGet("all")]
-        // Rimuovi temporaneamente [Authorize] per fare un test
+        [AllowAnonymous]  // Temporaneamente rimuoviamo l'autorizzazione per fare test
         public async Task<IActionResult> GetAllCategories()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
@@ -39,8 +39,6 @@ namespace NovaVerse.Controllers
             }
             return Ok(categories);
         }
-
-
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDto categoryDto)

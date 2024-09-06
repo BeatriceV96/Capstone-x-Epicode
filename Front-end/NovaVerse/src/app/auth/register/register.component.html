@@ -7,42 +7,56 @@
         <label for="username" class="block text-sm text-white mb-2">Username</label>
         <input formControlName="username" id="username" placeholder="Enter Username"
                class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <!-- Messaggio di errore -->
+        <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="text-red-500 text-sm mt-2">
+          Il campo username è obbligatorio.
+        </div>
       </div>
 
       <div class="form-group mb-4">
         <label for="email" class="block text-sm text-white mb-2">Email</label>
         <input formControlName="email" id="email" type="email" placeholder="Enter Email"
                class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <!-- Messaggio di errore -->
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-red-500 text-sm mt-2">
+          Inserisci un'email valida.
+        </div>
       </div>
 
       <div class="form-group mb-4">
         <label for="password" class="block text-sm text-white mb-2">Password</label>
         <input formControlName="password" id="password" type="password" placeholder="Password"
                class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <!-- Messaggio di errore -->
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-red-500 text-sm mt-2">
+          La password è obbligatoria.
+        </div>
       </div>
 
       <div class="form-group mb-4">
-        <label for="role" class="block text-sm text-white mb-2">Role</label>
+        <label for="role" class="block text-sm text-white mb-2">Ruolo</label>
         <select formControlName="role"
                 class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black border border-gray-500">
-          <option value="Artist">Artist</option>
-          <option value="Buyer">Buyer</option>
+          <option value="Artist">Artista</option>
+          <option value="Buyer">Acquirente</option>
         </select>
       </div>
 
       <div class="form-group mb-4">
-        <label for="profilePictureUrl" class="block text-sm text-white mb-2">Profile Picture URL</label>
-        <input formControlName="profilePictureUrl" id="profilePictureUrl" placeholder="Profile Picture URL"
+        <label for="profilePictureUrl" class="block text-sm text-white mb-2">URL Immagine Profilo</label>
+        <input formControlName="profilePictureUrl" id="profilePictureUrl" placeholder="URL Immagine Profilo"
                class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
       </div>
 
       <div class="form-group mb-6">
-        <label for="bio" class="block text-sm text-white mb-2">Bio</label>
-        <textarea formControlName="bio" id="bio" placeholder="Tell us about yourself"
+        <label for="bio" class="block text-sm text-white mb-2">Biografia</label>
+        <textarea formControlName="bio" id="bio" placeholder="Raccontaci di te"
                   class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500"></textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">Register</button>
+      <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+        {{ isLoading ? 'Registrazione in corso...' : 'Register' }}
+      </button>
     </form>
 
     <!-- Messaggio per il login -->

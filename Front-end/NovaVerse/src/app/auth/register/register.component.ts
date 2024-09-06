@@ -10,17 +10,20 @@ import { Router } from '@angular/router'; // Per la navigazione
 })
 export class RegisterComponent {
   registerForm: FormGroup;
+  isLoading = false;
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService, // Assicurati che AuthService sia iniettato
+    private authService: AuthService,
     private router: Router
   ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      role: ['Buyer', Validators.required],  // Imposta un valore predefinito come 'Buyer'
+      role: ['Buyer', Validators.required],
       profilePictureUrl: [''],
       bio: ['']
     });
@@ -28,13 +31,16 @@ export class RegisterComponent {
 
   onSubmit() {
     if (this.registerForm.valid) {
+      this.isLoading = true;  // Mostra il caricamento
       this.authService.register(this.registerForm.value).subscribe(
         (response) => {
-          console.log('Registration successful', response);
-          this.router.navigate(['/']);  // Redirige alla home dopo la registrazione
+          console.log('Registrazione avvenuta con successo', response);
+          this.isLoading = false;  // Nascondi il caricamento
+          this.router.navigate(['/']);  // Reindirizza alla home dopo la registrazione
         },
         (error: any) => {
-          console.error('Registration failed', error);
+          console.error('Registrazione fallita', error);
+          this.isLoading = false;  // Nascondi il caricamento anche in caso di errore
         }
       );
     }
