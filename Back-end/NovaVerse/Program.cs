@@ -29,8 +29,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services
     .AddAuthorization(opt =>
     {
-        opt.AddPolicy(Policies.Artist, policy =>
-        policy.RequireRole("Artist")); // Verifica che l'utente abbia il ruolo "Artist"
+        opt.AddPolicy("ArtistOnly", policy =>
+            policy.RequireRole("Artist"));
 
         opt.AddPolicy(Policies.Client, policy =>
             policy.RequireRole("Client")); // Verifica che l'utente abbia il ruolo "Client"
@@ -51,10 +51,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
         builder => builder
-            .WithOrigins("http://localhost:4200") 
+            .WithOrigins("http://localhost:4200")  // Indica il dominio Angular
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials());
+            .AllowCredentials());  // Consentire le credenziali (cookies)
 });
 
 
@@ -66,14 +66,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowAngularApp"); // CORS deve essere impostato prima di Authentication e Authorization
 
 app.UseHttpsRedirection();
 

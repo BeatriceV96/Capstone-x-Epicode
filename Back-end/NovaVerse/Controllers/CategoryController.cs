@@ -17,17 +17,6 @@ namespace NovaVerse.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllCategories()
-        {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-            if (categories == null)
-            {
-                return NotFound();
-            }
-            return Ok(categories);
-        }
-
         [HttpPost("create")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
@@ -38,6 +27,20 @@ namespace NovaVerse.Controllers
             }
             return Ok(category);
         }
+
+        [HttpGet("all")]
+        // Rimuovi temporaneamente [Authorize] per fare un test
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            if (categories == null)
+            {
+                return NotFound();
+            }
+            return Ok(categories);
+        }
+
+
 
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDto categoryDto)

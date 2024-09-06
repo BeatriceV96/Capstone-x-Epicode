@@ -79,9 +79,8 @@ export class AuthService {
 
   // Restituisce l'utente corrente
   getCurrentUser(): iUser | null {
-    return this.authSubject.value;
+    return this.authSubject.value;  // Assumendo che authSubject gestisca l'utente autenticato
   }
-
   // Metodo per ripristinare l'utente al ricaricamento della pagina
   restoreUser(): void {
     this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`).subscribe(
@@ -95,4 +94,5 @@ export class AuthService {
       }
     );
   }
+
 }

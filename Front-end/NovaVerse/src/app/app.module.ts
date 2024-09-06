@@ -9,12 +9,17 @@ import { FormsModule } from '@angular/forms';
 import { HomeComponent } from './Pages/home/home.component';
 import { AuthModule } from './auth/auth.module';
 import { NavbarComponent } from './Main-component/navbar/navbar.component';
+import { CategoryManagementComponent } from './components/category-management/category-management.component';
+import { RouterModule } from '@angular/router';
+import { CategoryListComponent } from './components/category-list/category-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     NavbarComponent,
+    CategoryManagementComponent,
+    CategoryListComponent,
   ],
   imports: [
     BrowserModule,
@@ -22,6 +27,7 @@ import { NavbarComponent } from './Main-component/navbar/navbar.component';
     NgbModule,
     FormsModule,
     AuthModule,
+    RouterModule
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),   //QUESTO IMPORTANTISSIMO, VERSIONE RECENTE

@@ -2,17 +2,16 @@
   <div class="container mx-auto flex justify-between items-center">
     <!-- Logo Section -->
     <div class="flex items-center">
-      <img src="assets/logo.png" alt="NovaVerse" class="w-12 h-12">   <!---aggiusta logo------>
+      <img src="assets/logo.png" alt="NovaVerse Logo" class="w-12 h-12"> <!-- Immagine logo -->
       <span class="text-xl font-semibold text-white">NovaVerse</span>
     </div>
 
     <!-- Middle Navigation Links -->
     <div class="hidden md:flex space-x-6 text-white">
-      <a href="#" class="hover:text-gray-400">Home</a>
-      <a href="#" class="hover:text-gray-400">Category</a>
+      <a routerLink="/" class="hover:text-gray-400">Home</a>
+      <a routerLink="/categories" class="hover:text-gray-400">Category</a>
       <a href="#" class="hover:text-gray-400">Art</a>
       <a href="#" class="hover:text-gray-400">Artists</a>
-      <a href="#" class="hover:text-gray-400">Photography</a>
       <a href="#" class="hover:text-gray-400">NFT (coming soon)</a>
       <a href="#" class="hover:text-gray-400">Crypto</a>
     </div>
@@ -20,7 +19,7 @@
     <!-- Right Side Section -->
     <div class="flex items-center space-x-4">
       <ng-container *ngIf="isLoggedIn(); else guestLinks">
-        <!-- Icone Profilo, Carrello e Logout rotondeggianti -->
+        <!-- Icone Profilo, Carrello e Logout -->
         <a routerLink="/profile" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
           <i class="fas fa-user"></i>
         </a>
