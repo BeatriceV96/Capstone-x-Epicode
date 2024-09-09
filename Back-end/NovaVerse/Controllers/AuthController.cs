@@ -28,8 +28,14 @@ namespace NovaVerse.Controllers
                 return BadRequest("Registration failed");
             }
 
-            return Ok();
+            // Recupera l'utente appena creato
+            var user = await _userService.Login(new LoginDto { Username = registerDto.Username, Password = registerDto.Password });
+
+            // Restituisci i dettagli dell'utente registrato
+            return Ok(user);
         }
+
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {

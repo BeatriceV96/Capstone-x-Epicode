@@ -1,13 +1,9 @@
 ﻿using NovaVerse.Dto;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace NovaVerse.Interfaces
+public interface IUserDashboardService
 {
-    public interface IUserDashboardService
-    {
-        Task<List<UserActivityDto>> GetUserActivitiesAsync(int userId);
-        Task<List<PurchaseSummaryDto>> GetUserPurchasesAsync(int userId);
-        Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto);
-    }
+    Task<UserDto> GetUserById(int userId);  // Definisci questo metodo
+    Task<List<UserActivityDto>> GetUserActivitiesAsync(int userId);
+    Task<List<PurchaseSummaryDto>> GetUserPurchasesAsync(int userId);
+    Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto);
 }

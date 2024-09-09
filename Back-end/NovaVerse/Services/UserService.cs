@@ -27,10 +27,10 @@ namespace NovaVerse.Services
                 Username = registerDto.Username,
                 Password = registerDto.Password,
                 Email = registerDto.Email,
-                ProfilePictureUrl = registerDto.ProfilePictureUrl,
-                Bio = registerDto.Bio,
-                Role = Enum.Parse<User.UserRole>(registerDto.Role),  //Parsing per enum
-                CreateDate = DateTime.Now
+                ProfilePictureUrl = registerDto.ProfilePictureUrl,  // Assicurati che questo campo sia mappato
+                Bio = registerDto.Bio,  // Assicurati che questo campo sia mappato
+                Role = Enum.Parse<User.UserRole>(registerDto.Role),
+                CreateDate = DateTime.Now  // Imposta la data di creazione
             };
 
             _context.Users.Add(user);
@@ -38,48 +38,73 @@ namespace NovaVerse.Services
             return result > 0;
         }
 
+
         public async Task<UserDto> Login(LoginDto loginDto)
         {
-            // Controlla se l'input è un'email o un nome utente
             bool isEmail = loginDto.Username.Contains('@');
 
-            // Cerca l'utente per email o nome utente
             var user = isEmail
                 ? await _context.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Username && x.Password == loginDto.Password)
                 : await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.Username && x.Password == loginDto.Password);
 
             if (user == null) return null;
 
-            // Restituisci i dettagli dell'utente come UserDto
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                Role = user.Role.ToString()
-            };
-
-            return userDto;
-        }
-
-        public async Task<UserDto> GetUserById(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return null;
-            }
-
-            // Mappa i dati dell'utente al DTO, inclusa la data di creazione
             return new UserDto
             {
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Bio = user.Bio,
-                ProfilePictureUrl = user.ProfilePictureUrl,
-                CreateDate = user.CreateDate // Assicurati che venga incluso
+                Role = user.Role.ToString(),
+                Bio = user.Bio, 
+                ProfilePictureUrl = user.ProfilePictureUrl,  
+                CreateDate = user.CreateDate  
+            };
+        }
+
+
+        public async Task<UserDto> GetUserById(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Bio = user.Bio,  // Recupera la bio
+                ProfilePictureUrl = user.ProfilePictureUrl,  // Recupera l'URL del profilo
+                CreateDate = user.CreateDate  // Recupera la data di creazione
+            };
+        }
+
+
+        public async Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Aggiorna i campi modificabili
+            user.Username = userDto.Username;
+            user.Email = userDto.Email;
+            user.Bio = userDto.Bio;  // Aggiorna la bio
+            user.ProfilePictureUrl = userDto.ProfilePictureUrl;
+
+            await _context.SaveChangesAsync();
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Bio = user.Bio,  // Restituisci la bio aggiornata
+                CreateDate = user.CreateDate
             };
         }
 

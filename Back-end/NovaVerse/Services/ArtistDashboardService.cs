@@ -56,7 +56,25 @@ namespace NovaVerse.Services
             return sales;
         }
 
-        // Nuovo metodo per aggiornare il profilo dell'artista
+        public async Task<UserDto> GetUserById(int id)
+        {
+            var artist = await _context.Users.FindAsync(id);
+            if (artist == null)
+            {
+                return null;
+            }
+
+            return new UserDto
+            {
+                Id = artist.Id,
+                Username = artist.Username,
+                Email = artist.Email,
+                Bio = artist.Bio,  // Recupera la bio
+                ProfilePictureUrl = artist.ProfilePictureUrl,  // Recupera l'URL del profilo
+                CreateDate = artist.CreateDate  // Recupera la data di creazione
+            };
+        }
+
         public async Task<UserDto> UpdateArtistProfileAsync(UserDto userDto)
         {
             var artist = await _context.Users.FirstOrDefaultAsync(u => u.Id == userDto.Id);
@@ -79,9 +97,11 @@ namespace NovaVerse.Services
                 Id = artist.Id,
                 Username = artist.Username,
                 Email = artist.Email,
-                Role = artist.Role.ToString()
+                Role = artist.Role.ToString(),
+                Bio = artist.Bio,
+                ProfilePictureUrl = artist.ProfilePictureUrl,
+                CreateDate = artist.CreateDate
             };
         }
-
     }
 }

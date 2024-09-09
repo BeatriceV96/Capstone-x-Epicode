@@ -9,5 +9,6 @@ namespace NovaVerse.Interfaces
         Task<UserDto> Login(LoginDto loginDto);
         Task Logout();
         Task<UserDto> GetUserById(int userId);
+        Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto);
     }
 }

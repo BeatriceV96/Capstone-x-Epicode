@@ -19,26 +19,50 @@ namespace NovaVerse.Controllers
             _artistDashboardService = artistDashboardService;
         }
 
+        private int? GetArtistId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+            {
+                return null;
+            }
+            return int.Parse(claim.Value);
+        }
+
         [HttpGet("artworks")]
         public async Task<IActionResult> GetArtistArtworks()
         {
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var artworks = await _artistDashboardService.GetArtistArtworksAsync(artistId);
+            var artistId = GetArtistId();
+            if (artistId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+
+            var artworks = await _artistDashboardService.GetArtistArtworksAsync(artistId.Value);
             return Ok(artworks);
         }
 
         [HttpGet("sales")]
         public async Task<IActionResult> GetArtistSales()
         {
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var sales = await _artistDashboardService.GetArtistSalesAsync(artistId);
+            var artistId = GetArtistId();
+            if (artistId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+
+            var sales = await _artistDashboardService.GetArtistSalesAsync(artistId.Value);
             return Ok(sales);
         }
 
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateArtistProfile([FromBody] UserDto userDto)
         {
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var artistId = GetArtistId();
+            if (artistId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
 
             // Assicurati che l'artista stia aggiornando il proprio profilo
             if (artistId != userDto.Id)
@@ -57,5 +81,23 @@ namespace NovaVerse.Controllers
             return Ok(updatedArtist);
         }
 
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetArtistProfile()
+        {
+            var artistId = GetArtistId();
+            if (artistId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+
+            var artist = await _artistDashboardService.GetUserById(artistId.Value);
+
+            if (artist == null)
+            {
+                return NotFound("Artist not found.");
+            }
+
+            return Ok(artist); // Restituisce il profilo artista con bio e data di creazione
+        }
     }
 }

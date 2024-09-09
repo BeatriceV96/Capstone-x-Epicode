@@ -4,15 +4,20 @@ import { Observable } from 'rxjs';
 import { iUser } from '../Models/i-user';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-  private baseUrl = 'http://localhost:5034/api/user-dashboard';  // Aggiorna l'URL se necessario
+  private baseUrl = 'http://localhost:5034/api/userdashboard';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // Metodo per aggiornare il profilo dell'utente
-  updateUserProfile(user: iUser): Observable<iUser> {
-    return this.http.put<iUser>(`${this.baseUrl}/update-profile`, user);
+  // Ottiene il profilo utente dal backend
+  getUserProfile(): Observable<iUser> {
+    return this.http.get<iUser>(`${this.baseUrl}/profile`);
+  }
+
+  // Aggiorna il profilo utente
+  updateUserProfile(updatedUser: iUser): Observable<iUser> {
+    return this.http.put<iUser>(`${this.baseUrl}/update-profile`, updatedUser);
   }
 }

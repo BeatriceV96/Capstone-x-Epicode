@@ -1,34 +1,49 @@
-<div class="container mx-auto mt-5">
-  <h1 class="text-2xl font-bold mb-6">Profilo Utente</h1>
+<div class="profile-container" *ngIf="user">
+  <!-- Mostra i dati del profilo utente -->
+  <h2>Profilo di {{ user.username }}</h2>
 
-  <!-- Dati dell'utente -->
-  <div class="profile-details mb-8 p-4 bg-gray-100 rounded-lg shadow-md flex items-center">
-    <img *ngIf="user?.profilePictureUrl" [src]="user?.profilePictureUrl" alt="Foto profilo" class="w-32 h-32 rounded-full mr-6">
-    <div>
-      <h2 class="text-xl font-semibold">{{ user?.username }}</h2>
-      <p class="text-gray-700">Email: {{ user?.email }}</p>
-      <p class="text-gray-700">Ruolo: {{ user?.role }}</p>
-      <p class="text-gray-700">ID Utente: {{ user?.id }}</p>
+  <div class="profile-field">
+    <strong>Email:</strong>
+    <span>{{ user.email }}</span>
+  </div>
 
-      <!-- Mostra la biografia se non siamo in modalità di modifica -->
-      <ng-container *ngIf="!isEditingBio; else editBioForm">
-        <p class="text-gray-700">Bio: {{ user?.bio || 'Nessuna biografia disponibile.' }}</p>
-        <button (click)="enableBioEdit()" class="text-blue-500 hover:underline">Modifica Bio</button>
-      </ng-container>
+  <div class="profile-field">
+    <strong>Ruolo:</strong>
+    <span>{{ user.role }}</span>
+  </div>
 
-      <!-- Modifica la biografia -->
-      <ng-template #editBioForm>
-        <textarea [(ngModel)]="updatedBio" class="border border-gray-300 p-2 rounded w-full"></textarea>
-        <button (click)="saveBio()" class="bg-green-500 text-white px-4 py-2 rounded mt-2">Salva</button>
-        <button (click)="cancelBioEdit()" class="bg-red-500 text-white px-4 py-2 rounded mt-2 ml-2">Annulla</button>
-      </ng-template>
+  <div class="profile-field">
+    <strong>Creato il:</strong>
+    <span>{{ user.createDate | date:'medium' }}</span> <!-- Formattazione della data -->
+  </div>
+
+  <!-- Visualizzazione e modifica della biografia -->
+  <div class="profile-field">
+    <strong>Biografia:</strong>
+    <div *ngIf="!isEditingBio">
+      <p>{{ user.bio || 'Nessuna biografia disponibile.' }}</p>
+      <button (click)="enableBioEdit()">Modifica Biografia</button>
+    </div>
+
+    <div *ngIf="isEditingBio">
+      <textarea [(ngModel)]="updatedBio"></textarea>
+      <button (click)="saveBio()">Salva</button>
+      <button (click)="cancelBioEdit()">Annulla</button>
     </div>
   </div>
 
-  <!-- Sezione dettagli aggiuntivi dell'utente -->
-  <div class="additional-info p-4 bg-gray-100 rounded-lg shadow-md mb-8">
-    <h3 class="text-xl font-semibold mb-4">Dettagli aggiuntivi</h3>
-    <p class="text-gray-700">Data di creazione: {{ user?.createDate | date:'medium' }}</p>
-    <!-- Aggiungi ulteriori dettagli dell'utente qui -->
+  <!-- Mostra l'immagine del profilo, se esiste -->
+  <div class="profile-field">
+    <strong>Immagine del profilo:</strong>
+    <div *ngIf="user.profilePictureUrl">
+      <img [src]="user.profilePictureUrl" alt="Immagine del profilo di {{ user.username }}" class="profile-picture"/>
+    </div>
+    <div *ngIf="!user.profilePictureUrl">
+      <p>Nessuna immagine del profilo disponibile.</p>
+    </div>
   </div>
+</div>
+
+<div *ngIf="!user">
+  <p>Caricamento dati utente...</p>
 </div>

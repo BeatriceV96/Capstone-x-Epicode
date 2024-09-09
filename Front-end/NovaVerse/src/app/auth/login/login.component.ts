@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router'; // Importa Router
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
 
 @Component({
   selector: 'app-login',
@@ -11,11 +10,12 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  loginError: string | null = null; // Variabile per gestire errori di login
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router // Inietta il Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -36,11 +36,18 @@ export class LoginComponent implements OnInit {
         next: (response) => {
           console.log('Login successful:', response);
 
-          // Reindirizza alla home dopo il login
-          this.router.navigate(['/home']); // Reindirizzamento alla home
+          // Reindirizzamento in base al ruolo dell'utente
+          if (response.user.role === 'Artist') {
+            this.router.navigate(['/artist-dashboard']);
+          } else if (response.user.role === 'Buyer') {
+            this.router.navigate(['/buyer-dashboard']);
+          } else {
+            this.router.navigate(['/home']); // Default per ruoli non previsti
+          }
         },
         error: (error) => {
           console.log('Login failed:', error);
+          this.loginError = 'Credenziali non valide. Riprova.'; // Gestisce l'errore di login
         }
       });
     }

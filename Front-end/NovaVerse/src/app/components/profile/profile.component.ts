@@ -21,10 +21,22 @@ export class ProfileComponent implements OnInit {
 
   // Carica i dati dell'utente
   loadUserProfile(): void {
+    // Usa l'AuthService per ottenere l'utente loggato
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.user = currentUser;
       this.updatedBio = this.user.bio || '';  // Inizializza la biografia
+
+      // Carica i dati dal backend per assicurarsi di avere le informazioni più aggiornate (bio e data creazione)
+      this.userService.getUserProfile().subscribe(
+        (response: iUser) => {
+          this.user = response;
+          this.updatedBio = this.user.bio || '';  // Assicurati che la bio sia inizializzata
+        },
+        (error) => {
+          console.error('Errore durante il caricamento del profilo', error);
+        }
+      );
     }
   }
 

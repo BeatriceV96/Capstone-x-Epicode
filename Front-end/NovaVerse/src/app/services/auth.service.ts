@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IAuthData } from '../Models/i-auth-data';
 import { iAuthResponse } from '../Models/i-auth-response';
@@ -35,6 +35,10 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/auth/register`, newUser).pipe(
       tap(() => {
         this.router.navigate(['/login']);  // Reindirizza alla pagina di login dopo la registrazione
+      }),
+      catchError((error) => {
+        console.error('Errore durante la registrazione', error);
+        throw error;
       })
     );
   }
@@ -43,7 +47,7 @@ export class AuthService {
   login(authData: IAuthData): Observable<iAuthResponse> {
     return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData, { withCredentials: true }).pipe(
       tap((res) => {
-        const user = {
+        const user: iUser = {
           id: res.user.id,
           username: res.user.username,
           email: res.user.email,
@@ -64,6 +68,10 @@ export class AuthService {
         } else if (res.user.role === 'Buyer') {
           this.router.navigate(['/buyer-dashboard']);
         }
+      }),
+      catchError((error) => {
+        console.error('Errore durante il login', error);
+        throw error;
       })
     );
   }
@@ -75,9 +83,14 @@ export class AuthService {
     localStorage.removeItem('user');  // Rimuovi l'utente dal localStorage
 
     // Effettua il logout dal backend
-    this.http.post(`${this.baseUrl}/auth/logout`, {}, { withCredentials: true }).subscribe(() => {
-      this.router.navigate(['/']);  // Reindirizza alla home dopo il logout
-    });
+    this.http.post(`${this.baseUrl}/auth/logout`, {}, { withCredentials: true }).subscribe(
+      () => {
+        this.router.navigate(['/']);  // Reindirizza alla home dopo il logout
+      },
+      (error) => {
+        console.error('Errore durante il logout', error);
+      }
+    );
   }
 
   // Controlla se l'utente è autenticato
@@ -98,7 +111,8 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(user));  // Salva nuovamente nel localStorage
         this.userLoggedIn = true;
       },
-      () => {
+      (error) => {
+        console.error('Errore durante il ripristino dell\'utente', error);
         this.authSubject.next(null);  // Se fallisce, imposta l'utente come non autenticato
         this.userLoggedIn = false;
         localStorage.removeItem('user');  // Rimuovi i dati utente se non è autenticato

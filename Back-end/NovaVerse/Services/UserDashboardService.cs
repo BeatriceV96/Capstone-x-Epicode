@@ -41,6 +41,26 @@ public class UserDashboardService : IUserDashboardService
             .ToListAsync();
     }
 
+    public async Task<UserDto> GetUserById(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Bio = user.Bio,  // Recupera la bio
+            ProfilePictureUrl = user.ProfilePictureUrl,
+            CreateDate = user.CreateDate // Mostra la data di creazione del profilo
+        };
+    }
+
+
     public async Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto)
     {
         var user = await _context.Users.FindAsync(userId);

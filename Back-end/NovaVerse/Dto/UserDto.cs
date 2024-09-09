@@ -6,5 +6,5 @@
     public string Role { get; set; }    // Il ruolo dell'utente
     public string Bio { get; set; }      // La biografia dell'utente
     public string ProfilePictureUrl { get; set; } // URL dell'immagine del profilo
-    public DateTime CreateDate { get; set; }
+    public DateTime CreateDate { get; set; } // Data di creazione
 }
