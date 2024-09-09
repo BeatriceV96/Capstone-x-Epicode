@@ -8,6 +8,22 @@
   text-align: center;
 }
 
+/* Sezione per l'immagine del profilo */
+.profile-picture-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Sezione dei campi del profilo */
 .profile-field {
   margin-bottom: 20px;
   text-align: left;
@@ -24,14 +40,6 @@
 .profile-field p {
   font-size: 14px;
   color: #555;
-}
-
-.profile-picture {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-top: 10px;
 }
 
 button {

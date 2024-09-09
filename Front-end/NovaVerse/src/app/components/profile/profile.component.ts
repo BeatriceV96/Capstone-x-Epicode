@@ -12,6 +12,7 @@ export class ProfileComponent implements OnInit {
   user: iUser | null = null;
   isEditingBio: boolean = false;
   updatedBio: string = '';
+  selectedFile: File | null = null; // Per l'immagine del profilo
 
   constructor(private authService: AuthService, private userService: UserService) { }
 
@@ -19,41 +20,31 @@ export class ProfileComponent implements OnInit {
     this.loadUserProfile();
   }
 
-  // Carica i dati dell'utente
   loadUserProfile(): void {
-    // Usa l'AuthService per ottenere l'utente loggato
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.user = currentUser;
-      this.updatedBio = this.user.bio || '';  // Inizializza la biografia
-
-      // Carica i dati dal backend per assicurarsi di avere le informazioni più aggiornate (bio e data creazione)
-      this.userService.getUserProfile().subscribe(
-        (response: iUser) => {
-          this.user = response;
-          this.updatedBio = this.user.bio || '';  // Assicurati che la bio sia inizializzata
-        },
-        (error) => {
-          console.error('Errore durante il caricamento del profilo', error);
-        }
-      );
-    }
+    this.userService.getUserProfile().subscribe(
+      (response: iUser) => {
+        this.user = response;
+        this.updatedBio = this.user.bio || '';
+      },
+      (error) => {
+        console.error('Errore durante il caricamento del profilo', error);
+      }
+    );
   }
 
-  // Abilita la modalità di modifica della biografia
   enableBioEdit(): void {
     this.isEditingBio = true;
   }
 
-  // Salva la biografia aggiornata
   saveBio(): void {
     if (this.user) {
-      const updatedUser = { ...this.user, bio: this.updatedBio };
+      const updatedUser: iUser = { ...this.user, bio: this.updatedBio };
 
       this.userService.updateUserProfile(updatedUser).subscribe(
         (response) => {
-          this.user = response;  // Aggiorna i dati dell'utente
-          this.isEditingBio = false;  // Disabilita la modalità di modifica
+          this.user = response;
+          this.updatedBio = this.user.bio || '';
+          this.isEditingBio = false;
         },
         (error) => {
           console.error('Errore durante l\'aggiornamento del profilo', error);
@@ -62,9 +53,31 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // Annulla la modifica della biografia
   cancelBioEdit(): void {
     this.isEditingBio = false;
-    this.updatedBio = this.user?.bio || '';  // Resetta il valore della biografia
+    this.updatedBio = this.user?.bio || '';
+  }
+
+  // Gestisce la selezione del file immagine
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
+  }
+
+  // Funzione per caricare l'immagine del profilo
+  uploadProfilePicture(): void {
+    if (this.selectedFile) {
+      this.userService.updateProfilePicture(this.selectedFile).subscribe(
+        (response) => {
+          if (this.user) {
+            this.user.profilePictureUrl = response.ProfilePictureUrl; // Aggiorna l'URL dell'immagine del profilo
+          }
+          // Ricarica il profilo utente per assicurarsi che tutte le modifiche siano aggiornate
+          this.loadUserProfile();
+        },
+        (error) => {
+          console.error('Errore durante il caricamento dell\'immagine del profilo', error);
+        }
+      );
+    }
   }
 }

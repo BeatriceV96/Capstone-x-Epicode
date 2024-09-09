@@ -5,100 +5,93 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NovaVerse.Models;
 
-namespace NovaVerse.Services
+public class ArtistDashboardService : IArtistDashboardService
 {
-    public class ArtistDashboardService : IArtistDashboardService
+    private readonly NovaVerseDbContext _context;
+
+    public ArtistDashboardService(NovaVerseDbContext context)
     {
-        private readonly NovaVerseDbContext _context;
+        _context = context;
+    }
 
-        public ArtistDashboardService(NovaVerseDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<List<ArtworkSummaryDto>> GetArtistArtworksAsync(int artistId)
-        {
-            var artworks = await _context.Artworks
-                .Include(a => a.TransactionArtworks)
-                .ThenInclude(ta => ta.Transaction)
-                .Where(a => a.ArtistId == artistId)
-                .Select(a => new ArtworkSummaryDto
-                {
-                    ArtworkId = a.Id,
-                    Title = a.Title,
-                    ViewCount = a.ViewCount,
-                    SalesCount = a.TransactionArtworks.Count(),
-                    TotalEarnings = a.TransactionArtworks.Sum(ta => ta.Transaction.Amount)
-                })
-                .ToListAsync();
-
-            return artworks;
-        }
-
-        public async Task<List<SaleSummaryDto>> GetArtistSalesAsync(int artistId)
-        {
-            var sales = await _context.TransactionArtworks
-                .Include(ta => ta.Transaction)
-                .ThenInclude(t => t.Buyer)
-                .Include(ta => ta.Artwork)
-                .Where(ta => ta.Artwork.ArtistId == artistId)
-                .Select(ta => new SaleSummaryDto
-                {
-                    ArtworkId = ta.ArtworkId,
-                    ArtworkTitle = ta.Artwork.Title,
-                    SaleDate = ta.Transaction.TransactionDate,
-                    SalePrice = ta.Transaction.Amount
-                })
-                .ToListAsync();
-
-            return sales;
-        }
-
-        public async Task<UserDto> GetUserById(int id)
-        {
-            var artist = await _context.Users.FindAsync(id);
-            if (artist == null)
+    public async Task<List<ArtworkSummaryDto>> GetArtistArtworksAsync(int artistId)
+    {
+        return await _context.Artworks
+            .Include(a => a.TransactionArtworks)  // Assumendo che TransactionArtworks sia una collezione di vendite
+            .Where(a => a.ArtistId == artistId)
+            .Select(a => new ArtworkSummaryDto
             {
-                return null;
-            }
+                ArtworkId = a.Id,
+                Title = a.Title,
+                ViewCount = a.ViewCount,   // Statistiche di visualizzazione
+                SalesCount = a.TransactionArtworks.Count(), // Numero di vendite
+                TotalEarnings = a.TransactionArtworks.Sum(ta => ta.Transaction.Amount) // Guadagni totali
+            })
+            .ToListAsync();
+    }
 
-            return new UserDto
+    public async Task<List<SaleSummaryDto>> GetArtistSalesAsync(int artistId)
+    {
+        return await _context.TransactionArtworks
+            .Include(ta => ta.Transaction)
+            .Include(ta => ta.Artwork)
+            .Where(ta => ta.Artwork.ArtistId == artistId)
+            .GroupBy(ta => new
             {
-                Id = artist.Id,
-                Username = artist.Username,
-                Email = artist.Email,
-                Bio = artist.Bio,  // Recupera la bio
-                ProfilePictureUrl = artist.ProfilePictureUrl,  // Recupera l'URL del profilo
-                CreateDate = artist.CreateDate  // Recupera la data di creazione
-            };
-        }
+                ta.ArtworkId,
+                ta.Artwork.Title
+            })
+            .Select(g => new SaleSummaryDto
+            {
+                ArtworkId = g.Key.ArtworkId,
+                ArtworkTitle = g.Key.Title,
+                TotalSales = g.Sum(ta => ta.Transaction.Amount) // Totale delle vendite
+            })
+            .ToListAsync();
+    }
 
-        public async Task<UserDto> UpdateArtistProfileAsync(UserDto userDto)
+    public async Task<UserDto> GetUserById(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
         {
-            var artist = await _context.Users.FirstOrDefaultAsync(u => u.Id == userDto.Id);
-
-            if (artist == null)
-            {
-                return null;
-            }
-
-            artist.Bio = userDto.Bio;
-            artist.ProfilePictureUrl = userDto.ProfilePictureUrl;
-
-            await _context.SaveChangesAsync();
-
-            return new UserDto
-            {
-                Id = artist.Id,
-                Username = artist.Username,
-                Email = artist.Email,
-                Bio = artist.Bio,
-                ProfilePictureUrl = artist.ProfilePictureUrl,
-                CreateDate = artist.CreateDate
-            };
+            return null;
         }
 
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Bio = user.Bio,
+            ProfilePictureUrl = user.ProfilePictureUrl,
+            CreateDate = user.CreateDate
+        };
+    }
+
+    public async Task<UserDto> UpdateArtistProfileAsync(UserDto userDto)
+    {
+        var user = await _context.Users.FindAsync(userDto.Id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        user.Username = userDto.Username;
+        user.Email = userDto.Email;
+        user.Bio = userDto.Bio;
+        user.ProfilePictureUrl = userDto.ProfilePictureUrl;  // Aggiungi questa riga se vuoi aggiornare anche l'immagine del profilo
+
+        await _context.SaveChangesAsync();
+
+        return new UserDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Bio = user.Bio,
+            ProfilePictureUrl = user.ProfilePictureUrl
+        };
     }
 }

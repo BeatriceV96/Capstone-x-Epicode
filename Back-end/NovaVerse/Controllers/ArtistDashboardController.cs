@@ -9,7 +9,7 @@ namespace NovaVerse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Artist")] // Solo gli artisti possono accedere
+    [Authorize(Roles = "Artist")]
     public class ArtistDashboardController : ControllerBase
     {
         private readonly IArtistDashboardService _artistDashboardService;
@@ -19,26 +19,17 @@ namespace NovaVerse.Controllers
             _artistDashboardService = artistDashboardService;
         }
 
-        private int? GetArtistId()
+        private int GetArtistId()
         {
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (claim == null)
-            {
-                return null;
-            }
-            return int.Parse(claim.Value);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
 
         [HttpGet("artworks")]
         public async Task<IActionResult> GetArtistArtworks()
         {
             var artistId = GetArtistId();
-            if (artistId == null)
-            {
-                return Unauthorized("User ID not found.");
-            }
-
-            var artworks = await _artistDashboardService.GetArtistArtworksAsync(artistId.Value);
+            var artworks = await _artistDashboardService.GetArtistArtworksAsync(artistId);
             return Ok(artworks);
         }
 
@@ -46,34 +37,18 @@ namespace NovaVerse.Controllers
         public async Task<IActionResult> GetArtistSales()
         {
             var artistId = GetArtistId();
-            if (artistId == null)
-            {
-                return Unauthorized("User ID not found.");
-            }
-
-            var sales = await _artistDashboardService.GetArtistSalesAsync(artistId.Value);
+            var sales = await _artistDashboardService.GetArtistSalesAsync(artistId);
             return Ok(sales);
         }
 
         [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateArtistProfile([FromForm] UserDto userDto, [FromForm] IFormFile profilePicture)
+        public async Task<IActionResult> UpdateArtistProfile([FromBody] UserDto userDto)
         {
             var artistId = GetArtistId();
-            if (artistId == null)
-            {
-                return Unauthorized("User ID not found.");
-            }
 
             if (artistId != userDto.Id)
             {
                 return BadRequest("Non puoi modificare un profilo che non è il tuo.");
-            }
-
-            if (profilePicture != null && profilePicture.Length > 0)
-            {
-                // Gestisci il caricamento del file (es. salva su disco o in un servizio di storage)
-                var pictureUrl = await _fileService.SaveProfilePictureAsync(profilePicture);
-                userDto.ProfilePictureUrl = pictureUrl;  // Aggiorna l'URL dell'immagine del profilo
             }
 
             var updatedArtist = await _artistDashboardService.UpdateArtistProfileAsync(userDto);
@@ -86,17 +61,11 @@ namespace NovaVerse.Controllers
             return Ok(updatedArtist);
         }
 
-
         [HttpGet("profile")]
         public async Task<IActionResult> GetArtistProfile()
         {
             var artistId = GetArtistId();
-            if (artistId == null)
-            {
-                return Unauthorized("User ID not found.");
-            }
-
-            var artist = await _artistDashboardService.GetUserById(artistId.Value);
+            var artist = await _artistDashboardService.GetUserById(artistId);
 
             if (artist == null)
             {

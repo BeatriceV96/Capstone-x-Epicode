@@ -4,6 +4,7 @@ using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace NovaVerse.Controllers
 {
@@ -19,11 +20,16 @@ namespace NovaVerse.Controllers
             _userDashboardService = userDashboardService;
         }
 
-        // Metodo per ottenere il profilo dell'utente
+        private int GetUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
+
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserProfile()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userId = GetUserId();
             var user = await _userDashboardService.GetUserById(userId);
 
             if (user == null)
@@ -31,34 +37,13 @@ namespace NovaVerse.Controllers
                 return NotFound("User not found.");
             }
 
-            return Ok(user); // Restituisce il profilo utente con bio e data di creazione
+            return Ok(user); // Restituisce il profilo utente
         }
 
-
-        // Metodo per ottenere le attività dell'utente
-        [HttpGet("activities")]
-        public async Task<IActionResult> GetUserActivities()
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var activities = await _userDashboardService.GetUserActivitiesAsync(userId);
-            return Ok(activities);
-        }
-
-        // Metodo per ottenere gli acquisti dell'utente
-        [HttpGet("purchases")]
-        public async Task<IActionResult> GetUserPurchases()
-        {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var purchases = await _userDashboardService.GetUserPurchasesAsync(userId);
-            return Ok(purchases);
-        }
-
-        // Metodo per aggiornare il profilo dell'utente
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserDto userDto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
+            var userId = GetUserId();
             var updatedUser = await _userDashboardService.UpdateUserProfileAsync(userId, userDto);
 
             if (updatedUser == null)
@@ -66,7 +51,54 @@ namespace NovaVerse.Controllers
                 return BadRequest("Failed to update profile.");
             }
 
-            return Ok(updatedUser); // Restituisce il profilo aggiornato
+            return Ok(updatedUser);
+        }
+        [HttpPut("update-profile-picture")]
+        public async Task<IActionResult> UpdateProfilePicture([FromForm] IFormFile profilePicture)
+        {
+            var userId = GetUserId();
+
+            if (profilePicture == null || profilePicture.Length == 0)
+            {
+                return BadRequest("No profile picture provided.");
+            }
+
+            var pictureUrl = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePicture);
+
+            if (pictureUrl == null)
+            {
+                return BadRequest("Failed to update profile picture.");
+            }
+
+            return Ok(new { ProfilePictureUrl = pictureUrl });
+        }
+
+        [HttpPost("favorites/{artworkId}")]
+        public async Task<IActionResult> AddFavorite(int artworkId)
+        {
+            var userId = GetUserId();
+            var success = await _userDashboardService.AddFavoriteAsync(userId, artworkId);
+
+            if (!success)
+            {
+                return BadRequest("Failed to add favorite.");
+            }
+
+            return Ok("Favorite added.");
+        }
+
+        [HttpDelete("favorites/{artworkId}")]
+        public async Task<IActionResult> RemoveFavorite(int artworkId)
+        {
+            var userId = GetUserId();
+            var success = await _userDashboardService.RemoveFavoriteAsync(userId, artworkId);
+
+            if (!success)
+            {
+                return BadRequest("Failed to remove favorite.");
+            }
+
+            return Ok("Favorite removed.");
         }
     }
 }
