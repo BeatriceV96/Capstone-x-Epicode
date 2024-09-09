@@ -1,8 +1,8 @@
-import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { IAuthData } from '../Models/i-auth-data';
 import { iAuthResponse } from '../Models/i-auth-response';
 import { iUser } from '../Models/i-user';
@@ -48,8 +48,12 @@ export class AuthService {
           username: res.user.username,
           email: res.user.email,
           password: res.user.password,
-          role: res.user.role
+          role: res.user.role,
+          bio: res.user.bio,  // Bio dell'utente
+          profilePictureUrl: res.user.profilePictureUrl,  // URL immagine profilo
+          createDate: res.user.createDate  // Data di creazione dell'account
         };
+
         this.authSubject.next(user);  // Aggiorna lo stato dell'utente
         localStorage.setItem('user', JSON.stringify(user));  // Salva l'utente in localStorage
         this.userLoggedIn = true;
@@ -81,7 +85,7 @@ export class AuthService {
     return !!localStorage.getItem('user');  // Verifica la presenza dell'utente nel localStorage
   }
 
-  // Restituisce l'utente corrente dal soggetto
+  // Restituisce l'utente corrente dal BehaviorSubject
   getCurrentUser(): iUser | null {
     return this.authSubject.value;
   }
@@ -90,7 +94,7 @@ export class AuthService {
   restoreUser(): void {
     this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`, { withCredentials: true }).subscribe(
       (user) => {
-        this.authSubject.next(user);  // Aggiorna il soggetto con i dati dell'utente
+        this.authSubject.next(user);  // Aggiorna il BehaviorSubject con i dati dell'utente
         localStorage.setItem('user', JSON.stringify(user));  // Salva nuovamente nel localStorage
         this.userLoggedIn = true;
       },

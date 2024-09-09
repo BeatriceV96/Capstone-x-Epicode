@@ -13,6 +13,7 @@ import { CategoryManagementComponent } from './components/category-management/ca
 import { RouterModule } from '@angular/router';
 import { CategoryListComponent } from './components/category-list/category-list.component';
 import { CategoryDetailComponent } from './components/category-detail/category-detail.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { CategoryDetailComponent } from './components/category-detail/category-d
     CategoryManagementComponent,
     CategoryListComponent,
     CategoryDetailComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,

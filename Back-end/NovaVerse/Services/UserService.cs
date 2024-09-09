@@ -62,21 +62,27 @@ namespace NovaVerse.Services
             return userDto;
         }
 
-        public async Task<UserDto> GetUserById(int userId)
+        public async Task<UserDto> GetUserById(int id)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
+            var user = await _context.Users.FindAsync(id);
 
-            var userDto = new UserDto
+            if (user == null)
+            {
+                return null;
+            }
+
+            // Mappa i dati dell'utente al DTO, inclusa la data di creazione
+            return new UserDto
             {
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role.ToString()
+                Bio = user.Bio,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                CreateDate = user.CreateDate // Assicurati che venga incluso
             };
-
-            return userDto;
         }
+
 
         public async Task Logout()
         {

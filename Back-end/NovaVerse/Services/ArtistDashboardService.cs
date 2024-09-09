@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NovaVerse.Context;
+﻿using NovaVerse.Context;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NovaVerse.Models;
 
 namespace NovaVerse.Services
@@ -20,16 +21,16 @@ namespace NovaVerse.Services
         public async Task<List<ArtworkSummaryDto>> GetArtistArtworksAsync(int artistId)
         {
             var artworks = await _context.Artworks
-                .Include(a => a.TransactionArtworks) // Include la collezione di TransactionArtworks
-                .ThenInclude(ta => ta.Transaction) // Include le transazioni associate
+                .Include(a => a.TransactionArtworks)
+                .ThenInclude(ta => ta.Transaction)
                 .Where(a => a.ArtistId == artistId)
                 .Select(a => new ArtworkSummaryDto
                 {
                     ArtworkId = a.Id,
                     Title = a.Title,
-                    ViewCount = a.ViewCount, // Conteggio delle visualizzazioni dell'opera
-                    SalesCount = a.TransactionArtworks.Count(), // Conteggio delle vendite
-                    TotalEarnings = a.TransactionArtworks.Sum(ta => ta.Transaction.Amount) // Somma dei guadagni totali
+                    ViewCount = a.ViewCount,
+                    SalesCount = a.TransactionArtworks.Count(),
+                    TotalEarnings = a.TransactionArtworks.Sum(ta => ta.Transaction.Amount)
                 })
                 .ToListAsync();
 
@@ -39,22 +40,48 @@ namespace NovaVerse.Services
         public async Task<List<SaleSummaryDto>> GetArtistSalesAsync(int artistId)
         {
             var sales = await _context.TransactionArtworks
-                .Include(ta => ta.Transaction) // Include la transazione associata
-                .ThenInclude(t => t.Buyer) // Include la relazione con l'acquirente
-                .Include(ta => ta.Artwork) // Include l'opera d'arte associata
+                .Include(ta => ta.Transaction)
+                .ThenInclude(t => t.Buyer)
+                .Include(ta => ta.Artwork)
                 .Where(ta => ta.Artwork.ArtistId == artistId)
                 .Select(ta => new SaleSummaryDto
                 {
-                    ArtworkId = ta.ArtworkId, // ID dell'opera d'arte
-                    ArtworkTitle = ta.Artwork.Title, // Titolo dell'opera d'arte
-                    SaleDate = ta.Transaction.TransactionDate, // Data della transazione
-                    SalePrice = ta.Transaction.Amount // Importo della transazione
+                    ArtworkId = ta.ArtworkId,
+                    ArtworkTitle = ta.Artwork.Title,
+                    SaleDate = ta.Transaction.TransactionDate,
+                    SalePrice = ta.Transaction.Amount
                 })
                 .ToListAsync();
 
             return sales;
         }
 
+        // Nuovo metodo per aggiornare il profilo dell'artista
+        public async Task<UserDto> UpdateArtistProfileAsync(UserDto userDto)
+        {
+            var artist = await _context.Users.FirstOrDefaultAsync(u => u.Id == userDto.Id);
+
+            if (artist == null)
+            {
+                return null;
+            }
+
+            // Aggiorna i dettagli del profilo
+            artist.Username = userDto.Username;
+            artist.Email = userDto.Email;
+            artist.Bio = userDto.Bio;  // Aggiungi eventuali altre proprietà, se necessario
+            artist.ProfilePictureUrl = userDto.ProfilePictureUrl;
+
+            await _context.SaveChangesAsync();
+
+            return new UserDto
+            {
+                Id = artist.Id,
+                Username = artist.Username,
+                Email = artist.Email,
+                Role = artist.Role.ToString()
+            };
+        }
 
     }
 }

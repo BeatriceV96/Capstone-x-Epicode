@@ -34,5 +34,28 @@ namespace NovaVerse.Controllers
             var sales = await _artistDashboardService.GetArtistSalesAsync(artistId);
             return Ok(sales);
         }
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateArtistProfile([FromBody] UserDto userDto)
+        {
+            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            // Assicurati che l'artista stia aggiornando il proprio profilo
+            if (artistId != userDto.Id)
+            {
+                return BadRequest("Non puoi modificare un profilo che non è il tuo.");
+            }
+
+            // Chiama il metodo specifico per aggiornare i profili degli artisti
+            var updatedArtist = await _artistDashboardService.UpdateArtistProfileAsync(userDto);
+
+            if (updatedArtist == null)
+            {
+                return BadRequest("Errore durante l'aggiornamento del profilo.");
+            }
+
+            return Ok(updatedArtist);
+        }
+
     }
 }

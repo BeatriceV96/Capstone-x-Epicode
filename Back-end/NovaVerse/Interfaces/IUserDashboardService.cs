@@ -8,5 +8,6 @@ namespace NovaVerse.Interfaces
     {
         Task<List<UserActivityDto>> GetUserActivitiesAsync(int userId);
         Task<List<PurchaseSummaryDto>> GetUserPurchasesAsync(int userId);
+        Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto);
     }
 }

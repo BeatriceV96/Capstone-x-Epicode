@@ -68,17 +68,14 @@ namespace NovaVerse.Controllers
         [HttpGet("currentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                if (userId != null)
+            if (userId != null)
+            {
+                var user = await _userService.GetUserById(int.Parse(userId));
+                if (user != null)
                 {
-                    var user = await _userService.GetUserById(int.Parse(userId));
-                    if (user != null)
-                    {
-                        return Ok(user);
-                    }
+                    return Ok(user); 
                 }
             }
 

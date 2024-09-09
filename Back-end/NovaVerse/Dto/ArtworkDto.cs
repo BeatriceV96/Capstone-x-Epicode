@@ -11,6 +11,6 @@ namespace NovaVerse.Dto
         public string ImageUrl { get; set; }
         public int CategoryId { get; set; }
         public ArtworkType Type { get; set; }
-
+        public int ArtistId { get; set; }  // Aggiungi questo campo
     }
 }
