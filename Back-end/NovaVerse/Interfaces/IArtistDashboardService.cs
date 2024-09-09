@@ -12,4 +12,3 @@ namespace NovaVerse.Interfaces
         Task<UserDto> UpdateArtistProfileAsync(UserDto userDto); // Per aggiornare il profilo dell'artista
     }
 }
-

@@ -1,5 +1,5 @@
-<div class="profile-container" *ngIf="user">
-  <!-- Mostra i dati del profilo utente -->
+<div *ngIf="user">
+  <!-- Sezione del profilo utente -->
   <h2>Profilo di {{ user.username }}</h2>
 
   <div class="profile-field">
@@ -21,22 +21,22 @@
   <div class="profile-field">
     <strong>Biografia:</strong>
     <div *ngIf="!isEditingBio">
-      <p>{{ user.bio || 'Nessuna biografia disponibile.' }}</p>
-      <button (click)="enableBioEdit()">Modifica Biografia</button>
+      <p>{{ user.bio || 'Nessuna biografia fornita.' }}</p>
+      <button class="btn btn-primary" (click)="enableBioEdit()">Modifica Biografia</button>
     </div>
 
     <div *ngIf="isEditingBio">
-      <textarea [(ngModel)]="updatedBio"></textarea>
-      <button (click)="saveBio()">Salva</button>
-      <button (click)="cancelBioEdit()">Annulla</button>
+      <textarea [(ngModel)]="updatedBio" class="form-control" rows="3"></textarea>
+      <button class="btn btn-success mt-2" (click)="saveBio()">Salva</button>
+      <button class="btn btn-secondary mt-2" (click)="cancelBioEdit()">Annulla</button>
     </div>
   </div>
 
-  <!-- Mostra l'immagine del profilo, se esiste -->
+  <!-- Mostra l'immagine del profilo, se disponibile -->
   <div class="profile-field">
     <strong>Immagine del profilo:</strong>
     <div *ngIf="user.profilePictureUrl">
-      <img [src]="user.profilePictureUrl" alt="Immagine del profilo di {{ user.username }}" class="profile-picture"/>
+      <img [src]="user.profilePictureUrl" alt="Immagine del profilo di {{ user.username }}" class="profile-picture img-thumbnail" />
     </div>
     <div *ngIf="!user.profilePictureUrl">
       <p>Nessuna immagine del profilo disponibile.</p>

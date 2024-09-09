@@ -84,10 +84,7 @@ namespace NovaVerse.Services
                 return null;
             }
 
-            // Aggiorna i dettagli del profilo
-            artist.Username = userDto.Username;
-            artist.Email = userDto.Email;
-            artist.Bio = userDto.Bio;  // Aggiungi eventuali altre proprietà, se necessario
+            artist.Bio = userDto.Bio;
             artist.ProfilePictureUrl = userDto.ProfilePictureUrl;
 
             await _context.SaveChangesAsync();
@@ -97,11 +94,11 @@ namespace NovaVerse.Services
                 Id = artist.Id,
                 Username = artist.Username,
                 Email = artist.Email,
-                Role = artist.Role.ToString(),
                 Bio = artist.Bio,
                 ProfilePictureUrl = artist.ProfilePictureUrl,
                 CreateDate = artist.CreateDate
             };
         }
+
     }
 }

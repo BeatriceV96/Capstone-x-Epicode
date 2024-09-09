@@ -56,7 +56,7 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateArtistProfile([FromBody] UserDto userDto)
+        public async Task<IActionResult> UpdateArtistProfile([FromForm] UserDto userDto, [FromForm] IFormFile profilePicture)
         {
             var artistId = GetArtistId();
             if (artistId == null)
@@ -64,13 +64,18 @@ namespace NovaVerse.Controllers
                 return Unauthorized("User ID not found.");
             }
 
-            // Assicurati che l'artista stia aggiornando il proprio profilo
             if (artistId != userDto.Id)
             {
                 return BadRequest("Non puoi modificare un profilo che non è il tuo.");
             }
 
-            // Chiama il metodo specifico per aggiornare i profili degli artisti
+            if (profilePicture != null && profilePicture.Length > 0)
+            {
+                // Gestisci il caricamento del file (es. salva su disco o in un servizio di storage)
+                var pictureUrl = await _fileService.SaveProfilePictureAsync(profilePicture);
+                userDto.ProfilePictureUrl = pictureUrl;  // Aggiorna l'URL dell'immagine del profilo
+            }
+
             var updatedArtist = await _artistDashboardService.UpdateArtistProfileAsync(userDto);
 
             if (updatedArtist == null)
@@ -80,6 +85,7 @@ namespace NovaVerse.Controllers
 
             return Ok(updatedArtist);
         }
+
 
         [HttpGet("profile")]
         public async Task<IActionResult> GetArtistProfile()
