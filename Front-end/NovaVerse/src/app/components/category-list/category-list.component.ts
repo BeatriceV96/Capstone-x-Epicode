@@ -27,20 +27,23 @@ export class CategoryListComponent implements OnInit {
   }
 
   // Carica le categorie
-  loadCategories(): void {
-    this.loading = true;
-    this.categoryService.getAllCategories().subscribe(
-      (data: Category[]) => {
-        this.categories = data;
-        this.loading = false;  // Fine caricamento
-      },
-      (error) => {
-        this.errorMessage = 'Errore durante il caricamento delle categorie.';
-        console.error('Failed to load categories:', error);
-        this.loading = false;  // Fine caricamento, ma con errore
-      }
-    );
-  }
+loadCategories(): void {
+  this.loading = true;
+  console.log('Inizio chiamata per ottenere le categorie...');
+  this.categoryService.getAllCategories().subscribe(
+    (data: Category[]) => {
+      console.log('Categorie caricate correttamente:', data);
+      this.categories = data;
+      this.loading = false;  // Fine caricamento
+    },
+    (error) => {
+      this.errorMessage = 'Errore durante il caricamento delle categorie.';
+      console.error('Errore nel caricamento delle categorie:', error);
+      this.loading = false;  // Fine caricamento, ma con errore
+    }
+  );
+}
+
 
   // Verifica il ruolo dell'utente e reindirizza se non autenticato
   checkRole(): void {

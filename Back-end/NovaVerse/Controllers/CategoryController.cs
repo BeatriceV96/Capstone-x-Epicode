@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
+using System.Threading.Tasks;
 
 namespace NovaVerse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "ArtistOnly")]
+    [Authorize(Policy = "ArtistOnly")] // Solo gli artisti possono creare, aggiornare e eliminare
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -17,29 +18,52 @@ namespace NovaVerse.Controllers
             _categoryService = categoryService;
         }
 
+        // Recupera tutte le categorie
+        [HttpGet("all")]
+        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare le categorie
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            if (categories == null || categories.Count == 0)
+            {
+                return NotFound("No categories found.");
+            }
+            return Ok(categories);
+        }
+
+        // Recupera una singola categoria per ID
+        [HttpGet("{id}")]
+        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare una singola categoria
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+            {
+                return NotFound($"Category with ID {id} not found.");
+            }
+            return Ok(category);
+        }
+
+        // Crea una nuova categoria (Solo per artisti)
+        [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
+            if (categoryDto == null)
+            {
+                return BadRequest("Invalid category data.");
+            }
+
             var category = await _categoryService.AddCategoryAsync(categoryDto);
             if (category == null)
             {
                 return BadRequest("Failed to create category.");
             }
-            return Ok(category);
+            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);  // Restituisce lo stato 201 e il percorso per la nuova risorsa
         }
 
-        [HttpGet("all")]
-        [AllowAnonymous]  // Temporaneamente rimuoviamo l'autorizzazione per fare test
-        public async Task<IActionResult> GetAllCategories()
-        {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-            if (categories == null)
-            {
-                return NotFound();
-            }
-            return Ok(categories);
-        }
-
+        // Aggiorna una categoria esistente (Solo per artisti)
+        [Authorize(Policy = "ArtistOnly")]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDto categoryDto)
         {
@@ -48,9 +72,11 @@ namespace NovaVerse.Controllers
             {
                 return BadRequest("Failed to update category.");
             }
-            return Ok(category);
+            return Ok(category); // Restituisce la categoria aggiornata
         }
 
+        // Elimina una categoria (Solo per artisti)
+        [Authorize(Policy = "ArtistOnly")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
@@ -59,7 +85,8 @@ namespace NovaVerse.Controllers
             {
                 return BadRequest(new { message = "Failed to delete category." });
             }
-            // Forzare una risposta JSON
+
+            // Invia una risposta chiara con un messaggio di successo
             return Ok(new { message = "Category deleted successfully." });
         }
     }

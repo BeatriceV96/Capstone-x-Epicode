@@ -3,6 +3,8 @@ using NovaVerse.Context;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NovaVerse.Services
 {
@@ -15,16 +17,19 @@ namespace NovaVerse.Services
             _context = context;
         }
 
+        // Restituisce tutte le categorie
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             return await _context.Categories.ToListAsync();
         }
 
+        // Restituisce una singola categoria per ID
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
             return await _context.Categories.FindAsync(id);
         }
 
+        // Aggiunge una nuova categoria
         public async Task<Category> AddCategoryAsync(CategoryDto categoryDto)
         {
             var category = new Category
@@ -39,12 +44,13 @@ namespace NovaVerse.Services
             return category;
         }
 
+        // Aggiorna una categoria esistente
         public async Task<Category> UpdateCategoryAsync(int id, CategoryDto categoryDto)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return null;
+                return null;  // Se la categoria non esiste, restituisce null
             }
 
             category.Name = categoryDto.Name;
@@ -54,6 +60,7 @@ namespace NovaVerse.Services
             return category;
         }
 
+        // Cancella una categoria esistente
         public async Task<bool> DeleteCategoryAsync(int id)
         {
             var category = await _context.Categories.FindAsync(id);

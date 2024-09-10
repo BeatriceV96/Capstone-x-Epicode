@@ -4,7 +4,7 @@ export interface Artwork {
   description: string;
   price: number;
   imageUrl: string;
-  categoryId: number;
+  categoryId: number | null;
   type: ArtworkType; // Enum per il tipo (Opere o NFT)
   artistId: number;
   createDate: Date;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { Category } from '../Models/category';
 
 @Injectable({
@@ -28,11 +28,22 @@ export class CategoryService {
 
   // Aggiorna una categoria esistente
   updateCategory(id: number, category: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${this.baseUrl}/update/${id}`, category);
+    return this.http.put<Category>(`${this.baseUrl}/update/${id}`, category, { withCredentials: true })
+      .pipe(
+        catchError((error) => {
+          console.error('Errore durante la richiesta di aggiornamento:', error);
+          return throwError(error);
+        })
+      );
   }
 
   // Cancella una categoria
   deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true });
+    return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true }).pipe(
+      catchError(error => {
+        console.error('Errore durante l\'eliminazione della categoria:', error);
+        return of(null);  // Restituisce null in caso di errore
+      })
+    );
   }
 }

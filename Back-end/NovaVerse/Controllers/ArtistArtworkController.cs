@@ -46,70 +46,70 @@ namespace NovaVerse.Controllers
             return Ok(artwork);
         }
 
+        [HttpGet("category/{categoryId}")]
+        public async Task<IActionResult> GetArtworksByCategory(int categoryId)
+        {
+            var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
+            if (artworks == null || artworks.Count == 0)
+            {
+                return NotFound("Nessuna opera trovata per questa categoria.");
+            }
+            return Ok(artworks);
+        }
+
+
+        [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromBody] ArtworkDto artworkDto)
         {
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            // Imposta l'ID dell'artista sull'opera che si sta creando
-            artworkDto.ArtistId = artistId;
-
             var artwork = await _artworkService.AddArtworkAsync(artworkDto);
             if (artwork == null)
             {
-                return BadRequest("Creazione dell'opera fallita.");
+                return BadRequest("Failed to create artwork.");
             }
             return Ok(artwork);
         }
 
-
+        [Authorize(Policy = "ArtistOnly")]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateArtwork(int id, [FromBody] ArtworkDto artworkDto)
         {
-            var existingArtwork = await _artworkService.GetArtworkByIdAsync(id);
-            if (existingArtwork == null)
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var artwork = await _artworkService.GetArtworkByIdAsync(id);
+
+            if (artwork.ArtistId != userId)
             {
-                return NotFound("Opera non trovata.");
+                return Unauthorized("Non sei autorizzato a modificare questa opera.");
             }
 
-            // Verifica che l'artista loggato sia il proprietario dell'opera
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            if (existingArtwork.ArtistId != artistId)
-            {
-                return Unauthorized("Non puoi modificare questa opera.");
-            }
-
-            // Aggiorna l'opera
             var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
             if (updatedArtwork == null)
             {
-                return BadRequest("Modifica dell'opera fallita.");
+                return BadRequest("Failed to update artwork.");
             }
+
             return Ok(updatedArtwork);
         }
 
+        [Authorize(Policy = "ArtistOnly")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteArtwork(int id)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var artwork = await _artworkService.GetArtworkByIdAsync(id);
-            if (artwork == null)
+
+            if (artwork.ArtistId != userId)
             {
-                return NotFound("Opera non trovata.");
+                return Unauthorized("Non sei autorizzato a eliminare questa opera.");
             }
 
-            // Verifica che l'artista loggato sia il proprietario dell'opera
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            if (artwork.ArtistId != artistId)
+            var success = await _artworkService.DeleteArtworkAsync(id);
+            if (!success)
             {
-                return Unauthorized("Non puoi eliminare questa opera.");
+                return BadRequest("Failed to delete artwork.");
             }
 
-            var result = await _artworkService.DeleteArtworkAsync(id);
-            if (!result)
-            {
-                return BadRequest("Eliminazione dell'opera fallita.");
-            }
-            return Ok("Opera eliminata con successo.");
+            return Ok("Artwork deleted successfully.");
         }
     }
 }

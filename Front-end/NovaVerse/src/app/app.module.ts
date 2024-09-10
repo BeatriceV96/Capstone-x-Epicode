@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router';
 import { CategoryListComponent } from './components/category-list/category-list.component';
 import { CategoryDetailComponent } from './components/category-detail/category-detail.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { ArtworkManagementComponent } from './components/artwork-management/artwork-management.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ProfileComponent } from './components/profile/profile.component';
     CategoryListComponent,
     CategoryDetailComponent,
     ProfileComponent,
+    ArtworkManagementComponent,
   ],
   imports: [
     BrowserModule,

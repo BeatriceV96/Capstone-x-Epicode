@@ -1,0 +1,39 @@
+<div *ngIf="loading">Caricamento...</div>
+
+<div *ngIf="message" [class]="success ? 'alert-success' : 'alert-danger'">
+  {{ message }}
+</div>
+
+<form (ngSubmit)="editing ? updateArtwork() : createArtwork()">
+  <div>
+    <label for="title">Titolo</label>
+    <input type="text" [(ngModel)]="artworkForm.title" name="title" required>
+  </div>
+
+  <div>
+    <label for="description">Descrizione</label>
+    <textarea [(ngModel)]="artworkForm.description" name="description" required></textarea>
+  </div>
+
+  <div>
+    <label for="price">Prezzo</label>
+    <input type="number" [(ngModel)]="artworkForm.price" name="price" required>
+  </div>
+
+  <div>
+    <label for="category">Categoria</label>
+    <select [(ngModel)]="artworkForm.categoryId" name="category" required>
+      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+    </select>
+  </div>
+
+  <button type="submit">{{ editing ? 'Aggiorna Opera' : 'Crea Opera' }}</button>
+</form>
+
+<ul>
+  <li *ngFor="let artwork of artworks">
+    {{ artwork.title }} - {{ artwork.description }}
+    <button (click)="editArtwork(artwork)">Modifica</button>
+    <button (click)="deleteArtwork(artwork.id)">Elimina</button>
+  </li>
+</ul>

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../Models/category';
-import { Router } from '@angular/router';  // Importa Router
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-category-management',
@@ -13,51 +15,50 @@ export class CategoryManagementComponent implements OnInit {
   categoryForm: Partial<Category> = { name: '', description: '' };
   editing: boolean = false;
   selectedCategoryId: number | null = null;
-  loading: boolean = false;  // Flag per il caricamento
-  message: string = '';  // Messaggio di successo o errore
-  success: boolean = true;  // Stato del successo del messaggio
+  loading: boolean = false;
+  message: string = '';
+  success: boolean = true;
 
   constructor(private categoryService: CategoryService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loadCategories();
+    this.loadCategories();  // Carica le categorie all'inizio
   }
 
   // Carica tutte le categorie
   loadCategories(): void {
-    this.categoryService.getAllCategories().subscribe(
-      (data: Category[]) => {
+    this.categoryService.getAllCategories().pipe(
+      tap((data: Category[]) => {
         this.categories = data;
-      },
-      (error) => {
+        this.success = true;
+      }),
+      catchError(error => {
         this.message = 'Errore nel caricamento delle categorie';
         this.success = false;
-      }
-    );
+        return of([]);  // Restituisce un array vuoto in caso di errore
+      })
+    ).subscribe();
   }
 
   // Aggiungi una nuova categoria
   createCategory(): void {
     if (this.categoryForm.name && this.categoryForm.description) {
       this.loading = true;
-      this.categoryService.createCategory(this.categoryForm).subscribe(
-        (newCategory) => {
+      this.categoryService.createCategory(this.categoryForm).pipe(
+        tap((newCategory: Category) => {
+          this.categories.push(newCategory); // Aggiorna la lista direttamente
           this.message = 'Categoria creata con successo';
           this.success = true;
-
-          // Reindirizza alla pagina della categoria appena creata
-          this.router.navigate([`/categories/${newCategory.id}`]);
-
           this.resetForm();
-        },
-        (error) => {
+        }),
+        catchError(error => {
           this.message = 'Errore nella creazione della categoria';
           this.success = false;
-        }
-      ).add(() => this.loading = false);  // Fine del caricamento
+          return of(null);  // Restituisce null in caso di errore
+        })
+      ).subscribe().add(() => this.loading = false);  // Fine caricamento
     }
   }
-
 
   // Modifica una categoria esistente
   editCategory(category: Category): void {
@@ -70,26 +71,24 @@ export class CategoryManagementComponent implements OnInit {
   updateCategory(): void {
     if (this.selectedCategoryId && this.categoryForm.name && this.categoryForm.description) {
       this.loading = true;
-      this.categoryService.updateCategory(this.selectedCategoryId, this.categoryForm).subscribe(
-        (updatedCategory) => {
+
+      this.categoryService.updateCategory(this.selectedCategoryId, this.categoryForm).pipe(
+        tap((updatedCategory: Category) => {
           this.message = 'Categoria aggiornata con successo';
           this.success = true;
 
-          // Trova l'indice della categoria da aggiornare
           const index = this.categories.findIndex(cat => cat.id === this.selectedCategoryId);
-
-          // Aggiorna la categoria nell'array locale
           if (index !== -1) {
-            this.categories[index] = updatedCategory;
+            this.categories[index] = updatedCategory;  // Aggiorna la categoria nell'array locale
           }
-
           this.resetForm();
-        },
-        (error) => {
-          this.message = 'Errore nell\'aggiornamento della categoria';
+        }),
+        catchError(error => {
+          this.message = 'Errore durante l\'aggiornamento della categoria';
           this.success = false;
-        }
-      ).add(() => this.loading = false);
+          return of(null);  // Restituisce null in caso di errore
+        })
+      ).subscribe().add(() => this.loading = false);  // Fine caricamento
     }
   }
 
@@ -97,19 +96,18 @@ export class CategoryManagementComponent implements OnInit {
   deleteCategory(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questa categoria?')) {
       this.loading = true;
-      this.categoryService.deleteCategory(id).subscribe(
-        (response) => {
+      this.categoryService.deleteCategory(id).pipe(
+        tap(() => {
+          this.categories = this.categories.filter(cat => cat.id !== id);  // Rimuovi la categoria dall'array locale
           this.message = 'Categoria eliminata con successo';
           this.success = true;
-
-          // Rimuovi la categoria dall'array locale
-          this.categories = this.categories.filter(cat => cat.id !== id);
-        },
-        (error) => {
-          this.message = 'Errore nell\'eliminazione della categoria';
+        }),
+        catchError(error => {
+          this.message = 'Errore durante l\'eliminazione della categoria';
           this.success = false;
-        }
-      ).add(() => this.loading = false);
+          return of(null);  // Restituisce null in caso di errore
+        })
+      ).subscribe().add(() => this.loading = false);  // Fine caricamento
     }
   }
 
