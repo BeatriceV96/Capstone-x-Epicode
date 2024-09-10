@@ -28,8 +28,9 @@ export class CategoryListComponent implements OnInit {
   loadCategories(): void {
     this.loading = true;
     this.categoryService.getAllCategories().subscribe(
-      (data: Category[]) => {
-        this.categories = data;
+      (data: any) => {
+        // Se data contiene $values, estrai le categorie da lì
+        this.categories = data.$values ? data.$values : data;
         this.loading = false;
       },
       (error) => {

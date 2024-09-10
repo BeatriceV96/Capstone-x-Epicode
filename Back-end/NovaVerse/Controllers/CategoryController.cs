@@ -20,7 +20,7 @@ namespace NovaVerse.Controllers
 
         // Recupera tutte le categorie
         [HttpGet("all")]
-        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare le categorie
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllCategories()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
@@ -28,8 +28,11 @@ namespace NovaVerse.Controllers
             {
                 return NotFound(new { message = "Nessuna categoria trovata." });
             }
-            return Ok(categories);
+
+            // Verifica il tipo di dati e serializza l'array come JSON
+            return Ok(categories.ToArray());
         }
+
 
         // Recupera una singola categoria per ID
         [HttpGet("{id}")]
@@ -81,13 +84,21 @@ namespace NovaVerse.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var result = await _categoryService.DeleteCategoryAsync(id);
-            if (!result)
+            try
             {
-                return BadRequest(new { message = "Eliminazione della categoria fallita." });
-            }
+                var result = await _categoryService.DeleteCategoryAsync(id);
+                if (!result)
+                {
+                    return BadRequest(new { message = $"Eliminazione della categoria fallita. La categoria con ID {id} potrebbe essere collegata ad altre entità." });
+                }
 
-            return Ok(new { message = "Categoria eliminata con successo." });
+                return Ok(new { message = "Categoria eliminata con successo." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Errore del server durante l'eliminazione.", error = ex.Message });
+            }
         }
+
     }
 }

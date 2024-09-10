@@ -29,7 +29,8 @@ export class CategoryManagementComponent implements OnInit {
   loadCategories(): void {
     this.categoryService.getAllCategories().pipe(
       tap((data: Category[]) => {
-        this.categories = data;
+        console.log('Categorie ricevute:', data); // Verifica la struttura dei dati
+        this.categories = Array.isArray(data) ? data : []; // Assicura che sia un array
         this.success = true;
       }),
       catchError(error => {

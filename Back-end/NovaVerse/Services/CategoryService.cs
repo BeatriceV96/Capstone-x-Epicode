@@ -66,6 +66,12 @@ namespace NovaVerse.Services
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
+                return false; 
+            }
+            // Controlla se ci sono opere collegate prima di eliminare
+            var hasArtworks = await _context.Artworks.AnyAsync(a => a.CategoryId == id);
+            if (hasArtworks)
+            {
                 return false;
             }
 
@@ -73,5 +79,6 @@ namespace NovaVerse.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
     }
 }

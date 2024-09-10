@@ -7,31 +7,37 @@ import { Category } from '../Models/category';
   providedIn: 'root',
 })
 export class CategoryService {
-  private baseUrl = 'http://localhost:5034/api/category';
-
+  private baseUrl = 'http://localhost:5034/api/category'; // Assicurati che questo sia corretto
 
   constructor(private http: HttpClient) {}
 
   // Ottieni tutte le categorie
   getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.baseUrl}/all`)
+    return this.http.get<Category[]>(`${this.baseUrl}/all`).pipe(
+      catchError((error) => {
+        console.error('Errore durante il recupero delle categorie:', error);
+        return throwError(error);
+      })
+    );
+  }
+
+
+  // Ottieni una categoria specifica dall'ID
+  getCategoryById(id: number): Observable<Category> {
+    return this.http.get<Category>(`${this.baseUrl}/${id}`)
       .pipe(
-        catchError(error => {
-          console.error('Errore durante il caricamento delle categorie:', error);
-          return throwError(error); // Propaga l'errore al componente che lo chiamerà
+        catchError((error) => {
+          console.error('Errore durante il caricamento della categoria:', error);
+          return throwError(error); // Propaga l'errore
         })
       );
   }
 
-  // Ottieni una categoria specifica dall'ID
-getCategoryById(id: number): Observable<Category> {
-  return this.http.get<Category>(`${this.baseUrl}/${id}`);
-}
   // Crea una nuova categoria
   createCategory(category: Partial<Category>): Observable<Category> {
     return this.http.post<Category>(`${this.baseUrl}/create`, category, { withCredentials: true })
       .pipe(
-        catchError(error => {
+        catchError((error) => {
           console.error('Errore durante la creazione della categoria:', error);
           return throwError(error); // Propaga l'errore
         })
@@ -53,7 +59,7 @@ getCategoryById(id: number): Observable<Category> {
   deleteCategory(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
       .pipe(
-        catchError(error => {
+        catchError((error) => {
           console.error('Errore durante l\'eliminazione della categoria:', error);
           return throwError(error); // Propaga l'errore
         })
