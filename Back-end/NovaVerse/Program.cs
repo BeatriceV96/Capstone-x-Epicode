@@ -58,6 +58,13 @@ builder.Services.AddCors(options =>
         .AllowCredentials());  // Consenti l'uso delle credenziali (cookie)
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    }); //per evitare cicli infiniti
+
+
 // Aggiungi supporto per Swagger (documentazione API)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
