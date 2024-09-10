@@ -3,7 +3,7 @@ import { ArtworkService } from '../../services/artwork.service';
 import { CategoryService } from '../../services/category.service';
 import { Artwork } from '../../Models/artwork';
 import { Category } from '../../Models/category';
-import { Router } from '@angular/router';  // Per il reindirizzamento
+import { ActivatedRoute, Router } from '@angular/router';  // Per il reindirizzamento
 
 @Component({
   selector: 'app-artwork-management',
@@ -15,6 +15,7 @@ export class ArtworkManagementComponent implements OnInit {
   categories: Category[] = [];  // Definiamo le categorie qui
   artworkForm: Partial<Artwork> = { title: '', description: '', price: 0, categoryId: undefined };  // Usa undefined invece di null
   selectedArtworkId: number | null = null;
+  categoryId: number | null = null; // Aggiungi la proprietà per l'ID della categoria
   editing: boolean = false;
   loading: boolean = false;
   message: string = '';
@@ -23,15 +24,24 @@ export class ArtworkManagementComponent implements OnInit {
   constructor(
     private artworkService: ArtworkService,
     private categoryService: CategoryService,  // Aggiungi CategoryService per caricare le categorie
+    private route: ActivatedRoute,  // Attivare la rotta per ottenere i parametri
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadCategories();  // Carica le categorie
-    this.loadArtworks();     // Carica le opere
+    // Ottieni l'ID della categoria dalla rotta
+    this.route.params.subscribe(params => {
+      this.categoryId = +params['id'];  // Converte l'ID in numero
+      if (this.categoryId) {
+        this.loadArtworks(this.categoryId);  // Carica le opere in base all'ID della categoria
+      }
+    });
+
+    // Carica tutte le categorie disponibili per la tendina
+    this.loadCategories();
   }
 
-  // Carica tutte le categorie
+  // Carica tutte le categorie per il dropdown
   loadCategories(): void {
     this.categoryService.getAllCategories().subscribe(
       (data: Category[]) => {
@@ -43,9 +53,9 @@ export class ArtworkManagementComponent implements OnInit {
     );
   }
 
-  // Carica tutte le opere d'arte
-  loadArtworks(): void {
-    this.artworkService.getAllArtworks().subscribe(
+  // Carica tutte le opere d'arte in base alla categoria
+  loadArtworks(categoryId: number): void {
+    this.artworkService.getArtworksByCategory(categoryId).subscribe(
       (data: Artwork[]) => {
         this.artworks = data;
       },
@@ -65,8 +75,8 @@ export class ArtworkManagementComponent implements OnInit {
           this.message = 'Opera creata con successo';
           this.success = true;
 
-          // Reindirizza alla pagina dell'opera appena creata
-          this.router.navigate([`/artworks/${newArtwork.id}`]);
+          // Aggiungi l'opera creata alla lista locale
+          this.artworks.push(newArtwork);
 
           this.resetForm();
         },
@@ -94,6 +104,7 @@ export class ArtworkManagementComponent implements OnInit {
           this.message = 'Opera aggiornata con successo';
           this.success = true;
 
+          // Trova l'opera modificata nella lista e aggiorna i suoi dati
           const index = this.artworks.findIndex(art => art.id === this.selectedArtworkId);
           if (index !== -1) {
             this.artworks[index] = updatedArtwork;
@@ -114,10 +125,11 @@ export class ArtworkManagementComponent implements OnInit {
     if (confirm('Sei sicuro di voler eliminare questa opera?')) {
       this.loading = true;
       this.artworkService.deleteArtwork(id).subscribe(
-        (response) => {
+        () => {
           this.message = 'Opera eliminata con successo';
           this.success = true;
 
+          // Rimuovi l'opera eliminata dalla lista locale
           this.artworks = this.artworks.filter(art => art.id !== id);
         },
         (error) => {

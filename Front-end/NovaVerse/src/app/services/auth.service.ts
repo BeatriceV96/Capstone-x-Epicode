@@ -93,6 +93,12 @@ export class AuthService {
     );
   }
 
+  // Controlla se l'utente è un artista
+  isArtist(): boolean {
+    const user = this.getCurrentUser();
+    return !!user && user.role === 'Artist';
+  }
+
   // Controlla se l'utente è autenticato
   isAuthenticated(): boolean {
     return !!localStorage.getItem('user');  // Verifica la presenza dell'utente nel localStorage

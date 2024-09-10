@@ -26,23 +26,27 @@ namespace NovaVerse.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             if (categories == null || categories.Count == 0)
             {
-                return NotFound("No categories found.");
+                return NotFound(new { message = "Nessuna categoria trovata." });
             }
             return Ok(categories);
         }
 
         // Recupera una singola categoria per ID
         [HttpGet("{id}")]
-        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare una singola categoria
+        [AllowAnonymous]
         public async Task<IActionResult> GetCategoryById(int id)
         {
+            Console.WriteLine($"Fetching category with ID: {id}");
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
+                Console.WriteLine($"Category with ID {id} not found.");
                 return NotFound($"Category with ID {id} not found.");
             }
             return Ok(category);
         }
+
+
 
         // Crea una nuova categoria (Solo per artisti)
         [Authorize(Policy = "ArtistOnly")]
@@ -51,13 +55,13 @@ namespace NovaVerse.Controllers
         {
             if (categoryDto == null)
             {
-                return BadRequest("Invalid category data.");
+                return BadRequest(new { message = "Dati della categoria non validi." });
             }
 
             var category = await _categoryService.AddCategoryAsync(categoryDto);
             if (category == null)
             {
-                return BadRequest("Failed to create category.");
+                return BadRequest(new { message = "Creazione della categoria fallita." });
             }
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);  // Restituisce lo stato 201 e il percorso per la nuova risorsa
         }
@@ -70,7 +74,7 @@ namespace NovaVerse.Controllers
             var category = await _categoryService.UpdateCategoryAsync(id, categoryDto);
             if (category == null)
             {
-                return BadRequest("Failed to update category.");
+                return BadRequest(new { message = "Aggiornamento della categoria fallito." });
             }
             return Ok(category); // Restituisce la categoria aggiornata
         }
@@ -83,11 +87,10 @@ namespace NovaVerse.Controllers
             var result = await _categoryService.DeleteCategoryAsync(id);
             if (!result)
             {
-                return BadRequest(new { message = "Failed to delete category." });
+                return BadRequest(new { message = "Eliminazione della categoria fallita." });
             }
 
-            // Invia una risposta chiara con un messaggio di successo
-            return Ok(new { message = "Category deleted successfully." });
+            return Ok(new { message = "Categoria eliminata con successo." });
         }
     }
 }

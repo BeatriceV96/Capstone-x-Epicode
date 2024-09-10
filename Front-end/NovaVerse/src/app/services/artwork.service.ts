@@ -22,6 +22,7 @@ export class ArtworkService {
       );
   }
 
+
   getAllArtworks(): Observable<Artwork[]> {
     return this.http.get<Artwork[]>(`${this.baseUrl}/all`)
       .pipe(
