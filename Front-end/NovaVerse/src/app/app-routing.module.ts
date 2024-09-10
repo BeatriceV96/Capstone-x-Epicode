@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'categories', component: CategoryListComponent },
   { path: 'categories/:id', component: CategoryDetailComponent },  // Dinamica per visualizzare i dettagli della categoria
   { path: 'category-management', component: CategoryManagementComponent },
-  { path: 'categories/:id/artworks', component: ArtworkListComponent }, // Lista delle opere
+  { path: 'categories/:id/artworks', component: ArtworkListComponent }, // Lista delle opere per una categoria specifica
   { path: 'categories/:id/artworks/manage', component: ArtworkManagementComponent }, // Gestione delle opere da parte dell'artista
   { path: 'profile', component: ProfileComponent },
   {

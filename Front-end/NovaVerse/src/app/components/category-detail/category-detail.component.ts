@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';  // Importa Router
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../Models/category';
 import { AuthService } from '../../services/auth.service';
@@ -13,10 +13,10 @@ export class CategoryDetailComponent implements OnInit {
   category: Category | null = null;
   categoryId: number | null = null;
   isArtist: boolean = false;
-  errorMessage: string | null = null;  // Aggiungi la gestione dell'errore
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,  // Aggiungi il Router
     private categoryService: CategoryService,
     private authService: AuthService
   ) {}
@@ -39,9 +39,15 @@ export class CategoryDetailComponent implements OnInit {
         this.category = category;
       },
       (error) => {
-        this.errorMessage = `Errore nel caricamento della categoria con ID ${id}: ${error.message}`;
         console.error('Errore nel caricamento della categoria:', error);
       }
     );
+  }
+
+  // Funzione per gestire il click sulla matita per andare alla pagina di gestione opere
+  manageArtworks(): void {
+    if (this.categoryId) {
+      this.router.navigate(['/categories', this.categoryId, 'artworks/manage']);
+    }
   }
 }

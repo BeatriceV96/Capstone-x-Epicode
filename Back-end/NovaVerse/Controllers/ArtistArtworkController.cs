@@ -9,12 +9,12 @@ namespace NovaVerse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = Policies.Artist)]  // Solo l'artista può accedere
+    [Authorize(Policy = "ArtistOnly")]
     public class ArtistArtworkController : Controller
     {
         private readonly IArtworkService _artworkService;
 
-        public ArtistArtworkController(IArtworkService artworkService) // Dependency Injection
+        public ArtistArtworkController(IArtworkService artworkService)
         {
             _artworkService = artworkService;
         }
@@ -22,7 +22,6 @@ namespace NovaVerse.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllArtworks()
         {
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var artworks = await _artworkService.GetAllArtworksAsync();
             return Ok(artworks);
         }
@@ -49,19 +48,31 @@ namespace NovaVerse.Controllers
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetArtworksByCategory(int categoryId)
         {
-            var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
-            if (artworks == null || artworks.Count == 0)
+            try
             {
-                return NotFound("Nessuna opera trovata per questa categoria.");
+                var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
+                if (artworks == null || artworks.Count == 0)
+                {
+                    return NotFound("Nessuna opera trovata per questa categoria.");
+                }
+                return Ok(artworks);
             }
-            return Ok(artworks);
+            catch (Exception ex)
+            {
+                // Log dell'errore per avere più dettagli
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "Errore interno del server.");
+            }
         }
-
 
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromBody] ArtworkDto artworkDto)
         {
+            // Setta l'ArtistId basandoti sull'utente loggato
+            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            artworkDto.ArtistId = artistId;
+
             var artwork = await _artworkService.AddArtworkAsync(artworkDto);
             if (artwork == null)
             {

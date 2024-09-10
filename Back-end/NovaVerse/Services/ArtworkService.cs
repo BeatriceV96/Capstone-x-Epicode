@@ -34,12 +34,10 @@ namespace NovaVerse.Services
         public async Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId)
         {
             return await _context.Artworks
-                .Where(a => a.CategoryId == categoryId) // Filtra per la categoria
-                .Include(a => a.Category)
-                .Include(a => a.Artist)
+                .Where(a => a.CategoryId == categoryId)
+                .Include(a => a.Artist) 
                 .ToListAsync();
         }
-
 
         public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
         {
@@ -51,7 +49,8 @@ namespace NovaVerse.Services
                 ImageUrl = artworkDto.ImageUrl,
                 CategoryId = artworkDto.CategoryId,
                 Type = artworkDto.Type,
-                CreateDate = DateTime.Now,
+                ArtistId = artworkDto.ArtistId,  
+                CreateDate = DateTime.Now
             };
 
             _context.Artworks.Add(artwork);
@@ -74,6 +73,7 @@ namespace NovaVerse.Services
             artwork.ImageUrl = artworkDto.ImageUrl;
             artwork.CategoryId = artworkDto.CategoryId;
             artwork.Type = artworkDto.Type;
+            artwork.ArtistId = artworkDto.ArtistId;  
 
             await _context.SaveChangesAsync();
             return artwork;
