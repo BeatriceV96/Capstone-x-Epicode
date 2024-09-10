@@ -24,16 +24,9 @@ export class CategoryService {
   }
 
   // Ottieni una categoria specifica dall'ID
-  getCategoryById(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.baseUrl}/${id}`)
-      .pipe(
-        catchError(error => {
-          console.error(`Errore durante il caricamento della categoria con ID ${id}:`, error);
-          return throwError(error); // Propaga l'errore
-        })
-      );
-  }
-
+getCategoryById(id: number): Observable<Category> {
+  return this.http.get<Category>(`${this.baseUrl}/${id}`);
+}
   // Crea una nuova categoria
   createCategory(category: Partial<Category>): Observable<Category> {
     return this.http.post<Category>(`${this.baseUrl}/create`, category, { withCredentials: true })

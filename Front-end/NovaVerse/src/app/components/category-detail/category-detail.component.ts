@@ -12,13 +12,13 @@ import { AuthService } from '../../services/auth.service';
 export class CategoryDetailComponent implements OnInit {
   category: Category | null = null;
   categoryId: number | null = null;
-  isArtist: boolean = false;  // Variabile per controllare se l'utente è un artista
-  errorMessage: string | null = null;
+  isArtist: boolean = false;
+  errorMessage: string | null = null;  // Aggiungi la gestione dell'errore
 
   constructor(
     private route: ActivatedRoute,
     private categoryService: CategoryService,
-    private authService: AuthService  // Servizio di autenticazione
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -29,7 +29,6 @@ export class CategoryDetailComponent implements OnInit {
       }
     });
 
-    // Verifica se l'utente è un artista
     this.isArtist = this.authService.isArtist();
   }
 
@@ -38,7 +37,6 @@ export class CategoryDetailComponent implements OnInit {
     this.categoryService.getCategoryById(id).subscribe(
       (category: Category) => {
         this.category = category;
-        this.errorMessage = null; // Reset dell'errore
       },
       (error) => {
         this.errorMessage = `Errore nel caricamento della categoria con ID ${id}: ${error.message}`;
