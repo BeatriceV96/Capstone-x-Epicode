@@ -26,9 +26,8 @@ namespace NovaVerse.Services
         // Restituisce una singola categoria per ID
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            return await _context.Categories.FindAsync(id);  // Assicurati che questo recuperi la categoria correttamente
+            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         }
-
 
         // Aggiunge una nuova categoria
         public async Task<Category> AddCategoryAsync(CategoryDto categoryDto)

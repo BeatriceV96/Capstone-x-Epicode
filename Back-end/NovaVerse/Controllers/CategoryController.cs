@@ -33,19 +33,16 @@ namespace NovaVerse.Controllers
 
         // Recupera una singola categoria per ID
         [HttpGet("{id}")]
-        [AllowAnonymous]
+        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare una singola categoria
         public async Task<IActionResult> GetCategoryById(int id)
         {
-            Console.WriteLine($"Fetching category with ID: {id}");
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
             {
-                Console.WriteLine($"Category with ID {id} not found.");
                 return NotFound($"Category with ID {id} not found.");
             }
             return Ok(category);
         }
-
 
 
         // Crea una nuova categoria (Solo per artisti)
