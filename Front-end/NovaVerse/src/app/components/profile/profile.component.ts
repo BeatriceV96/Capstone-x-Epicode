@@ -21,15 +21,21 @@ export class ProfileComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    this.userService.getUserProfile().subscribe(
-      (response: iUser) => {
-        this.user = response;
-        this.updatedBio = this.user.bio || '';
-      },
-      (error) => {
-        console.error('Errore durante il caricamento del profilo', error);
-      }
-    );
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.user = currentUser;
+      this.updatedBio = this.user.bio || '';
+
+      this.userService.getUserProfile().subscribe(
+        (response: iUser) => {
+          this.user = response;
+          this.updatedBio = this.user.bio || '';
+        },
+        (error) => {
+          console.error('Errore durante il caricamento del profilo', error);
+        }
+      );
+    }
   }
 
   enableBioEdit(): void {
