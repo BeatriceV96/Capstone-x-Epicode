@@ -25,12 +25,11 @@ export class ArtworkListComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.categoryId = +params['id'];  // Prende l'ID della categoria dalla rotta
+      this.categoryId = +params['id']; // Prende l'ID della categoria dalla rotta
       if (this.categoryId) {
         this.loadArtworks(this.categoryId);
       }
     });
-
     this.isArtist = this.authService.isArtist();  // Verifica se l'utente è un artista
   }
 

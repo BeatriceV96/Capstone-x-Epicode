@@ -13,7 +13,8 @@ export class ArtworkService {
   constructor(private http: HttpClient) {}
 
   getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
-    return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}`)
+    return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}`, { withCredentials: true })
+
       .pipe(
         catchError(error => {
           console.error('Errore durante il caricamento delle opere:', error);

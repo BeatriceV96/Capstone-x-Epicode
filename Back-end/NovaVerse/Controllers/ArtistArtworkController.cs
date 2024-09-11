@@ -115,6 +115,7 @@ namespace NovaVerse.Controllers
             }
 
             var success = await _artworkService.DeleteArtworkAsync(id);
+            var success = await _artworkService.DeleteArtworkAsync(id);
             if (!success)
             {
                 return BadRequest("Failed to delete artwork.");

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../Models/category';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-category-list',
@@ -12,11 +13,12 @@ export class CategoryListComponent implements OnInit {
   categories: Category[] = [];
   loading: boolean = true;
   errorMessage: string | null = null;
-  isArtist: boolean = false;  // Definisci se l'utente è un artista
+  isArtist: boolean = false;  // Verifica se l'utente è un artista
 
   constructor(
     private categoryService: CategoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -28,9 +30,8 @@ export class CategoryListComponent implements OnInit {
   loadCategories(): void {
     this.loading = true;
     this.categoryService.getAllCategories().subscribe(
-      (data: any) => {
-        // Se data contiene $values, estrai le categorie da lì
-        this.categories = data.$values ? data.$values : data;
+      (data: Category[]) => {
+        this.categories = data;
         this.loading = false;
       },
       (error) => {
@@ -38,5 +39,10 @@ export class CategoryListComponent implements OnInit {
         this.loading = false;
       }
     );
+  }
+
+  navigateToManage(categoryId: number): void {
+    console.log('Navigating to:', `/categories/${categoryId}/artworks/manage`);
+    this.router.navigate([`/categories/${categoryId}/artworks/manage`]);
   }
 }
