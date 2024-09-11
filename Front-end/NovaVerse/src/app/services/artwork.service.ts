@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Artwork, ArtworkType } from '../Models/artwork';
+import { Artwork } from '../Models/artwork';
 
 @Injectable({
   providedIn: 'root'
@@ -18,17 +18,6 @@ export class ArtworkService {
       .pipe(
         catchError(error => {
           console.error('Errore durante il caricamento delle opere per la categoria:', error);
-          throw error;
-        })
-      );
-  }
-
-  // Ottieni tutte le opere
-  getAllArtworks(): Observable<Artwork[]> {
-    return this.http.get<Artwork[]>(`${this.baseUrl}/all`, { withCredentials: true })
-      .pipe(
-        catchError(error => {
-          console.error('Errore durante il caricamento delle opere:', error);
           throw error;
         })
       );

@@ -26,10 +26,9 @@ namespace NovaVerse.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             if (categories == null || categories.Count == 0)
             {
-                return NotFound(new { message = "Nessuna categoria trovata." });
+                return NoContent(); // Cambia da NotFound a NoContent
             }
 
-            // Verifica il tipo di dati e serializza l'array come JSON
             return Ok(categories.ToArray());
         }
 
@@ -53,9 +52,9 @@ namespace NovaVerse.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
-            if (categoryDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "Dati della categoria non validi." });
+                return BadRequest(ModelState); // Restituisci gli errori di validazione
             }
 
             var category = await _categoryService.AddCategoryAsync(categoryDto);
@@ -63,8 +62,9 @@ namespace NovaVerse.Controllers
             {
                 return BadRequest(new { message = "Creazione della categoria fallita." });
             }
-            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);  // Restituisce lo stato 201 e il percorso per la nuova risorsa
+            return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
+
 
         // Aggiorna una categoria esistente (Solo per artisti)
         [Authorize(Policy = "ArtistOnly")]
@@ -84,6 +84,12 @@ namespace NovaVerse.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
+            var category = await _categoryService.GetCategoryByIdAsync(id);
+            if (category == null)
+            {
+                return NotFound(new { message = $"Categoria con ID {id} non trovata." });
+            }
+
             try
             {
                 var result = await _categoryService.DeleteCategoryAsync(id);

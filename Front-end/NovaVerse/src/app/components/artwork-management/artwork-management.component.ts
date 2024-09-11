@@ -1,3 +1,4 @@
+import { DomSanitizer } from '@angular/platform-browser';
 import { ArtworkType } from './../../Models/artwork';
 import { Component, OnInit } from '@angular/core';
 import { ArtworkService } from '../../services/artwork.service';
@@ -22,19 +23,23 @@ export class ArtworkManagementComponent implements OnInit {
     description: '',
     price: 0,
     categoryId: undefined,
-    type: ArtworkType.Opere
+    type: ArtworkType.Opere,
+    imageUrl: '' // Campo per URL o base64
   };
-  selectedFiles: File[] = [];
+  selectedFile: File | null = null; // Campo per il file selezionato
   editing: boolean = false;
   loading: boolean = false;
   message: string = '';
   success: boolean = true;
   selectedArtworkId: number | null = null;
+  selectedFilePreviewUrl: string | ArrayBuffer | null = null;
+
 
   constructor(
     private artworkService: ArtworkService,
     private categoryService: CategoryService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -75,52 +80,88 @@ export class ArtworkManagementComponent implements OnInit {
     });
   }
 
+  // Gestione del file immagine selezionato
   onFileChange(event: any): void {
-    this.selectedFiles = Array.from(event.target.files);
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+
+      // Creiamo un URL di anteprima per il file selezionato
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.selectedFilePreviewUrl = reader.result; // Memorizziamo l'URL di anteprima
+      };
+      reader.readAsDataURL(file); // Leggiamo il file come Data URL (base64)
+    }
   }
 
 
-  // Crea una nuova opera
-  createArtwork(): void {
-    if (this.artworkForm.title && this.artworkForm.description && this.artworkForm.categoryId && this.selectedFiles.length > 0) {
-        this.loading = true;
-
-        const formData = new FormData();
-        formData.append('title', this.artworkForm.title!); // Assicura che il titolo non sia undefined
-        formData.append('description', this.artworkForm.description!); // Assicura che la descrizione non sia undefined
-        formData.append('price', this.artworkForm.price!.toString()); // Assicura che il prezzo non sia undefined
-        formData.append('categoryId', this.artworkForm.categoryId!.toString()); // Asserzione non-null
-        formData.append('type', this.artworkForm.type!); // Assicura che il tipo non sia undefined
-
-        this.selectedFiles.forEach((file, index) => {
-            formData.append('photo', file, file.name);  // Allegare l'immagine
-        });
-
-        this.artworkService.createArtwork(formData).subscribe(
-            (newArtwork: Artwork) => {
-                this.artworks.push(newArtwork);
-                this.message = 'Opera creata con successo';
-                this.success = true;
-                this.resetForm();
-                this.loading = false;
-            },
-            (error) => {
-                this.message = 'Errore nella creazione dell\'opera';
-                console.error('Errore durante la creazione dell\'opera:', error);
-                this.success = false;
-                this.loading = false;
-            }
-        );
-    } else {
-        this.message = 'Per favore compila tutti i campi e carica almeno un\'immagine';
-        this.success = false;
-    }
+  // Funzione per convertire un array di byte in una stringa Base64
+photoBase64(photo: Uint8Array): string {
+  return 'data:image/jpeg;base64,' + this.arrayBufferToBase64(photo);
 }
 
+// Helper per convertire ArrayBuffer in Base64
+private arrayBufferToBase64(buffer: Uint8Array): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
+
+  // Crea una nuova opera
+  createArtwork(): void {
+    if (this.artworkForm.title && this.artworkForm.description && this.artworkForm.categoryId) {
+      this.loading = true;
+
+      const formData = new FormData();
+      formData.append('title', this.artworkForm.title!);
+      formData.append('description', this.artworkForm.description!);
+      formData.append('price', this.artworkForm.price!.toString());
+      formData.append('categoryId', this.artworkForm.categoryId!.toString());
+      formData.append('type', this.artworkForm.type!);
+
+      // Aggiungi l'immagine, o come file o come URL
+      if (this.selectedFile) {
+        formData.append('photo', this.selectedFile); // Se è stato caricato un file
+      } else if (this.artworkForm.imageUrl) {
+        formData.append('imageUrl', this.artworkForm.imageUrl); // Se viene fornito un URL
+      }
+
+      this.artworkService.createArtwork(formData).subscribe(
+        (newArtwork: Artwork) => {
+          this.artworks.push(newArtwork);
+          this.message = 'Opera creata con successo';
+          this.success = true;
+          this.resetForm();
+          this.loading = false;
+        },
+        (error) => {
+          this.message = 'Errore nella creazione dell\'opera';
+          console.error('Errore durante la creazione dell\'opera:', error);
+          this.success = false;
+          this.loading = false;
+        }
+      );
+    } else {
+      this.message = 'Per favore compila tutti i campi e carica almeno un\'immagine';
+      this.success = false;
+    }
+  }
 
   // Modifica un'opera esistente
   editArtwork(artwork: Artwork): void {
-    this.artworkForm = { title: artwork.title, description: artwork.description, price: artwork.price, categoryId: artwork.categoryId, type: artwork.type };
+    this.artworkForm = {
+      title: artwork.title,
+      description: artwork.description,
+      price: artwork.price,
+      categoryId: artwork.categoryId,
+      type: artwork.type,
+      imageUrl: artwork.imageUrl // Imposta l'URL dell'immagine esistente
+    };
     this.selectedArtworkId = artwork.id;
     this.editing = true;
   }
@@ -137,9 +178,12 @@ export class ArtworkManagementComponent implements OnInit {
       formData.append('categoryId', this.artworkForm.categoryId!.toString());
       formData.append('type', this.artworkForm.type!);
 
-      this.selectedFiles.forEach((file, index) => {
-        formData.append('photo', file, file.name);
-      });
+      // Aggiungi l'immagine, o come file o come URL
+      if (this.selectedFile) {
+        formData.append('photo', this.selectedFile); // Se è stato caricato un file
+      } else if (this.artworkForm.imageUrl) {
+        formData.append('imageUrl', this.artworkForm.imageUrl); // Se viene fornito un URL
+      }
 
       this.artworkService.updateArtwork(this.selectedArtworkId, formData).pipe(
         tap((updatedArtwork: Artwork) => {
@@ -179,9 +223,10 @@ export class ArtworkManagementComponent implements OnInit {
     }
   }
 
+  // Funzione per resettare il form
   resetForm(): void {
-    this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere };
-    this.selectedFiles = [];
+    this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere, imageUrl: '' };
+    this.selectedFile = null;
     this.selectedArtworkId = null;
     this.editing = false;
     this.message = '';

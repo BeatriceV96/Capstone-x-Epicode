@@ -19,7 +19,7 @@ namespace NovaVerse.Models
         public string Description { get; set; }
 
         
-        public byte[] Photo { get; set; }
+        public string Photo { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]

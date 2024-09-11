@@ -56,23 +56,16 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPut("update-profile-picture")]
-        public async Task<IActionResult> UpdateProfilePicture([FromForm] IFormFile profilePicture)
+        public async Task<IActionResult> UpdateProfilePicture([FromBody] string profilePicture)
         {
             var userId = GetUserId();
 
-            if (profilePicture == null || profilePicture.Length == 0)
+            if (string.IsNullOrEmpty(profilePicture))
             {
                 return BadRequest("No profile picture provided.");
             }
 
-            byte[] profilePictureData;
-            using (var ms = new MemoryStream())
-            {
-                await profilePicture.CopyToAsync(ms);
-                profilePictureData = ms.ToArray();
-            }
-
-            var success = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePictureData);
+            var success = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePicture);
 
             if (!success)
             {
@@ -81,6 +74,7 @@ namespace NovaVerse.Controllers
 
             return Ok(new { Message = "Profile picture updated successfully." });
         }
+
 
         [HttpPost("favorites/{artworkId}")]
         public async Task<IActionResult> AddFavorite(int artworkId)

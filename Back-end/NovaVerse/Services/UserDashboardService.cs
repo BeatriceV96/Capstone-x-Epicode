@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NovaVerse.Models;
-using Microsoft.AspNetCore.Http;
-using System.IO;
+using System;
 
 public class UserDashboardService : IUserDashboardService
 {
@@ -46,10 +45,7 @@ public class UserDashboardService : IUserDashboardService
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
-        if (user == null)
-        {
-            return null;
-        }
+        if (user == null) return null;
 
         return new UserDto
         {
@@ -65,15 +61,14 @@ public class UserDashboardService : IUserDashboardService
     public async Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto)
     {
         var user = await _context.Users.FindAsync(userId);
-        if (user == null)
-        {
-            return null;
-        }
+        if (user == null) return null;
 
         user.Username = userDto.Username;
         user.Email = userDto.Email;
         user.Bio = userDto.Bio;
-        user.ProfilePicture = userDto.ProfilePicture;
+        user.ProfilePicture = !string.IsNullOrEmpty(userDto.ProfilePicture)
+            ? userDto.ProfilePicture
+            : user.ProfilePicture;  // Se l'immagine è presente, aggiorna
 
         await _context.SaveChangesAsync();
 
@@ -87,20 +82,22 @@ public class UserDashboardService : IUserDashboardService
             CreateDate = user.CreateDate
         };
     }
-    public async Task<bool> UpdateProfilePictureAsync(int userId, byte[] profilePictureData)
+
+    public async Task<bool> UpdateProfilePictureAsync(int userId, string profilePictureBase64OrUrl)
     {
         var user = await _context.Users.FindAsync(userId);
-        if (user == null)
+        if (user == null) return false;
+
+        if (!string.IsNullOrEmpty(profilePictureBase64OrUrl))
         {
-            return false;
+            // Accetta sia URL che base64
+            user.ProfilePicture = profilePictureBase64OrUrl;
         }
 
-        user.ProfilePicture = profilePictureData;
-
         await _context.SaveChangesAsync();
-
         return true;
     }
+
 
     public async Task<bool> AddFavoriteAsync(int userId, int artworkId)
     {
@@ -122,37 +119,11 @@ public class UserDashboardService : IUserDashboardService
         var favorite = await _context.Favorites
             .FirstOrDefaultAsync(f => f.UserId == userId && f.ArtworkId == artworkId);
 
-        if (favorite == null)
-        {
-            return false;
-        }
+        if (favorite == null) return false;
 
         _context.Favorites.Remove(favorite);
         await _context.SaveChangesAsync();
 
         return true;
-    }
-
-    private async Task<string> SaveProfilePictureAsync(IFormFile profilePicture)
-    {
-        if (profilePicture == null || profilePicture.Length == 0)
-        {
-            return null;
-        }
-
-        // Percorso per salvare l'immagine del profilo (puoi modificarlo a seconda delle tue necessità)
-        var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-        var fileName = Path.GetFileName(profilePicture.FileName);
-        var filePath = Path.Combine(uploadPath, fileName);
-
-        // Salva l'immagine sul disco
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            await profilePicture.CopyToAsync(fileStream);
-        }
-
-        // Restituisci l'URL dell'immagine
-        var pictureUrl = $"/images/{fileName}";
-        return pictureUrl;
     }
 }

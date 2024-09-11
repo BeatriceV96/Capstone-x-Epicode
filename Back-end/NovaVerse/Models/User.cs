@@ -20,7 +20,7 @@ namespace NovaVerse.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        public byte[] ProfilePicture { get; set; } // Modificato da string a byte[]
+        public string ProfilePicture { get; set; } // Modificato da string a byte[]
 
         [Required]
         public string Bio { get; set; }

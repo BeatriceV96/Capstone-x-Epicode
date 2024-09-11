@@ -68,36 +68,29 @@ namespace NovaVerse.Controllers
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto)
         {
             // Verifica se l'immagine è presente
-            if (artworkDto.Photo == null || artworkDto.Photo.Length == 0)
+            if (string.IsNullOrEmpty(artworkDto.Photo))
             {
                 ModelState.AddModelError("Photo", "L'immagine dell'opera è richiesta");
                 return BadRequest(ModelState);
             }
 
-            byte[] imageBytes = null;
-
-            // Se l'immagine è presente, copiala in un array di byte
-            if (artworkDto.Photo != null)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await artworkDto.Photo.CopyToAsync(memoryStream);
-                    imageBytes = memoryStream.ToArray();
-                }
-            }
-
             // Recupera l'ID dell'artista dall'utente autenticato
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            artworkDto.ArtistId = artistId;
-
-            // Aggiungi l'artwork con l'immagine
-            var artwork = await _artworkService.AddArtworkAsync(artworkDto, imageBytes);
-            if (artwork == null)
+            if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var artistId))
             {
-                return BadRequest("Creazione dell'opera fallita");
+                artworkDto.ArtistId = artistId;
+
+                // Aggiungi l'artwork con l'immagine gestita come stringa (base64 o URL)
+                var artwork = await _artworkService.AddArtworkAsync(artworkDto); 
+
+                if (artwork == null)
+                {
+                    return BadRequest("Creazione dell'opera fallita");
+                }
+
+                return Ok(artwork);
             }
 
-            return Ok(artwork);
+            return Unauthorized();
         }
 
 

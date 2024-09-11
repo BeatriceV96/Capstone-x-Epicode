@@ -29,10 +29,23 @@
         <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
       </select>
     </div>
+
+    <!-- Campo Immagine (URL o File) -->
     <div class="mb-4">
-      <label class="block mb-1">Immagini</label>
-      <input type="file" (change)="onFileChange($event)" multiple>
+      <label class="block mb-1">Immagine (URL o carica un file)</label>
+      <input [(ngModel)]="artworkForm.imageUrl" class="border p-2 rounded w-full mb-2" placeholder="Inserisci URL dell'immagine" [disabled]="loading">
+
+      <!-- Campo per il caricamento del file immagine -->
+      <input type="file" (change)="onFileChange($event)" class="border p-2 rounded w-full" [disabled]="loading">
     </div>
+
+    <!-- Preview dell'immagine -->
+    <div *ngIf="artworkForm.imageUrl || selectedFile" class="mb-4">
+      <label class="block mb-1">Anteprima Immagine</label>
+      <img *ngIf="artworkForm.imageUrl" [src]="artworkForm.imageUrl" alt="Anteprima Immagine" class="w-32 h-32 object-cover border rounded-lg">
+      <img *ngIf="selectedFilePreviewUrl" [src]="selectedFilePreviewUrl" alt="Anteprima Immagine" class="w-32 h-32 object-cover border rounded-lg">
+    </div>
+
     <div class="flex space-x-4">
       <button *ngIf="!editing" [disabled]="loading" (click)="createArtwork()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
         {{ loading ? 'Caricamento...' : 'Aggiungi Opera' }}
@@ -54,6 +67,7 @@
           <th class="px-4 py-2">Titolo</th>
           <th class="px-4 py-2">Descrizione</th>
           <th class="px-4 py-2">Prezzo</th>
+          <th class="px-4 py-2">Immagine</th>
           <th class="px-4 py-2">Azioni</th>
         </tr>
       </thead>
@@ -62,6 +76,11 @@
           <td class="px-4 py-2">{{ artwork.title }}</td>
           <td class="px-4 py-2">{{ artwork.description }}</td>
           <td class="px-4 py-2">{{ artwork.price | currency }}</td>
+          <td class="px-4 py-2">
+            <!-- Condizioni per gestire immagine da URL o file -->
+            <img *ngIf="artwork.imageUrl" [src]="artwork.imageUrl" alt="Opera" class="w-20 h-20 object-cover" />
+            <img *ngIf="artwork.photo" [src]="photoBase64(artwork.photo)" alt="Opera" class="w-20 h-20 object-cover" />
+          </td>
           <td class="px-4 py-2">
             <button (click)="editArtwork(artwork)" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
               <i class="fas fa-edit"></i> Modifica
@@ -72,7 +91,7 @@
           </td>
         </tr>
         <tr *ngIf="artworks.length === 0">
-          <td colspan="4" class="px-4 py-2 text-center text-gray-500">Non ci sono opere disponibili.</td>
+          <td colspan="5" class="px-4 py-2 text-center text-gray-500">Non ci sono opere disponibili.</td>
         </tr>
       </tbody>
     </table>

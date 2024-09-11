@@ -1,13 +1,13 @@
-﻿using NovaVerse.Interfaces;
+﻿using NovaVerse.Dto;
+using NovaVerse.Interfaces;
 using NovaVerse.Context;
 using NovaVerse.Models;
-using NovaVerse.Dto;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace NovaVerse.Services
 {
@@ -24,25 +24,15 @@ namespace NovaVerse.Services
 
         public async Task<bool> Register(RegisterDto registerDto)
         {
-            byte[] profilePictureData = null;
-            if (registerDto.ProfilePicture != null)
-            {
-                using (var ms = new MemoryStream())
-                {
-                    await registerDto.ProfilePicture.CopyToAsync(ms);
-                    profilePictureData = ms.ToArray();
-                }
-            }
-
             var user = new User
             {
                 Username = registerDto.Username,
                 Password = registerDto.Password,
                 Email = registerDto.Email,
-                ProfilePicture = profilePictureData,
                 Bio = registerDto.Bio,
                 Role = Enum.Parse<User.UserRole>(registerDto.Role),
-                CreateDate = DateTime.Now
+                ProfilePicture = registerDto.ProfilePicture,  // Accetta stringa URL o base64
+                CreateDate = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
@@ -53,7 +43,6 @@ namespace NovaVerse.Services
         public async Task<UserDto> Login(LoginDto loginDto)
         {
             bool isEmail = loginDto.Username.Contains('@');
-
             var user = isEmail
                 ? await _context.Users.FirstOrDefaultAsync(x => x.Email == loginDto.Username && x.Password == loginDto.Password)
                 : await _context.Users.FirstOrDefaultAsync(x => x.Username == loginDto.Username && x.Password == loginDto.Password);
@@ -75,10 +64,7 @@ namespace NovaVerse.Services
         public async Task<UserDto> GetUserById(int id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return null;
-            }
+            if (user == null) return null;
 
             return new UserDto
             {
@@ -94,15 +80,14 @@ namespace NovaVerse.Services
         public async Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto)
         {
             var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return null;
-            }
+            if (user == null) return null;
 
             user.Username = userDto.Username;
             user.Email = userDto.Email;
             user.Bio = userDto.Bio;
-            user.ProfilePicture = userDto.ProfilePicture;
+            user.ProfilePicture = !string.IsNullOrEmpty(userDto.ProfilePicture)
+                                  ? userDto.ProfilePicture
+                                  : user.ProfilePicture;  // Se la foto è presente, aggiorna
 
             await _context.SaveChangesAsync();
 
@@ -117,17 +102,17 @@ namespace NovaVerse.Services
             };
         }
 
-        public async Task<bool> UpdateProfilePictureAsync(int userId, byte[] profilePictureData)
+        public async Task<bool> UpdateProfilePictureAsync(int userId, string profilePictureBase64OrUrl)
         {
             var user = await _context.Users.FindAsync(userId);
-            if (user == null)
+            if (user == null) return false;
+
+            if (!string.IsNullOrEmpty(profilePictureBase64OrUrl))
             {
-                return false;
+                user.ProfilePicture = profilePictureBase64OrUrl;  // Accetta sia URL che base64
             }
 
-            user.ProfilePicture = profilePictureData;
             await _context.SaveChangesAsync();
-
             return true;
         }
 

@@ -39,26 +39,24 @@ namespace NovaVerse.Services
                 .ToListAsync();
         }
 
-        public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto, byte[] imageBytes)
+        public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
         {
-            var artwork = new Artwork
+            var newArtwork = new Artwork
             {
                 Title = artworkDto.Title,
                 Description = artworkDto.Description,
                 Price = artworkDto.Price,
-                Photo = imageBytes,
+                Photo = artworkDto.Photo,  
                 CategoryId = artworkDto.CategoryId,
-                Type = artworkDto.Type,
                 ArtistId = artworkDto.ArtistId,
-                CreateDate = DateTime.Now
+                CreateDate = DateTime.UtcNow
             };
 
-            _context.Artworks.Add(artwork);
+            _context.Artworks.Add(newArtwork);
             await _context.SaveChangesAsync();
 
-            return artwork;
+            return newArtwork;
         }
-
 
         public async Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto)
         {
@@ -68,17 +66,17 @@ namespace NovaVerse.Services
                 return null;
             }
 
+            // Aggiorna le proprietà dell'opera
             artwork.Title = artworkDto.Title;
             artwork.Description = artworkDto.Description;
             artwork.Price = artworkDto.Price;
-            if (artworkDto.Photo != null)
+
+            // Aggiorna la foto solo se è stata fornita una nuova
+            if (!string.IsNullOrEmpty(artworkDto.Photo))
             {
-                using (var ms = new MemoryStream())
-                {
-                    await artworkDto.Photo.CopyToAsync(ms);
-                    artwork.Photo = ms.ToArray();
-                }
+                artwork.Photo = artworkDto.Photo; 
             }
+
             artwork.CategoryId = artworkDto.CategoryId;
             artwork.Type = artworkDto.Type;
             artwork.ArtistId = artworkDto.ArtistId;
@@ -86,6 +84,7 @@ namespace NovaVerse.Services
             await _context.SaveChangesAsync();
             return artwork;
         }
+
 
         public async Task<bool> DeleteArtworkAsync(int id)
         {

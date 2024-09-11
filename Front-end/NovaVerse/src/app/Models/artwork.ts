@@ -3,13 +3,15 @@ export interface Artwork {
   title: string;
   description: string;
   price: number;
-  imageUrl: string;
-  categoryId: number | null;
-  type: ArtworkType; // Enum per il tipo (Opere o NFT)
+  photo?: Uint8Array; // L'immagine caricata come byte[]
+  imageUrl?: string;  // Aggiungi questa proprietà se devi gestire URL
+  categoryId: number;
+  type: ArtworkType;
   artistId: number;
   createDate: Date;
   viewCount: number;
 }
+
 
 export enum ArtworkType {
   Opere = 'Opere',
