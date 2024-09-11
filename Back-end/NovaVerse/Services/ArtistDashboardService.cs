@@ -65,7 +65,7 @@ public class ArtistDashboardService : IArtistDashboardService
             Username = user.Username,
             Email = user.Email,
             Bio = user.Bio,
-            ProfilePictureUrl = user.ProfilePictureUrl,
+            ProfilePicture = user.ProfilePicture,
             CreateDate = user.CreateDate
         };
     }
@@ -81,7 +81,7 @@ public class ArtistDashboardService : IArtistDashboardService
         user.Username = userDto.Username;
         user.Email = userDto.Email;
         user.Bio = userDto.Bio;
-        user.ProfilePictureUrl = userDto.ProfilePictureUrl;  // Aggiungi questa riga se vuoi aggiornare anche l'immagine del profilo
+        user.ProfilePicture = userDto.ProfilePicture;  // Aggiungi questa riga se vuoi aggiornare anche l'immagine del profilo
 
         await _context.SaveChangesAsync();
 
@@ -91,7 +91,7 @@ public class ArtistDashboardService : IArtistDashboardService
             Username = user.Username,
             Email = user.Email,
             Bio = user.Bio,
-            ProfilePictureUrl = user.ProfilePictureUrl
+            ProfilePicture = user.ProfilePicture
         };
     }
 }

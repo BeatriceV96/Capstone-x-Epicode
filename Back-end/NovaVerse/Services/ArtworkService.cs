@@ -39,17 +39,17 @@ namespace NovaVerse.Services
                 .ToListAsync();
         }
 
-        public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
+        public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto, byte[] imageBytes)
         {
             var artwork = new Artwork
             {
                 Title = artworkDto.Title,
                 Description = artworkDto.Description,
                 Price = artworkDto.Price,
-                ImageUrl = artworkDto.ImageUrl,
+                Photo = imageBytes,
                 CategoryId = artworkDto.CategoryId,
                 Type = artworkDto.Type,
-                ArtistId = artworkDto.ArtistId,  
+                ArtistId = artworkDto.ArtistId,
                 CreateDate = DateTime.Now
             };
 
@@ -58,6 +58,7 @@ namespace NovaVerse.Services
 
             return artwork;
         }
+
 
         public async Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto)
         {
@@ -70,10 +71,17 @@ namespace NovaVerse.Services
             artwork.Title = artworkDto.Title;
             artwork.Description = artworkDto.Description;
             artwork.Price = artworkDto.Price;
-            artwork.ImageUrl = artworkDto.ImageUrl;
+            if (artworkDto.Photo != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await artworkDto.Photo.CopyToAsync(ms);
+                    artwork.Photo = ms.ToArray();
+                }
+            }
             artwork.CategoryId = artworkDto.CategoryId;
             artwork.Type = artworkDto.Type;
-            artwork.ArtistId = artworkDto.ArtistId;  
+            artwork.ArtistId = artworkDto.ArtistId;
 
             await _context.SaveChangesAsync();
             return artwork;

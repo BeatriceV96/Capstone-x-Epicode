@@ -29,19 +29,8 @@ export class UserService {
   }
 
   // Aggiorna l'immagine del profilo
-  updateProfilePicture(file: File): Observable<{ ProfilePictureUrl: string }> {
-    const formData = new FormData();
-    formData.append('profilePicture', file);
-
-    return this.http.put<{ ProfilePictureUrl: string }>(`${this.apiUrl}/update-profile-picture`, formData, {
-      withCredentials: true,
-      headers: new HttpHeaders({
-        'Accept': 'application/json'
-      })
-    })
-    .pipe(
-      catchError(this.handleError)
-    );
+  updateProfilePicture(profilePictureData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/updateProfilePicture`, profilePictureData, { withCredentials: true });
   }
 
   // Aggiunge un'opera ai preferiti

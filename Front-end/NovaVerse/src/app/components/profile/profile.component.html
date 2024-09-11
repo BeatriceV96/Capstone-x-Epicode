@@ -1,10 +1,20 @@
 <div *ngIf="user" class="profile-container">
   <!-- Immagine del profilo -->
   <div class="profile-picture-container">
-    <img *ngIf="user.profilePictureUrl" [src]="user.profilePictureUrl" alt="Immagine del profilo di {{ user.username }}" class="profile-picture img-thumbnail">
-    <div *ngIf="!user.profilePictureUrl" class="no-profile-picture">
+    <img *ngIf="user?.profilePicture"
+     [src]="sanitizer.bypassSecurityTrustUrl('data:image/jpeg;base64,' + profilePictureBase64(user.profilePicture))"
+     alt="Immagine del profilo di {{ user.username }}"
+     class="profile-picture img-thumbnail">
+    <div *ngIf="!user.profilePicture" class="no-profile-picture">
       <p>Nessuna immagine del profilo disponibile.</p>
     </div>
+  </div>
+
+  <!-- Caricamento dell'immagine del profilo -->
+  <div class="profile-field">
+    <strong>Cambia immagine del profilo:</strong>
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file mt-2">
+    <button *ngIf="selectedFile" class="btn btn-primary mt-2" (click)="uploadProfilePicture()">Carica immagine</button>
   </div>
 
   <!-- Sezione del profilo utente -->
@@ -30,7 +40,7 @@
     <strong>Biografia:</strong>
     <div *ngIf="!isEditingBio">
       <p>{{ user.bio || 'Nessuna biografia fornita.' }}</p>
-      <button (click)="enableBioEdit()">Modifica Biografia</button>
+      <button class="btn btn-secondary" (click)="enableBioEdit()">Modifica Biografia</button>
     </div>
     <div *ngIf="isEditingBio">
       <textarea [(ngModel)]="updatedBio" class="form-control"></textarea>

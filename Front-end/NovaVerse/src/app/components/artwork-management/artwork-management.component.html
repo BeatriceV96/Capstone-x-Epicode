@@ -29,6 +29,10 @@
         <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
       </select>
     </div>
+    <div class="mb-4">
+      <label class="block mb-1">Immagini</label>
+      <input type="file" (change)="onFileChange($event)" multiple>
+    </div>
     <div class="flex space-x-4">
       <button *ngIf="!editing" [disabled]="loading" (click)="createArtwork()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
         {{ loading ? 'Caricamento...' : 'Aggiungi Opera' }}

@@ -10,5 +10,6 @@ namespace NovaVerse.Interfaces
         Task Logout();
         Task<UserDto> GetUserById(int userId);
         Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto);
+        Task<bool> UpdateProfilePictureAsync(int userId, byte[] profilePictureData);
     }
 }

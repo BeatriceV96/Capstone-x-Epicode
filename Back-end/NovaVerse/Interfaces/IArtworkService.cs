@@ -16,9 +16,7 @@ namespace NovaVerse.Interfaces
         // Restituisce tutte le opere per una categoria specifica
         Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId);
 
-        // Aggiunge una nuova opera
-        Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto);
-
+        Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto, byte[] imageBytes);
         // Aggiorna un'opera esistente
         Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto);
 

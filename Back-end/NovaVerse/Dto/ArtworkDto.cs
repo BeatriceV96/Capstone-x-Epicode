@@ -8,7 +8,7 @@ namespace NovaVerse.Dto
         public string Title { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
-        public string ImageUrl { get; set; }
+        public IFormFile Photo { get; set; }
         public int CategoryId { get; set; }
         public ArtworkType Type { get; set; }
         public int ArtistId { get; set; }  // Aggiungi questo campo

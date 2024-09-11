@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { iUser } from '../../Models/i-user';
 import { UserService } from '../../services/user.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +15,7 @@ export class ProfileComponent implements OnInit {
   updatedBio: string = '';
   selectedFile: File | null = null; // Per l'immagine del profilo
 
-  constructor(private authService: AuthService, private userService: UserService) { }
+  constructor(private authService: AuthService, private userService: UserService, public sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.loadUserProfile();
@@ -40,6 +41,10 @@ export class ProfileComponent implements OnInit {
 
   enableBioEdit(): void {
     this.isEditingBio = true;
+  }
+
+  profilePictureBase64(byteArray: Uint8Array): string {
+    return btoa(String.fromCharCode.apply(null, Array.from(byteArray)));
   }
 
   saveBio(): void {
@@ -70,20 +75,25 @@ export class ProfileComponent implements OnInit {
   }
 
   // Funzione per caricare l'immagine del profilo
-  uploadProfilePicture(): void {
-    if (this.selectedFile) {
-      this.userService.updateProfilePicture(this.selectedFile).subscribe(
-        (response) => {
-          if (this.user) {
-            this.user.profilePictureUrl = response.ProfilePictureUrl; // Aggiorna l'URL dell'immagine del profilo
-          }
-          // Ricarica il profilo utente per assicurarsi che tutte le modifiche siano aggiornate
-          this.loadUserProfile();
-        },
-        (error) => {
-          console.error('Errore durante il caricamento dell\'immagine del profilo', error);
+  // Funzione per caricare l'immagine del profilo
+uploadProfilePicture(): void {
+  if (this.selectedFile) {
+    const formData = new FormData();
+    formData.append('profilePicture', this.selectedFile);
+
+    this.userService.updateProfilePicture(formData).subscribe(
+      (response: any) => {
+        if (this.user) {
+          // Aggiorna la foto del profilo con i dati ricevuti
+          this.user.profilePicture = response.profilePicture; // Ora è byte[] e non più URL
         }
-      );
-    }
+        // Ricarica il profilo utente per assicurarsi che tutte le modifiche siano aggiornate
+        this.loadUserProfile();
+      },
+      (error) => {
+        console.error('Errore durante il caricamento dell\'immagine del profilo', error);
+      }
+    );
   }
+}
 }

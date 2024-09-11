@@ -6,6 +6,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace NovaVerse.Services
 {
@@ -22,22 +24,31 @@ namespace NovaVerse.Services
 
         public async Task<bool> Register(RegisterDto registerDto)
         {
+            byte[] profilePictureData = null;
+            if (registerDto.ProfilePicture != null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    await registerDto.ProfilePicture.CopyToAsync(ms);
+                    profilePictureData = ms.ToArray();
+                }
+            }
+
             var user = new User
             {
                 Username = registerDto.Username,
                 Password = registerDto.Password,
                 Email = registerDto.Email,
-                ProfilePictureUrl = registerDto.ProfilePictureUrl,  // Assicurati che questo campo sia mappato
-                Bio = registerDto.Bio,  // Assicurati che questo campo sia mappato
+                ProfilePicture = profilePictureData,
+                Bio = registerDto.Bio,
                 Role = Enum.Parse<User.UserRole>(registerDto.Role),
-                CreateDate = DateTime.Now  // Imposta la data di creazione
+                CreateDate = DateTime.Now
             };
 
             _context.Users.Add(user);
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }
-
 
         public async Task<UserDto> Login(LoginDto loginDto)
         {
@@ -55,12 +66,11 @@ namespace NovaVerse.Services
                 Username = user.Username,
                 Email = user.Email,
                 Role = user.Role.ToString(),
-                Bio = user.Bio, 
-                ProfilePictureUrl = user.ProfilePictureUrl,  
-                CreateDate = user.CreateDate  
+                Bio = user.Bio,
+                ProfilePicture = user.ProfilePicture,
+                CreateDate = user.CreateDate
             };
         }
-
 
         public async Task<UserDto> GetUserById(int id)
         {
@@ -75,12 +85,11 @@ namespace NovaVerse.Services
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Bio = user.Bio,  // Recupera la bio
-                ProfilePictureUrl = user.ProfilePictureUrl,  // Recupera l'URL del profilo
-                CreateDate = user.CreateDate  // Recupera la data di creazione
+                Bio = user.Bio,
+                ProfilePicture = user.ProfilePicture,
+                CreateDate = user.CreateDate
             };
         }
-
 
         public async Task<UserDto> UpdateUserProfileAsync(int userId, UserDto userDto)
         {
@@ -90,11 +99,10 @@ namespace NovaVerse.Services
                 return null;
             }
 
-            // Aggiorna i campi modificabili
             user.Username = userDto.Username;
             user.Email = userDto.Email;
-            user.Bio = userDto.Bio;  // Aggiorna la bio
-            user.ProfilePictureUrl = userDto.ProfilePictureUrl;
+            user.Bio = userDto.Bio;
+            user.ProfilePicture = userDto.ProfilePicture;
 
             await _context.SaveChangesAsync();
 
@@ -103,16 +111,28 @@ namespace NovaVerse.Services
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Bio = user.Bio,  // Restituisci la bio aggiornata
+                Bio = user.Bio,
+                ProfilePicture = user.ProfilePicture,
                 CreateDate = user.CreateDate
             };
         }
 
+        public async Task<bool> UpdateProfilePictureAsync(int userId, byte[] profilePictureData)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.ProfilePicture = profilePictureData;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
 
         public async Task Logout()
         {
-
-            //Termina la sessione dell'utente utilizzando i cookie di autenticazione.
             await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }

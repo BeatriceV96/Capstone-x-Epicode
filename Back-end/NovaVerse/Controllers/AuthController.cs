@@ -20,12 +20,12 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
         {
             var result = await _userService.Register(registerDto);
             if (!result)
             {
-                return BadRequest("Registration failed");
+                return BadRequest("Registration failed.");
             }
 
             // Recupera l'utente appena creato
@@ -34,6 +34,7 @@ namespace NovaVerse.Controllers
             // Restituisci i dettagli dell'utente registrato
             return Ok(user);
         }
+
 
 
         [HttpPost("login")]

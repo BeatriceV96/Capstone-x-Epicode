@@ -18,7 +18,8 @@ namespace NovaVerse.Models
         [Column(TypeName = "nvarchar(max)")]
         public string Description { get; set; }
 
-        public string ImageUrl { get; set; }
+        
+        public byte[] Photo { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]

@@ -35,7 +35,6 @@ namespace NovaVerse.Controllers
                 return NotFound("Opera non trovata.");
             }
 
-            // Verifica che l'artista loggato sia il proprietario dell'opera
             var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             if (artwork.ArtistId != artistId)
             {
@@ -59,7 +58,6 @@ namespace NovaVerse.Controllers
             }
             catch (Exception ex)
             {
-                // Log dell'errore per avere più dettagli
                 Console.WriteLine(ex.Message);
                 return StatusCode(500, "Errore interno del server.");
             }
@@ -67,23 +65,46 @@ namespace NovaVerse.Controllers
 
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateArtwork([FromBody] ArtworkDto artworkDto)
+        public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto)
         {
-            // Setta l'ArtistId basandoti sull'utente loggato
+            // Verifica se l'immagine è presente
+            if (artworkDto.Photo == null || artworkDto.Photo.Length == 0)
+            {
+                ModelState.AddModelError("Photo", "L'immagine dell'opera è richiesta");
+                return BadRequest(ModelState);
+            }
+
+            byte[] imageBytes = null;
+
+            // Se l'immagine è presente, copiala in un array di byte
+            if (artworkDto.Photo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await artworkDto.Photo.CopyToAsync(memoryStream);
+                    imageBytes = memoryStream.ToArray();
+                }
+            }
+
+            // Recupera l'ID dell'artista dall'utente autenticato
             var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             artworkDto.ArtistId = artistId;
 
-            var artwork = await _artworkService.AddArtworkAsync(artworkDto);
+            // Aggiungi l'artwork con l'immagine
+            var artwork = await _artworkService.AddArtworkAsync(artworkDto, imageBytes);
             if (artwork == null)
             {
-                return BadRequest("Failed to create artwork.");
+                return BadRequest("Creazione dell'opera fallita");
             }
+
             return Ok(artwork);
         }
 
+
+
         [Authorize(Policy = "ArtistOnly")]
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateArtwork(int id, [FromBody] ArtworkDto artworkDto)
+        public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var artwork = await _artworkService.GetArtworkByIdAsync(id);
@@ -114,7 +135,6 @@ namespace NovaVerse.Controllers
                 return Unauthorized("Non sei autorizzato a eliminare questa opera.");
             }
 
-            var success = await _artworkService.DeleteArtworkAsync(id);
             var success = await _artworkService.DeleteArtworkAsync(id);
             if (!success)
             {

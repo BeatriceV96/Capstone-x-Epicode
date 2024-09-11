@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NovaVerse.Context;
 
@@ -11,9 +12,11 @@ using NovaVerse.Context;
 namespace NovaVerse.Migrations
 {
     [DbContext(typeof(NovaVerseDbContext))]
-    partial class NovaVerseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240911153824_AggiuntoCampoProfiloUtente")]
+    partial class AggiuntoCampoProfiloUtente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +51,8 @@ namespace NovaVerse.Migrations
 
                     b.Property<byte[]>("Photo")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varbinary(128)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");

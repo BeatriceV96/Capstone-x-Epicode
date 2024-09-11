@@ -57,7 +57,7 @@ public class UserDashboardService : IUserDashboardService
             Username = user.Username,
             Email = user.Email,
             Bio = user.Bio,
-            ProfilePictureUrl = user.ProfilePictureUrl,
+            ProfilePicture = user.ProfilePicture,
             CreateDate = user.CreateDate
         };
     }
@@ -73,6 +73,7 @@ public class UserDashboardService : IUserDashboardService
         user.Username = userDto.Username;
         user.Email = userDto.Email;
         user.Bio = userDto.Bio;
+        user.ProfilePicture = userDto.ProfilePicture;
 
         await _context.SaveChangesAsync();
 
@@ -82,26 +83,23 @@ public class UserDashboardService : IUserDashboardService
             Username = user.Username,
             Email = user.Email,
             Bio = user.Bio,
-            ProfilePictureUrl = user.ProfilePictureUrl,
+            ProfilePicture = user.ProfilePicture,
             CreateDate = user.CreateDate
         };
     }
-
-    public async Task<string> UpdateProfilePictureAsync(int userId, IFormFile profilePicture)
+    public async Task<bool> UpdateProfilePictureAsync(int userId, byte[] profilePictureData)
     {
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
         {
-            return null;
+            return false;
         }
 
-        // Logica per gestire il caricamento del file
-        var pictureUrl = await SaveProfilePictureAsync(profilePicture);
-        user.ProfilePictureUrl = pictureUrl;
+        user.ProfilePicture = profilePictureData;
 
         await _context.SaveChangesAsync();
 
-        return pictureUrl;
+        return true;
     }
 
     public async Task<bool> AddFavoriteAsync(int userId, int artworkId)

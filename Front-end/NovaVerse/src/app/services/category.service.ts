@@ -13,14 +13,14 @@ export class CategoryService {
 
   // Ottieni tutte le categorie
   getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.baseUrl}/all`).pipe(
-      catchError((error) => {
-        console.error('Errore durante il recupero delle categorie:', error);
-        return throwError(error);
-      })
-    );
+    return this.http.get<Category[]>(`${this.baseUrl}/all`, { withCredentials: true })
+      .pipe(
+        catchError(error => {
+          console.error('Errore durante il caricamento delle categorie:', error);
+          throw error;
+        })
+      );
   }
-
 
   // Ottieni una categoria specifica dall'ID
   getCategoryById(id: number): Observable<Category> {

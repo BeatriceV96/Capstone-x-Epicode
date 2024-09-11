@@ -5,6 +5,7 @@ using NovaVerse.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace NovaVerse.Controllers
 {
@@ -53,6 +54,7 @@ namespace NovaVerse.Controllers
 
             return Ok(updatedUser);
         }
+
         [HttpPut("update-profile-picture")]
         public async Task<IActionResult> UpdateProfilePicture([FromForm] IFormFile profilePicture)
         {
@@ -63,14 +65,21 @@ namespace NovaVerse.Controllers
                 return BadRequest("No profile picture provided.");
             }
 
-            var pictureUrl = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePicture);
+            byte[] profilePictureData;
+            using (var ms = new MemoryStream())
+            {
+                await profilePicture.CopyToAsync(ms);
+                profilePictureData = ms.ToArray();
+            }
 
-            if (pictureUrl == null)
+            var success = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePictureData);
+
+            if (!success)
             {
                 return BadRequest("Failed to update profile picture.");
             }
 
-            return Ok(new { ProfilePictureUrl = pictureUrl });
+            return Ok(new { Message = "Profile picture updated successfully." });
         }
 
         [HttpPost("favorites/{artworkId}")]

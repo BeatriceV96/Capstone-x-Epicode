@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -31,7 +32,7 @@ export class AuthService {
   }
 
   // Registrazione di un nuovo utente
-  register(newUser: Partial<iUser>): Observable<any> {
+  register(newUser: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/register`, newUser).pipe(
       tap(() => {
         this.router.navigate(['/login']);  // Reindirizza alla pagina di login dopo la registrazione
@@ -51,10 +52,9 @@ export class AuthService {
           id: res.user.id,
           username: res.user.username,
           email: res.user.email,
-          password: res.user.password,
           role: res.user.role,
           bio: res.user.bio,  // Bio dell'utente
-          profilePictureUrl: res.user.profilePictureUrl,  // URL immagine profilo
+          profilePicture: res.user.profilePicture,  // Ora è byte[] non URL
           createDate: res.user.createDate  // Data di creazione dell'account
         };
 
