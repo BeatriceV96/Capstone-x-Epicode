@@ -10,5 +10,6 @@ namespace NovaVerse.Interfaces
         Task<Category> AddCategoryAsync(CategoryDto categoryDto);
         Task<Category> UpdateCategoryAsync(int id, CategoryDto categoryDto);
         Task<bool> DeleteCategoryAsync(int id);
+        Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId);
     }
 }

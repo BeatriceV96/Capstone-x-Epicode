@@ -23,7 +23,11 @@ const routes: Routes = [
   { path: 'category-management', component: CategoryManagementComponent, canActivate: [ArtistGuard] },
 
   // Visualizza opere in una specifica categoria
-  { path: 'categories/:id/artworks', component: ArtworkListComponent }, // Visualizza opere
+  {
+    path: 'categories/:id/artworks',
+    component: ArtworkListComponent
+  }
+  , // Visualizza opere
   { path: 'categories/:id/artworks/manage', component: ArtworkManagementComponent, canActivate: [ArtistGuard] }, // Gestione opere
 
   // Profilo utente

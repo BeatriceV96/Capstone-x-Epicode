@@ -12,10 +12,12 @@ namespace NovaVerse.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
+        private readonly IArtworkService _artworkService;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ICategoryService categoryService, IArtworkService artworkService)
         {
             _categoryService = categoryService;
+            _artworkService = artworkService; 
         }
 
         // Recupera tutte le categorie
@@ -32,7 +34,6 @@ namespace NovaVerse.Controllers
             return Ok(categories.ToArray());
         }
 
-
         // Recupera una singola categoria per ID
         [HttpGet("{id}")]
         [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare una singola categoria
@@ -45,6 +46,21 @@ namespace NovaVerse.Controllers
             }
             return Ok(category);
         }
+
+        // Nuovo endpoint per ottenere le opere associate a una categoria
+        [Authorize(Policy = "ArtistOnly")]
+        [HttpGet("{id}/artworks")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCategoryWithArtworks(int id)
+        {
+            var artworks = await _artworkService.GetArtworksByCategoryAsync(id);
+            if (artworks == null || artworks.Count == 0)
+            {
+                return NotFound("No artworks found for this category.");
+            }
+            return Ok(artworks);
+        }
+
 
 
         // Crea una nuova categoria (Solo per artisti)
@@ -64,7 +80,6 @@ namespace NovaVerse.Controllers
             }
             return CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }, category);
         }
-
 
         // Aggiorna una categoria esistente (Solo per artisti)
         [Authorize(Policy = "ArtistOnly")]

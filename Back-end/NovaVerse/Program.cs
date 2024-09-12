@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using NovaVerse.Context;
 using NovaVerse.Interfaces;
@@ -8,7 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurazione del database
 builder.Services.AddDbContext<NovaVerseDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"),
+    sqlServerOptions => sqlServerOptions.CommandTimeout(180)));  
+
 
 // Registrazione dei servizi necessari
 builder.Services.AddScoped<IUserService, UserService>();
@@ -63,6 +66,16 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     }); //per evitare cicli infiniti
+
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 52428800; // Imposta il limite a 50 MB
+});
+
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 52428800; // Imposta il limite a 50 MB
+});
 
 
 // Aggiungi supporto per Swagger (documentazione API)

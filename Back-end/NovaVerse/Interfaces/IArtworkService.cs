@@ -8,19 +8,19 @@ namespace NovaVerse.Interfaces
     public interface IArtworkService
     {
         // Restituisce tutte le opere
-        Task<List<Artwork>> GetAllArtworksAsync();
+        Task<List<ArtworkDto>> GetAllArtworksAsync();
 
         // Restituisce una singola opera per ID
-        Task<Artwork> GetArtworkByIdAsync(int id);
+        Task<ArtworkDto> GetArtworkByIdAsync(int id);
 
         // Restituisce tutte le opere per una categoria specifica
-        Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId);
+        Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId);
 
         // Crea una nuova opera
-        Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto);
+        Task<ArtworkDto> AddArtworkAsync(ArtworkDto artworkDto);
 
         // Aggiorna un'opera esistente
-        Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto);
+        Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto);
 
         // Cancella un'opera
         Task<bool> DeleteArtworkAsync(int id);

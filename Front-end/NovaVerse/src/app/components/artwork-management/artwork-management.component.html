@@ -84,11 +84,6 @@
       <input type="file" (change)="onFileChange($event)" accept="image/*" />
     </div>
 
-    <!-- Anteprima immagine se disponibile -->
-    <div *ngIf="artworkForm.imageUrl" class="mb-4">
-      <img [src]="artworkForm.imageUrl" alt="Anteprima" class="w-40 h-40 mt-4" />
-    </div>
-
     <!-- Pulsante di invio -->
     <div class="mb-4">
       <button
@@ -146,8 +141,10 @@
         </td>
       </tr>
       <tr *ngIf="artworks.length === 0">
-        <td colspan="5" class="px-4 py-2 text-center text-gray-500">Non ci sono opere disponibili.</td>
+        <td colspan="5" class="px-4 py-2 text-center text-gray-500">Non ci sono opere disponibili nella categoria selezionata.</td>
       </tr>
     </tbody>
   </table>
 </div>
+
+

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { Category } from '../Models/category';
+import { Artwork } from '../Models/artwork';  // Importa il modello Artwork
 
 @Injectable({
   providedIn: 'root',
@@ -11,24 +12,35 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
-  // Ottieni tutte le categorie
-  getAllCategories(): Observable<Category[]> {
+   // Ottieni tutte le categorie
+   getAllCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}/all`, { withCredentials: true })
       .pipe(
         catchError(error => {
           console.error('Errore durante il caricamento delle categorie:', error);
-          throw error;
+          return throwError(error);
         })
       );
   }
 
-  // Ottieni una categoria specifica dall'ID
-  getCategoryById(id: number): Observable<Category> {
+   // Ottieni una categoria specifica dall'ID
+   getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.baseUrl}/${id}`)
       .pipe(
         catchError((error) => {
           console.error('Errore durante il caricamento della categoria:', error);
-          return throwError(error); // Propaga l'errore
+          return throwError(error);
+        })
+      );
+  }
+
+  // Ottieni opere associate a una categoria specifica
+  getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
+    return this.http.get<Artwork[]>(`${this.baseUrl}/${categoryId}/artworks`, { withCredentials: true })
+      .pipe(
+        catchError((error) => {
+          console.error('Errore durante il caricamento delle opere:', error);
+          return throwError(error);
         })
       );
   }
@@ -39,7 +51,7 @@ export class CategoryService {
       .pipe(
         catchError((error) => {
           console.error('Errore durante la creazione della categoria:', error);
-          return throwError(error); // Propaga l'errore
+          return throwError(error);
         })
       );
   }
@@ -50,7 +62,7 @@ export class CategoryService {
       .pipe(
         catchError((error) => {
           console.error('Errore durante la richiesta di aggiornamento:', error);
-          return throwError(error); // Propaga l'errore
+          return throwError(error);
         })
       );
   }
@@ -61,7 +73,7 @@ export class CategoryService {
       .pipe(
         catchError((error) => {
           console.error('Errore durante l\'eliminazione della categoria:', error);
-          return throwError(error); // Propaga l'errore
+          return throwError(error);
         })
       );
   }

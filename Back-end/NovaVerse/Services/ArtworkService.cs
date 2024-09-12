@@ -31,15 +31,27 @@ namespace NovaVerse.Services
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId)
+        public async Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId)
         {
-            return await _context.Artworks
+            var artworks = await _context.Artworks
                 .Where(a => a.CategoryId == categoryId)
-                .Include(a => a.Artist) 
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Price = a.Price,
+                    Photo = a.Photo,
+     
+                })
                 .ToListAsync();
-        }
 
-        public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
+            return artworks;
+        }
+    
+
+
+    public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
         {
             var newArtwork = new Artwork
             {

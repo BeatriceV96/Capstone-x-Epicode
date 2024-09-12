@@ -33,11 +33,23 @@
       <ng-container *ngIf="isArtist">
         <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700">
           <i class="fas fa-edit fa-2x"></i> Gestisci le opere
-        </a>         <!--QUI INVECE DI USARE  solo [routerLink], ho aggiunto un evento (click) che invoca una funzione nel MIO componente TypeScript:, Il routerLink può a volte non aggiornare correttamente l'URL quando viene usato
-        in certi contesti,specialmente se ci sono problemi di binding o di guardie attive nel router.
-        Usando direttamente il Router di Angular in TypeScript, forziamo il passaggio a una rotta specifica, senza fare affidamento esclusivo su routerLink.-->
-
+        </a>
       </ng-container>
+
+      <!-- Mostra le opere associate alla categoria solo se esistono e sono state caricate -->
+      <div *ngIf="artworksByCategory[category.id] && artworksByCategory[category.id].length > 0" class="mt-4">
+        <h3 class="text-lg font-semibold mb-2">Opere associate a {{ category.name }}</h3>
+        <ul>
+          <li *ngFor="let artwork of artworksByCategory[category.id]" class="border-b py-2">
+            {{ artwork.title }} - {{ artwork.description }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Messaggio se non ci sono opere associate -->
+      <div *ngIf="artworksByCategory[category.id]?.length === 0" class="text-gray-500">
+        Nessuna opera associata a questa categoria.
+      </div>
     </div>
   </div>
 

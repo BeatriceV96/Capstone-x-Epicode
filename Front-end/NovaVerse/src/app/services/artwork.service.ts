@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Artwork } from '../Models/artwork';
 
 @Injectable({
@@ -9,20 +9,20 @@ import { Artwork } from '../Models/artwork';
 })
 export class ArtworkService {
   private baseUrl = 'http://localhost:5034/api/artistArtwork';
-  private artworkSubject = new BehaviorSubject<Artwork[]>([]);
+  private artworkSubject = new BehaviorSubject<Artwork[]>([]);  // Inizializza con un array vuoto
   public artworks$: Observable<Artwork[]> = this.artworkSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   // Ottieni opere per categoria
   getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
-    return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}`, { withCredentials: true }).pipe(
-      tap((artworks: Artwork[]) => {
-        console.log('Opere recuperate:', artworks); // Log per debug
-        this.artworkSubject.next(artworks);
-      }),
-      catchError(this.handleError)
-    );
+    return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true })
+      .pipe(
+        catchError((error) => {
+          console.error('Errore durante il caricamento delle opere:', error);
+          return throwError(error);
+        })
+      );
   }
 
   // Crea una nuova opera
@@ -34,9 +34,9 @@ export class ArtworkService {
 
     return this.http.post<Artwork>(`${this.baseUrl}/create`, formData, { withCredentials: true }).pipe(
       tap((newArtwork: Artwork) => {
-        console.log('Opera creata:', newArtwork); // Log di debug
-        const updatedArtworks = [...this.artworkSubject.value, newArtwork]; // Aggiungi la nuova opera all'elenco
-        this.artworkSubject.next(updatedArtworks); // Aggiorna l'osservabile
+        console.log('Opera creata:', newArtwork);
+        const updatedArtworks = [...this.artworkSubject.value, newArtwork];  // Aggiungi l'opera all'array esistente
+        this.artworkSubject.next(updatedArtworks);
       }),
       catchError(this.handleError)
     );
@@ -46,7 +46,7 @@ export class ArtworkService {
   updateArtwork(id: number, formData: FormData): Observable<Artwork> {
     return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, formData, { withCredentials: true }).pipe(
       tap((updatedArtwork: Artwork) => {
-        console.log('Opera aggiornata:', updatedArtwork); // Log di debug
+        console.log('Opera aggiornata:', updatedArtwork);
         const updatedArtworks = this.artworkSubject.value.map((artwork) =>
           artwork.id === id ? updatedArtwork : artwork
         );
@@ -60,7 +60,7 @@ export class ArtworkService {
   deleteArtwork(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true }).pipe(
       tap(() => {
-        console.log('Opera eliminata:', id); // Log di debug
+        console.log('Opera eliminata:', id);
         const updatedArtworks = this.artworkSubject.value.filter((artwork) => artwork.id !== id);
         this.artworkSubject.next(updatedArtworks);
       }),

@@ -80,5 +80,12 @@ namespace NovaVerse.Services
             return true;
         }
 
+        public async Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId)
+        {
+            return await _context.Artworks
+                .Where(a => a.CategoryId == categoryId)
+                .ToListAsync();
+        }
+
     }
 }

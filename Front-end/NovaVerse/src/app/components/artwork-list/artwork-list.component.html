@@ -1,5 +1,15 @@
 <div class="container mx-auto mt-5">
-  <h1 class="text-2xl font-bold">Opere nella categoria: {{ categoryName }}</h1>
+  <!-- Header della categoria -->
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Opere nella categoria: {{ categoryName }}</h1>
+
+    <!-- Mostra il pulsante di gestione delle opere solo se l'utente è un artista -->
+    <ng-container *ngIf="isArtist">
+      <a (click)="navigateToManage()" class="text-blue-500 hover:text-blue-700">
+        <i class="fas fa-edit fa-2x"></i> Gestisci le opere
+      </a>
+    </ng-container>
+  </div>
 
   <!-- Mostra un loader se i dati sono in fase di caricamento -->
   <div *ngIf="loading" class="flex justify-center items-center h-20">
@@ -11,24 +21,24 @@
     {{ errorMessage }}
   </div>
 
-  <!-- Elenco delle opere, nascondi il loader se non ci sono opere -->
-  <div *ngIf="artworks.length > 0 && !loading; else noArtworks">
-    <div *ngFor="let artwork of artworks" class="bg-white shadow-md rounded-lg p-4 mb-4">
-      <h2 class="text-xl font-semibold">{{ artwork.title }}</h2>
-      <p>{{ artwork.description }}</p>
-      <p>Prezzo: {{ artwork.price | currency }}</p>
-    </div>
+  <!-- Mostra le opere solo se sono state caricate correttamente -->
+  <div *ngIf="artworks.length > 0 && !loading">
+    <h3 class="text-lg font-semibold mb-2">Opere associate a {{ categoryName }}:</h3>
+    <ul>
+      <li *ngFor="let artwork of artworks" class="border-b py-2">
+        <!-- Titolo e descrizione dell'opera -->
+        <div class="flex justify-between items-center">
+          <div>
+            <h4 class="text-xl font-bold">{{ artwork.title }}</h4>
+            <p class="text-gray-700">{{ artwork.description }}</p>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 
-  <!-- Se l'utente è un artista, mostra l'icona per la gestione delle opere -->
-  <ng-container *ngIf="isArtist">
-    <a [routerLink]="['/categories', categoryId, 'artworks/manage']" class="text-blue-500 hover:text-blue-700">
-      <i class="fas fa-edit fa-2x"></i> Gestisci le opere
-    </a>
-  </ng-container>
-
-  <!-- Messaggio se non ci sono opere -->
-  <ng-template #noArtworks>
-    <p class="text-gray-500">Non ci sono opere disponibili al momento.</p>
-  </ng-template>
+  <!-- Messaggio se non ci sono opere associate -->
+  <div *ngIf="artworks.length === 0 && !loading" class="text-gray-500">
+    Non ci sono opere disponibili al momento.
+  </div>
 </div>
