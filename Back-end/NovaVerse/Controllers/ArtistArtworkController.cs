@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
+using NovaVerse.Models;
 using System.Security.Claims;
+
 using System.Threading.Tasks;
 
 namespace NovaVerse.Controllers
@@ -50,10 +52,7 @@ namespace NovaVerse.Controllers
             try
             {
                 var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
-                if (artworks == null || artworks.Count == 0)
-                {
-                    return NotFound("Nessuna opera trovata per questa categoria.");
-                }
+               
                 return Ok(artworks);
             }
             catch (Exception ex)
@@ -65,32 +64,43 @@ namespace NovaVerse.Controllers
 
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto)
+        public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
         {
-            // Verifica se l'immagine è presente
-            if (string.IsNullOrEmpty(artworkDto.Photo))
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("Photo", "L'immagine dell'opera è richiesta");
                 return BadRequest(ModelState);
             }
 
-            // Recupera l'ID dell'artista dall'utente autenticato
-            if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var artistId))
+            // Se l'utente carica un file immagine
+            if (photoFile != null && photoFile.Length > 0)
             {
-                artworkDto.ArtistId = artistId;
-
-                // Aggiungi l'artwork con l'immagine gestita come stringa (base64 o URL)
-                var artwork = await _artworkService.AddArtworkAsync(artworkDto); 
-
-                if (artwork == null)
+                // Gestione dell'immagine caricata come file
+                using (var ms = new MemoryStream())
                 {
-                    return BadRequest("Creazione dell'opera fallita");
+                    await photoFile.CopyToAsync(ms);
+                    artworkDto.Photo = Convert.ToBase64String(ms.ToArray());
                 }
+            }
+            // Caso in cui nessuna immagine venga fornita (opzionale)
+            else
+            {
+                artworkDto.Photo = null; // Non viene fornita alcuna immagine
+            }
+            // Imposta l'ID dell'artista dall'utente autenticato
+            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            artworkDto.ArtistId = artistId;
 
-                return Ok(artwork);
+            // Debug: log dei dati ricevuti nel DTO per verificare
+            Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}, ArtistId: {artworkDto.ArtistId}, Photo: {artworkDto.Photo}");
+            
+            // Crea l'opera tramite il servizio
+            var createdArtwork = await _artworkService.AddArtworkAsync(artworkDto);
+            if (createdArtwork == null)
+            {
+                return BadRequest("Errore nella creazione dell'opera.");
             }
 
-            return Unauthorized();
+            return Ok(createdArtwork);
         }
 
 

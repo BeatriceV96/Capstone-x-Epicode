@@ -3,15 +3,14 @@ export interface Artwork {
   title: string;
   description: string;
   price: number;
-  photo?: Uint8Array; // L'immagine caricata come byte[]
-  imageUrl?: string;  // Aggiungi questa proprietà se devi gestire URL
+  photo?: string;
+  imageUrl?: string;  // Per gestire un URL dell'immagine se è presente
   categoryId: number;
   type: ArtworkType;
   artistId: number;
   createDate: Date;
   viewCount: number;
 }
-
 
 export enum ArtworkType {
   Opere = 'Opere',

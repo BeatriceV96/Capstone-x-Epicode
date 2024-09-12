@@ -17,7 +17,7 @@ namespace NovaVerse.Interfaces
         Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId);
 
         // Crea una nuova opera
-        Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto); // Rimosso il parametro byte[] imageBytes
+        Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto);
 
         // Aggiorna un'opera esistente
         Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto);

@@ -1,57 +1,62 @@
-import { DomSanitizer } from '@angular/platform-browser';
-import { ArtworkType } from './../../Models/artwork';
 import { Component, OnInit } from '@angular/core';
-import { ArtworkService } from '../../services/artwork.service';
-import { CategoryService } from '../../services/category.service';
-import { Artwork } from '../../Models/artwork';
-import { Category } from '../../Models/category';
-import { of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
+import { ArtworkService } from '../../services/artwork.service';
+import { Artwork, ArtworkType } from '../../Models/artwork'; // Assicurati di importare ArtworkType
+import { catchError, Observable, of, tap } from 'rxjs';
+import { Category } from '../../Models/category';
+import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-artwork-management',
   templateUrl: './artwork-management.component.html',
   styleUrls: ['./artwork-management.component.scss']
 })
-
 export class ArtworkManagementComponent implements OnInit {
-  artworks: Artwork[] = [];
+  artworks$: Observable<Artwork[]> = new Observable<Artwork[]>();
+  categoryId: number | null | undefined;
   categories: Category[] = [];
-  artworkForm: Partial<Artwork> = {
-    title: '',
-    description: '',
-    price: 0,
-    categoryId: undefined,
-    type: ArtworkType.Opere,
-    imageUrl: '' // Campo per URL o base64
-  };
-  selectedFile: File | null = null; // Campo per il file selezionato
+  artworkForm: Partial<Artwork> = { title: '', description: '', price: 0, categoryId: undefined, imageUrl: '' };
   editing: boolean = false;
   loading: boolean = false;
   message: string = '';
   success: boolean = true;
   selectedArtworkId: number | null = null;
-  selectedFilePreviewUrl: string | ArrayBuffer | null = null;
+  selectedFile: File | null = null;
 
+  // Aggiungi la proprietà ArtworkType per poterla usare nel template
+  ArtworkType = ArtworkType;
 
   constructor(
     private artworkService: ArtworkService,
-    private categoryService: CategoryService,
     private route: ActivatedRoute,
-    public sanitizer: DomSanitizer
-  ) {}
+    private categoryService: CategoryService
+  ) {
+    this.route.params.subscribe(params => {
+      this.categoryId = params['id'] ? +params['id'] : null; // Assicurati che sia null se non esiste
+      if (this.categoryId) {
+        this.artworkForm.categoryId = this.categoryId; // Imposta solo se esiste
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadCategories();
     this.loadArtworks();
   }
 
-  // Carica tutte le categorie per il dropdown
+  loadArtworks(): void {
+    this.route.params.subscribe(params => {
+      this.categoryId = +params['id'];
+      if (this.categoryId) {
+        this.artworks$ = this.artworkService.getArtworksByCategory(this.categoryId);
+      }
+    });
+  }
+
   loadCategories(): void {
     this.categoryService.getAllCategories().pipe(
-      tap((categories: Category[]) => {
-        this.categories = categories;
+      tap((data: Category[]) => {
+        this.categories = data;
       }),
       catchError(error => {
         this.message = 'Errore nel caricamento delle categorie';
@@ -61,171 +66,132 @@ export class ArtworkManagementComponent implements OnInit {
     ).subscribe();
   }
 
-  // Carica tutte le opere
-  loadArtworks(): void {
-    this.route.params.subscribe(params => {
-      const categoryId = +params['id'];
-      if (categoryId) {
-        this.artworkService.getArtworksByCategory(categoryId).pipe(
-          tap((artworks: Artwork[]) => {
-            this.artworks = artworks;
-          }),
-          catchError(error => {
-            this.message = 'Errore nel caricamento delle opere';
-            this.success = false;
-            return of([]);
-          })
-        ).subscribe();
-      }
-    });
-  }
-
-  // Gestione del file immagine selezionato
   onFileChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-
-      // Creiamo un URL di anteprima per il file selezionato
       const reader = new FileReader();
+
       reader.onload = () => {
-        this.selectedFilePreviewUrl = reader.result; // Memorizziamo l'URL di anteprima
+        // Se devi convertire il file in base64 e visualizzarlo
+        this.artworkForm.imageUrl = reader.result as string;
       };
-      reader.readAsDataURL(file); // Leggiamo il file come Data URL (base64)
+
+      reader.readAsDataURL(file);
     }
   }
 
-
-  // Funzione per convertire un array di byte in una stringa Base64
-photoBase64(photo: Uint8Array): string {
-  return 'data:image/jpeg;base64,' + this.arrayBufferToBase64(photo);
-}
-
-// Helper per convertire ArrayBuffer in Base64
-private arrayBufferToBase64(buffer: Uint8Array): string {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
-
-  // Crea una nuova opera
   createArtwork(): void {
-    if (this.artworkForm.title && this.artworkForm.description && this.artworkForm.categoryId) {
-      this.loading = true;
+    const formData = new FormData();
 
-      const formData = new FormData();
-      formData.append('title', this.artworkForm.title!);
-      formData.append('description', this.artworkForm.description!);
-      formData.append('price', this.artworkForm.price!.toString());
-      formData.append('categoryId', this.artworkForm.categoryId!.toString());
-      formData.append('type', this.artworkForm.type!);
-
-      // Aggiungi l'immagine, o come file o come URL
-      if (this.selectedFile) {
-        formData.append('photo', this.selectedFile); // Se è stato caricato un file
-      } else if (this.artworkForm.imageUrl) {
-        formData.append('imageUrl', this.artworkForm.imageUrl); // Se viene fornito un URL
-      }
-
-      this.artworkService.createArtwork(formData).subscribe(
-        (newArtwork: Artwork) => {
-          this.artworks.push(newArtwork);
-          this.message = 'Opera creata con successo';
-          this.success = true;
-          this.resetForm();
-          this.loading = false;
-        },
-        (error) => {
-          this.message = 'Errore nella creazione dell\'opera';
-          console.error('Errore durante la creazione dell\'opera:', error);
-          this.success = false;
-          this.loading = false;
-        }
-      );
-    } else {
-      this.message = 'Per favore compila tutti i campi e carica almeno un\'immagine';
-      this.success = false;
+    if (this.artworkForm.title) {
+      formData.append('title', this.artworkForm.title);
     }
+    if (this.artworkForm.description) {
+      formData.append('description', this.artworkForm.description);
+    }
+    if (this.artworkForm.price) {
+      formData.append('price', this.artworkForm.price.toString());
+    }
+    if (this.artworkForm.categoryId) {
+      formData.append('categoryId', this.artworkForm.categoryId.toString());
+    }
+    if (this.artworkForm.type) {
+      formData.append('type', this.artworkForm.type);
+    }
+
+    // Assicurati che il file sia presente
+    if (this.selectedFile) {
+      formData.append('photoFile', this.selectedFile);
+      formData.append('Photo', this.artworkForm.imageUrl ?? '');
+    }
+    else {
+      console.error('Il file immagine è obbligatorio');
+      this.message = 'Seleziona un file immagine per continuare';
+      return; // Blocca l'esecuzione se il file immagine non è selezionato
+    }
+
+    // Debug: log del FormData per verificare che tutto sia corretto
+    for (const [key, value] of (formData as any).entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    // Invia la richiesta
+    this.artworkService.createArtwork(formData).subscribe(
+      (response) => {
+        console.log('Opera creata con successo', response);
+        this.message = 'Opera creata con successo';
+        this.success = true;
+        this.resetForm();
+      },
+      (error) => {
+        console.error('Errore durante la creazione dell\'opera', error);
+        this.message = 'Errore durante la creazione dell\'opera';
+        this.success = false;
+      }
+    );
   }
 
-  // Modifica un'opera esistente
+
   editArtwork(artwork: Artwork): void {
-    this.artworkForm = {
-      title: artwork.title,
-      description: artwork.description,
-      price: artwork.price,
-      categoryId: artwork.categoryId,
-      type: artwork.type,
-      imageUrl: artwork.imageUrl // Imposta l'URL dell'immagine esistente
-    };
+    this.artworkForm = { title: artwork.title, description: artwork.description, price: artwork.price, categoryId: artwork.categoryId, imageUrl: artwork.imageUrl };
     this.selectedArtworkId = artwork.id;
     this.editing = true;
   }
 
-  // Salva le modifiche a un'opera
   updateArtwork(): void {
-    if (this.selectedArtworkId && this.artworkForm.title && this.artworkForm.description && this.artworkForm.categoryId) {
+    if (this.selectedArtworkId && this.artworkForm.title && this.artworkForm.description) {
       this.loading = true;
-
       const formData = new FormData();
       formData.append('title', this.artworkForm.title!);
       formData.append('description', this.artworkForm.description!);
       formData.append('price', this.artworkForm.price!.toString());
       formData.append('categoryId', this.artworkForm.categoryId!.toString());
-      formData.append('type', this.artworkForm.type!);
 
-      // Aggiungi l'immagine, o come file o come URL
       if (this.selectedFile) {
-        formData.append('photo', this.selectedFile); // Se è stato caricato un file
+        formData.append('photoFile', this.selectedFile);
       } else if (this.artworkForm.imageUrl) {
-        formData.append('imageUrl', this.artworkForm.imageUrl); // Se viene fornito un URL
+        formData.append('imageUrl', this.artworkForm.imageUrl!);
       }
 
-      this.artworkService.updateArtwork(this.selectedArtworkId, formData).pipe(
-        tap((updatedArtwork: Artwork) => {
-          const index = this.artworks.findIndex(art => art.id === this.selectedArtworkId);
-          if (index !== -1) {
-            this.artworks[index] = updatedArtwork;
-          }
+      this.artworkService.updateArtwork(this.selectedArtworkId, formData).subscribe(
+        () => {
           this.message = 'Opera aggiornata con successo';
           this.success = true;
           this.resetForm();
-        }),
-        catchError(error => {
+          this.loadArtworks();
+          this.loading = false;
+        },
+        (error) => {
           this.message = 'Errore durante l\'aggiornamento dell\'opera';
           this.success = false;
-          return of(null);
-        })
-      ).subscribe().add(() => this.loading = false);
+          this.loading = false;
+        }
+      );
     }
   }
 
-  // Elimina un'opera
   deleteArtwork(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questa opera?')) {
       this.loading = true;
-      this.artworkService.deleteArtwork(id).pipe(
-        tap(() => {
-          this.artworks = this.artworks.filter(art => art.id !== id);
+      this.artworkService.deleteArtwork(id).subscribe(
+        () => {
           this.message = 'Opera eliminata con successo';
           this.success = true;
-        }),
-        catchError(error => {
+          this.loadArtworks();
+          this.loading = false;
+        },
+        (error) => {
           this.message = 'Errore durante l\'eliminazione dell\'opera';
           this.success = false;
-          return of(null);
-        })
-      ).subscribe().add(() => this.loading = false);
+          this.loading = false;
+        }
+      );
     }
   }
 
-  // Funzione per resettare il form
   resetForm(): void {
-    this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere, imageUrl: '' };
+    this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, imageUrl: '' };
     this.selectedFile = null;
     this.selectedArtworkId = null;
     this.editing = false;
