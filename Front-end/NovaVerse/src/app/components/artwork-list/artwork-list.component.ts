@@ -20,22 +20,21 @@ export class ArtworkListComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router, // Aggiungi il Router qui
+    private router: Router,
     private artworkService: ArtworkService,
-    private categoryService: CategoryService, // Aggiungi il CategoryService
+    private categoryService: CategoryService,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Recupera i parametri della rotta
     this.route.params.subscribe(params => {
-      this.categoryId = +params['id']; // Prende l'ID della categoria dalla rotta
+      this.categoryId = +params['id'];
       if (this.categoryId) {
-        this.loadArtworks(this.categoryId);   // Carica le opere associate alla categoria
-        this.loadCategoryDetails(this.categoryId); // Carica i dettagli della categoria
+        this.loadArtworks(this.categoryId);
+        this.loadCategoryDetails(this.categoryId);
+        this.isArtist = this.authService.isArtist();
       }
     });
-    this.isArtist = this.authService.isArtist();  // Verifica se l'utente è un artista
   }
 
   // Carica le opere della categoria
@@ -43,7 +42,7 @@ export class ArtworkListComponent implements OnInit {
     this.loading = true;
     this.artworkService.getArtworksByCategory(categoryId).subscribe(
       (artworks: Artwork[]) => {
-        this.artworks = artworks;   // Imposta la lista delle opere
+        this.artworks = artworks;
         this.loading = false;
       },
       (error) => {

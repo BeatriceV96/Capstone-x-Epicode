@@ -25,20 +25,13 @@
   <div *ngIf="artworks.length > 0 && !loading">
     <h3 class="text-lg font-semibold mb-2">Opere associate a {{ categoryName }}:</h3>
     <ul>
-      <li *ngFor="let artwork of artworks" class="border-b py-2">
-        <!-- Titolo e descrizione dell'opera -->
-        <div class="flex justify-between items-center">
-          <div>
-            <h4 class="text-xl font-bold">{{ artwork.title }}</h4>
-            <p class="text-gray-700">{{ artwork.description }}</p>
-          </div>
-        </div>
+      <li *ngFor="let artwork of artworks">
+        <h4 class="text-xl font-bold">{{ artwork.title }}</h4>
+        <p>{{ artwork.description }}</p>
       </li>
     </ul>
   </div>
 
-  <!-- Messaggio se non ci sono opere associate -->
-  <div *ngIf="artworks.length === 0 && !loading" class="text-gray-500">
+  <div *ngIf="artworks.length === 0 && !loading">
     Non ci sono opere disponibili al momento.
   </div>
-</div>

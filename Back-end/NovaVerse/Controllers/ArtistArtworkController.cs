@@ -46,13 +46,12 @@ namespace NovaVerse.Controllers
             return Ok(artwork);
         }
 
-        [HttpGet("category/{categoryId}")]
+        [HttpGet("category/{categoryId}/artworks")]
         public async Task<IActionResult> GetArtworksByCategory(int categoryId)
         {
             try
             {
                 var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
-               
                 return Ok(artworks);
             }
             catch (Exception ex)
@@ -61,6 +60,7 @@ namespace NovaVerse.Controllers
                 return StatusCode(500, "Errore interno del server.");
             }
         }
+
 
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
