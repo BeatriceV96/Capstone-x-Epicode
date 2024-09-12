@@ -20,7 +20,6 @@ namespace NovaVerse.Controllers
             _artworkService = artworkService; 
         }
 
-        // Recupera tutte le categorie
         [HttpGet("all")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllCategories()
@@ -36,7 +35,7 @@ namespace NovaVerse.Controllers
 
         // Recupera una singola categoria per ID
         [HttpGet("{id}")]
-        [AllowAnonymous] // Permetti agli utenti non autenticati di visualizzare una singola categoria
+        [AllowAnonymous]
         public async Task<IActionResult> GetCategoryById(int id)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
@@ -48,7 +47,7 @@ namespace NovaVerse.Controllers
         }
 
         // Nuovo endpoint per ottenere le opere associate a una categoria
-        [Authorize(Policy = "ArtistOnly")]
+       
         [HttpGet("{id}/artworks")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCategoryWithArtworks(int id)
@@ -61,6 +60,17 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
+        [HttpGet("{categoryId}/artworks")]
+        [AllowAnonymous] // Permetti agli utenti non autenticati di vedere le opere associate
+        public async Task<IActionResult> GetArtworksByCategory(int categoryId)
+        {
+            var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
+            if (artworks == null || artworks.Count == 0)
+            {
+                return NoContent(); // Se non ci sono opere, restituisce 204
+            }
+            return Ok(artworks); // Restituisce la lista delle opere
+        }
 
 
         // Crea una nuova categoria (Solo per artisti)
@@ -110,7 +120,7 @@ namespace NovaVerse.Controllers
                 var result = await _categoryService.DeleteCategoryAsync(id);
                 if (!result)
                 {
-                    return BadRequest(new { message = $"Eliminazione della categoria fallita. La categoria con ID {id} potrebbe essere collegata ad altre entità." });
+                    return BadRequest(new { message = "Eliminazione della categoria fallita. Potrebbe esserci un collegamento con altre entità." });
                 }
 
                 return Ok(new { message = "Categoria eliminata con successo." });
@@ -120,6 +130,7 @@ namespace NovaVerse.Controllers
                 return StatusCode(500, new { message = "Errore del server durante l'eliminazione.", error = ex.Message });
             }
         }
+
 
     }
 }

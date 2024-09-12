@@ -63,28 +63,37 @@ namespace NovaVerse.Services
         // Cancella una categoria esistente
         public async Task<bool> DeleteCategoryAsync(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.Include(c => c.Artworks).FirstOrDefaultAsync(c => c.Id == id);
             if (category == null)
-            {
-                return false; 
-            }
-            // Controlla se ci sono opere collegate prima di eliminare
-            var hasArtworks = await _context.Artworks.AnyAsync(a => a.CategoryId == id);
-            if (hasArtworks)
             {
                 return false;
             }
 
+            // Rimuovi tutte le opere collegate
+            _context.Artworks.RemoveRange(category.Artworks);
+
+            // Rimuovi la categoria
             _context.Categories.Remove(category);
+
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<Artwork>> GetArtworksByCategoryAsync(int categoryId)
+
+        public async Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId)
         {
-            return await _context.Artworks
+            var artworks = await _context.Artworks
                 .Where(a => a.CategoryId == categoryId)
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Photo = a.Photo
+                })
                 .ToListAsync();
+
+            return artworks;
         }
 
     }

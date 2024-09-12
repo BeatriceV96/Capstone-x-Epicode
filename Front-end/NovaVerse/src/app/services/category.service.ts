@@ -67,9 +67,9 @@ export class CategoryService {
       );
   }
 
-  // Cancella una categoria
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
+   // Cancella una categoria
+   deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
       .pipe(
         catchError((error) => {
           console.error('Errore durante l\'eliminazione della categoria:', error);

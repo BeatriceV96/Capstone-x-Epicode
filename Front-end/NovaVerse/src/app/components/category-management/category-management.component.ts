@@ -99,12 +99,14 @@ export class CategoryManagementComponent implements OnInit {
       this.loading = true;
       this.categoryService.deleteCategory(id).pipe(
         tap(() => {
+          console.log('Categoria eliminata:', id); // Log per il debug
           this.categories = this.categories.filter(cat => cat.id !== id);  // Rimuovi la categoria dall'array locale
           this.message = 'Categoria eliminata con successo';
           this.success = true;
         }),
         catchError(error => {
-          this.message = 'Errore durante l\'eliminazione della categoria';
+          console.error('Errore durante l\'eliminazione della categoria:', error); // Log per il debug
+          this.message = error.error.message || 'Errore durante l\'eliminazione della categoria';
           this.success = false;
           return of(null);  // Restituisce null in caso di errore
         })

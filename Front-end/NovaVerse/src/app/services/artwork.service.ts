@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Artwork } from '../Models/artwork';
 
 @Injectable({
@@ -18,6 +18,9 @@ export class ArtworkService {
   getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
     return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true })
       .pipe(
+        tap((artworks: Artwork[]) => {
+          this.artworkSubject.next(artworks);
+        }),
         catchError((error) => {
           console.error('Errore durante il caricamento delle opere:', error);
           return throwError(error);
@@ -44,6 +47,11 @@ export class ArtworkService {
 
   // Aggiorna un'opera esistente
   updateArtwork(id: number, formData: FormData): Observable<Artwork> {
+    // Log del FormData per il debug
+    for (const [key, value] of (formData as any).entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
     return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, formData, { withCredentials: true }).pipe(
       tap((updatedArtwork: Artwork) => {
         console.log('Opera aggiornata:', updatedArtwork);

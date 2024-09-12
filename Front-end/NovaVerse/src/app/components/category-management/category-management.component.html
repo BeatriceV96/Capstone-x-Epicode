@@ -8,56 +8,61 @@
     </div>
   </div>
 
-  <!-- Form per creare o modificare categorie -->
-  <div class="mb-4">
-    <h3 class="text-lg font-semibold mb-4">{{ editing ? 'Modifica Categoria' : 'Aggiungi Nuova Categoria' }}</h3>
+  <div class="container mx-auto mt-4">
+    <h2 class="text-2xl font-semibold mb-4">Gestione delle Categorie</h2>
+
+
+    <!-- Form per creare o modificare categorie -->
     <div class="mb-4">
-      <label class="block mb-1">Nome Categoria</label>
-      <input [(ngModel)]="categoryForm.name" class="border p-2 rounded w-full" placeholder="Inserisci il nome della categoria" [disabled]="loading">
+      <h3 class="text-lg font-semibold mb-4">{{ editing ? 'Modifica Categoria' : 'Aggiungi Nuova Categoria' }}</h3>
+      <div class="mb-4">
+        <label class="block mb-1">Nome Categoria</label>
+        <input [(ngModel)]="categoryForm.name" class="border p-2 rounded w-full" placeholder="Inserisci il nome della categoria" [disabled]="loading">
+      </div>
+      <div class="mb-4">
+        <label class="block mb-1">Descrizione Categoria</label>
+        <input [(ngModel)]="categoryForm.description" class="border p-2 rounded w-full" placeholder="Inserisci la descrizione della categoria" [disabled]="loading">
+      </div>
+      <div class="flex space-x-4">
+        <button *ngIf="!editing" [disabled]="loading" (click)="createCategory()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          {{ loading ? 'Caricamento...' : 'Aggiungi Categoria' }}
+        </button>
+        <button *ngIf="editing" [disabled]="loading" (click)="updateCategory()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+          {{ loading ? 'Caricamento...' : 'Salva Modifiche' }}
+        </button>
+        <button *ngIf="editing" [disabled]="loading" (click)="resetForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+          Annulla
+        </button>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block mb-1">Descrizione Categoria</label>
-      <input [(ngModel)]="categoryForm.description" class="border p-2 rounded w-full" placeholder="Inserisci la descrizione della categoria" [disabled]="loading">
-    </div>
-    <div class="flex space-x-4">
-      <button *ngIf="!editing" [disabled]="loading" (click)="createCategory()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-        {{ loading ? 'Caricamento...' : 'Aggiungi Categoria' }}
-      </button>
-      <button *ngIf="editing" [disabled]="loading" (click)="updateCategory()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
-        {{ loading ? 'Caricamento...' : 'Salva Modifiche' }}
-      </button>
-      <button *ngIf="editing" [disabled]="loading" (click)="resetForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-        Annulla
-      </button>
+
+    <!-- Elenco delle categorie -->
+    <div class="mt-6">
+      <table class="min-w-full table-auto">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Nome Categoria</th>
+            <th class="px-4 py-2">Descrizione Categoria</th>
+            <th class="px-4 py-2">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories" class="border-t">
+            <td class="px-4 py-2">{{ category.name }}</td>
+            <td class="px-4 py-2">{{ category.description }}</td>
+            <td class="px-4 py-2">
+              <button (click)="editCategory(category)" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
+                <i class="fas fa-edit"></i> Modifica
+              </button>
+              <button (click)="deleteCategory(category.id)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2" [disabled]="loading">
+                <i class="fas fa-trash"></i> Elimina
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="categories.length === 0">
+            <td colspan="3" class="px-4 py-2 text-center text-gray-500">Non ci sono categorie disponibili.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-
- <!-- Elenco delle categorie -->
-<div class="mt-6">
-  <table class="min-w-full table-auto">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="px-4 py-2">Nome Categoria</th>
-        <th class="px-4 py-2">Descrizione Categoria</th>
-        <th class="px-4 py-2">Azioni</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let category of categories" class="border-t">
-        <td class="px-4 py-2">{{ category.name }}</td>
-        <td class="px-4 py-2">{{ category.description }}</td>
-        <td class="px-4 py-2">
-          <button (click)="editCategory(category)" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">
-            <i class="fas fa-edit"></i> Modifica
-          </button>
-          <button (click)="deleteCategory(category.id)" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2" [disabled]="loading">
-            <i class="fas fa-trash"></i> Elimina
-          </button>
-        </td>
-      </tr>
-      <tr *ngIf="categories.length === 0">
-        <td colspan="3" class="px-4 py-2 text-center text-gray-500">Non ci sono categorie disponibili.</td>
-      </tr>
-    </tbody>
-  </table>
-</div>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router'; // Importa il Router
 import { CategoryService } from '../../services/category.service';
 import { AuthService } from '../../services/auth.service';
 import { Category } from '../../Models/category';
@@ -18,7 +19,8 @@ export class CategoryListComponent implements OnInit {
 
   constructor(
     private categoryService: CategoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router // Inietta il Router
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +63,6 @@ export class CategoryListComponent implements OnInit {
 
   // Funzione per la navigazione alla gestione delle opere
   navigateToManage(categoryId: number): void {
-    console.log('Navigating to:', `/categories/${categoryId}/artworks/manage`);
-    // Implementazione della logica di navigazione
+    this.router.navigate([`/categories/${categoryId}/artworks/manage`]); // Naviga alla rotta specificata
   }
 }

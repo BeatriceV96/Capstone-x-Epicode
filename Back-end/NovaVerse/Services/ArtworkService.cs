@@ -3,6 +3,9 @@ using NovaVerse.Context;
 using NovaVerse.Dto;
 using Microsoft.EntityFrameworkCore;
 using NovaVerse.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NovaVerse.Services
 {
@@ -15,25 +18,55 @@ namespace NovaVerse.Services
             _context = context;
         }
 
-        public async Task<List<Artwork>> GetAllArtworksAsync()
+        // Restituisce tutte le opere come ArtworkDto
+        public async Task<List<ArtworkDto>> GetAllArtworksAsync()
         {
             return await _context.Artworks
                 .Include(a => a.Category)
                 .Include(a => a.Artist)
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Price = a.Price,
+                    Photo = a.Photo,
+                    CategoryId = a.CategoryId,
+                    ArtistId = a.ArtistId
+                })
                 .ToListAsync();
         }
 
-        public async Task<Artwork> GetArtworkByIdAsync(int id)
+        // Restituisce un'opera specifica per ID come ArtworkDto
+        public async Task<ArtworkDto> GetArtworkByIdAsync(int id)
         {
-            return await _context.Artworks
+            var artwork = await _context.Artworks
                 .Include(a => a.Category)
                 .Include(a => a.Artist)
                 .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (artwork == null)
+            {
+                return null;
+            }
+
+            // Converte Artwork in ArtworkDto
+            return new ArtworkDto
+            {
+                Id = artwork.Id,
+                Title = artwork.Title,
+                Description = artwork.Description,
+                Price = artwork.Price,
+                Photo = artwork.Photo,
+                CategoryId = artwork.CategoryId,
+                ArtistId = artwork.ArtistId
+            };
         }
 
+        // Restituisce tutte le opere di una categoria come ArtworkDto
         public async Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId)
         {
-            var artworks = await _context.Artworks
+            return await _context.Artworks
                 .Where(a => a.CategoryId == categoryId)
                 .Select(a => new ArtworkDto
                 {
@@ -42,23 +75,21 @@ namespace NovaVerse.Services
                     Description = a.Description,
                     Price = a.Price,
                     Photo = a.Photo,
-     
+                    CategoryId = a.CategoryId,
+                    ArtistId = a.ArtistId
                 })
                 .ToListAsync();
-
-            return artworks;
         }
-    
 
-
-    public async Task<Artwork> AddArtworkAsync(ArtworkDto artworkDto)
+        // Crea una nuova opera a partire da ArtworkDto
+        public async Task<ArtworkDto> AddArtworkAsync(ArtworkDto artworkDto)
         {
             var newArtwork = new Artwork
             {
                 Title = artworkDto.Title,
                 Description = artworkDto.Description,
                 Price = artworkDto.Price,
-                Photo = artworkDto.Photo,  
+                Photo = artworkDto.Photo,
                 CategoryId = artworkDto.CategoryId,
                 ArtistId = artworkDto.ArtistId,
                 CreateDate = DateTime.UtcNow
@@ -67,10 +98,21 @@ namespace NovaVerse.Services
             _context.Artworks.Add(newArtwork);
             await _context.SaveChangesAsync();
 
-            return newArtwork;
+            // Restituisce il nuovo Artwork come ArtworkDto
+            return new ArtworkDto
+            {
+                Id = newArtwork.Id,
+                Title = newArtwork.Title,
+                Description = newArtwork.Description,
+                Price = newArtwork.Price,
+                Photo = newArtwork.Photo,
+                CategoryId = newArtwork.CategoryId,
+                ArtistId = newArtwork.ArtistId
+            };
         }
 
-        public async Task<Artwork> UpdateArtworkAsync(int id, ArtworkDto artworkDto)
+        // Aggiorna un'opera esistente
+        public async Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto)
         {
             var artwork = await _context.Artworks.FindAsync(id);
             if (artwork == null)
@@ -78,26 +120,33 @@ namespace NovaVerse.Services
                 return null;
             }
 
-            // Aggiorna le proprietà dell'opera
             artwork.Title = artworkDto.Title;
             artwork.Description = artworkDto.Description;
             artwork.Price = artworkDto.Price;
 
-            // Aggiorna la foto solo se è stata fornita una nuova
             if (!string.IsNullOrEmpty(artworkDto.Photo))
             {
-                artwork.Photo = artworkDto.Photo; 
+                artwork.Photo = artworkDto.Photo;
             }
 
             artwork.CategoryId = artworkDto.CategoryId;
-            artwork.Type = artworkDto.Type;
             artwork.ArtistId = artworkDto.ArtistId;
 
             await _context.SaveChangesAsync();
-            return artwork;
+
+            return new ArtworkDto
+            {
+                Id = artwork.Id,
+                Title = artwork.Title,
+                Description = artwork.Description,
+                Price = artwork.Price,
+                Photo = artwork.Photo,
+                CategoryId = artwork.CategoryId,
+                ArtistId = artwork.ArtistId
+            };
         }
 
-
+        // Cancella un'opera
         public async Task<bool> DeleteArtworkAsync(int id)
         {
             var artwork = await _context.Artworks.FindAsync(id);

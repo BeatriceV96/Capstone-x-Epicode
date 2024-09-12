@@ -12,6 +12,12 @@ import { CategoryService } from '../../services/category.service';
   styleUrls: ['./artwork-management.component.scss']
 })
 export class ArtworkManagementComponent implements OnInit {
+deleteCategory(arg0: number) {
+throw new Error('Method not implemented.');
+}
+editCategory(_t84: Category) {
+throw new Error('Method not implemented.');
+}
   artworks$: Observable<Artwork[]> = new Observable<Artwork[]>();
   categoryId: number | null | undefined;
   categories: Category[] = [];
@@ -53,20 +59,6 @@ export class ArtworkManagementComponent implements OnInit {
     ).subscribe();
   }
 
-  onFileChange(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.artworkForm.imageUrl = reader.result as string;
-      };
-
-      reader.readAsDataURL(file);
-    }
-  }
-
   createArtwork(): void {
     const formData = new FormData();
 
@@ -99,6 +91,7 @@ export class ArtworkManagementComponent implements OnInit {
         this.message = 'Opera creata con successo';
         this.success = true;
         this.resetForm(); // Resetta il form dopo la creazione
+        this.loadArtworks(); // Ricarica le opere per vedere i cambiamenti in tempo reale
       },
       (error) => {
         console.error('Errore durante la creazione dell\'opera', error);
@@ -129,37 +122,41 @@ export class ArtworkManagementComponent implements OnInit {
         formData.append('imageUrl', this.artworkForm.imageUrl!);
       }
 
-      this.artworkService.updateArtwork(this.selectedArtworkId, formData).subscribe(
-        () => {
+      this.artworkService.updateArtwork(this.selectedArtworkId, formData).pipe(
+        tap(() => {
           this.message = 'Opera aggiornata con successo';
           this.success = true;
           this.resetForm();
           this.loading = false;
-        },
-        (error) => {
+          this.loadArtworks(); // Ricarica le opere per vedere i cambiamenti in tempo reale
+        }),
+        catchError((error) => {
           this.message = 'Errore durante l\'aggiornamento dell\'opera';
           this.success = false;
           this.loading = false;
-        }
-      );
+          return of(null);
+        })
+      ).subscribe();
     }
   }
 
   deleteArtwork(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questa opera?')) {
       this.loading = true;
-      this.artworkService.deleteArtwork(id).subscribe(
-        () => {
+      this.artworkService.deleteArtwork(id).pipe(
+        tap(() => {
           this.message = 'Opera eliminata con successo';
           this.success = true;
           this.loading = false;
-        },
-        (error) => {
+          this.loadArtworks(); // Ricarica le opere per vedere i cambiamenti in tempo reale
+        }),
+        catchError((error) => {
           this.message = 'Errore durante l\'eliminazione dell\'opera';
           this.success = false;
           this.loading = false;
-        }
-      );
+          return of(null);
+        })
+      ).subscribe();
     }
   }
 
@@ -169,5 +166,19 @@ export class ArtworkManagementComponent implements OnInit {
     this.selectedArtworkId = null;
     this.editing = false;
     this.message = '';
+  }
+
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        this.artworkForm.imageUrl = reader.result as string;
+      };
+
+      reader.readAsDataURL(file);
+    }
   }
 }

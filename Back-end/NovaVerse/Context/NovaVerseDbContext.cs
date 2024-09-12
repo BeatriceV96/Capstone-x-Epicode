@@ -119,9 +119,10 @@ namespace NovaVerse.Context
                 .HasOne(f => f.Artist)
                 .WithMany()
                 .HasForeignKey(f => f.ArtistId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }
