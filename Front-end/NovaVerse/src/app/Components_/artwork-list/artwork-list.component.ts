@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { ArtworkService } from '../services/artwork.service';
-import { Artwork } from '../Models/artwork';
+import { ArtworkService } from '../../services/artwork.service';
+import { Artwork } from '../../Models/artwork';
 
 @Component({
   selector: 'app-artwork-list',

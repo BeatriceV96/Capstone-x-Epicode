@@ -9,19 +9,19 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
 
   // Lazy-loaded Category List
-  { path: 'categories', loadChildren: () => import('./category-list/category-list.module').then(m => m.CategoryListModule) },
+  { path: 'categories', loadChildren: () => import('./Components_/category-list/category-list.module').then(m => m.CategoryListModule) },
 
   // Lazy-loaded Artwork List
-  { path: 'categories/:id/artworks', loadChildren: () => import('./artwork-list/artwork-list.module').then(m => m.ArtworkListModule) },
+  { path: 'categories/:id/artworks', loadChildren: () => import('./Components_/artwork-list/artwork-list.module').then(m => m.ArtworkListModule) },
 
   // Lazy-loaded Category Management, accessibile solo agli artisti
-  { path: 'category-management', loadChildren: () => import('./category-management/category-management.module').then(m => m.CategoryManagementModule), canActivate: [ArtistGuard] },
+  { path: 'category-management', loadChildren: () => import('./Components_/category-management/category-management.module').then(m => m.CategoryManagementModule), canActivate: [ArtistGuard] },
 
   // Lazy-loaded Artwork Management, accessibile solo agli artisti
-  { path: 'categories/:id/artworks/manage', loadChildren: () => import('./artwork-management/artwork-management.module').then(m => m.ArtworkManagementModule), canActivate: [ArtistGuard] },
+  { path: 'categories/:id/artworks/manage', loadChildren: () => import('./Components_/artwork-management/artwork-management.module').then(m => m.ArtworkManagementModule), canActivate: [ArtistGuard] },
 
   // Lazy-loaded Profile
-  { path: 'profile', loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
+  { path: 'profile', loadChildren: () => import('./Components_/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
 
   // Modulo di autenticazione lazy-loaded
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },

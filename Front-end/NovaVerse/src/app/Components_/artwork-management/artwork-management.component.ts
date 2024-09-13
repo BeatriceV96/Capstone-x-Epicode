@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { Artwork, ArtworkType } from '../Models/artwork';
-import { Category } from '../Models/category';
-import { ArtworkService } from '../services/artwork.service';
-import { CategoryService } from '../services/category.service';
+import { Artwork, ArtworkType } from '../../Models/artwork';
+import { Category } from '../../Models/category';
+import { ArtworkService } from '../../services/artwork.service';
+import { CategoryService } from '../../services/category.service';
 
 
 @Component({

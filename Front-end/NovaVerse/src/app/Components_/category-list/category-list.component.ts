@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
-import { Category } from '../Models/category';
-import { CategoryService } from '../services/category.service';
-import { AuthService } from '../services/auth.service';
+import { Category } from '../../Models/category';
+import { CategoryService } from '../../services/category.service';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({

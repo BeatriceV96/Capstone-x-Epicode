@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { CategoryService } from '../services/category.service';
-import { Category } from '../Models/category';
+import { CategoryService } from '../../services/category.service';
+import { Category } from '../../Models/category';
 
 
 @Component({
