@@ -6,25 +6,23 @@ using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
 using System.Security.Claims;
-
 using System.Threading.Tasks;
 
 namespace NovaVerse.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize(Policy = "ArtistOnly")]
     public class ArtistArtworkController : Controller
     {
         private readonly IArtworkService _artworkService;
+        private readonly NovaVerseDbContext _context;
 
         public ArtistArtworkController(IArtworkService artworkService, NovaVerseDbContext context)
         {
             _artworkService = artworkService;
             _context = context;
         }
-
-        private readonly NovaVerseDbContext _context;
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllArtworks()
@@ -61,8 +59,6 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
-
-        [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
         {
@@ -88,13 +84,13 @@ namespace NovaVerse.Controllers
                     await photoFile.CopyToAsync(fileStream);
                 }
 
-                artworkDto.Photo = "/uploads/" + uniqueFileName;  // Imposta il percorso della foto caricata
+                artworkDto.Photo = "/uploads/" + uniqueFileName;
             }
 
             // Se viene fornito un URL, usa quello come foto
             if (!string.IsNullOrWhiteSpace(artworkDto.ImageUrl))
             {
-                artworkDto.Photo = artworkDto.ImageUrl;  // Usa l'URL come foto
+                artworkDto.Photo = artworkDto.ImageUrl;
             }
 
             // Imposta l'ID dell'artista autenticato
@@ -111,9 +107,6 @@ namespace NovaVerse.Controllers
             return Ok(createdArtwork);
         }
 
-
-
-        [Authorize(Policy = "ArtistOnly")]
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto)
         {
@@ -134,7 +127,6 @@ namespace NovaVerse.Controllers
             return Ok(updatedArtwork);
         }
 
-        [Authorize(Policy = "ArtistOnly")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteArtwork(int id)
         {

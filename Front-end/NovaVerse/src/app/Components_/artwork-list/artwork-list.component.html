@@ -8,10 +8,11 @@
         <!-- Immagine dell'opera -->
         <div class="relative h-48 mb-4">
           <img *ngIf="artwork.photo || artwork.imageUrl"
-               [src]="artwork.photo || artwork.imageUrl"
-               alt="Opera"
-               loading="lazy"
-               class="w-full h-full object-cover rounded-lg">
+     [src]="'http://localhost:5034' + artwork.photo"
+     alt="Opera"
+     loading="lazy"
+     class="w-full h-full object-cover rounded-lg">
+
         </div>
 
         <!-- Dettagli dell'opera -->

@@ -88,12 +88,13 @@ namespace NovaVerse.Services
                 Title = artworkDto.Title,
                 Description = artworkDto.Description,
                 Price = artworkDto.Price,
-                Photo = artworkDto.Photo,
+                Photo = artworkDto.Photo,  // Il percorso relativo dell'immagine
                 CategoryId = artworkDto.CategoryId,
                 Type = artworkDto.Type,
                 ArtistId = artworkDto.ArtistId,
                 CreateDate = DateTime.UtcNow
             };
+
 
             _context.Artworks.Add(newArtwork);
             await _context.SaveChangesAsync();

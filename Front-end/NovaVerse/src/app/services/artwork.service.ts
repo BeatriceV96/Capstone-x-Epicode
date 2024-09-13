@@ -31,9 +31,15 @@ export class ArtworkService {
     }
 
     const formData = new FormData();
-    formData.append('imageFile', file);
+    formData.append('photoFile', file);
 
-    return this.http.post<{ imageUrl: string }>(`${this.baseUrl}/upload-image`, formData, { withCredentials: true });
+    return this.http.post<{ imageUrl: string }>(`${this.baseUrl}/create`, formData, { withCredentials: true })
+      .pipe(
+        catchError(error => {
+          console.error('Errore durante il caricamento dell\'immagine:', error);
+          return throwError('Errore durante il caricamento dell\'immagine. Riprova più tardi.');
+        })
+      );
   }
 
   // Crea una nuova opera con l'URL dell'immagine

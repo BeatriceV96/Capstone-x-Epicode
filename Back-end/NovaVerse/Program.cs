@@ -92,6 +92,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection(); // Redirect per HTTPS
+app.UseStaticFiles(); // Questo consente di servire file statici dalla cartella wwwroot
 app.UseCors("AllowAngularApp"); // Abilita CORS per l'app Angular
 app.UseAuthentication(); // Gestione dell'autenticazione
 app.UseAuthorization();  // Gestione dell'autorizzazione
