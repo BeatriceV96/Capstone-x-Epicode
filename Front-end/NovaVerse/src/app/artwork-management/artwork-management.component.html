@@ -1,0 +1,41 @@
+<form (ngSubmit)="createArtwork()">
+  <!-- Campi titolo, descrizione, prezzo, categoria, tipo -->
+  <div class="form-group">
+    <label for="title">Titolo</label>
+    <input type="text" class="form-control" id="title" [(ngModel)]="artworkForm.title" name="title" required>
+  </div>
+  <div class="form-group">
+    <label for="description">Descrizione</label>
+    <textarea class="form-control" id="description" [(ngModel)]="artworkForm.description" name="description" required></textarea>
+  </div>
+  <div class="form-group">
+    <label for="price">Prezzo</label>
+    <input type="number" class="form-control" id="price" [(ngModel)]="artworkForm.price" name="price" required>
+  </div>
+  <div class="form-group">
+    <label for="categoryId">Categoria</label>
+    <select class="form-control" id="categoryId" [(ngModel)]="artworkForm.categoryId" name="categoryId" required>
+      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="type">Tipo di Opera</label>
+    <select class="form-control" id="type" [(ngModel)]="artworkForm.type" name="type" required>
+      <option *ngFor="let type of artworkTypes" [value]="type">{{ type }}</option>
+    </select>
+  </div>
+
+  <!-- Caricamento immagine tramite file -->
+  <div class="form-group">
+    <label for="photoFile">Carica Immagine (facoltativo)</label>
+    <input type="file" (change)="onFileSelected($event)" accept="image/*">
+  </div>
+
+  <!-- Campo per l'URL dell'immagine -->
+  <div class="form-group">
+    <label for="imageUrl">URL dell'Immagine (facoltativo)</label>
+    <input type="text" class="form-control" id="imageUrl" [(ngModel)]="artworkForm.imageUrl" name="imageUrl">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Crea Opera</button>
+</form>

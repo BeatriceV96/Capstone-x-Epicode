@@ -1,0 +1,44 @@
+<div class="container mx-auto mt-5">
+  <!-- Header della pagina categorie -->
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Categorie disponibili</h1>
+
+    <!-- Mostra il pulsante di gestione categorie se l'utente è un artista -->
+    <ng-container *ngIf="isArtist">
+      <a routerLink="/category-management" class="text-blue-500 hover:text-blue-700">
+        <i class="fas fa-edit fa-2x"></i> Gestisci Categorie
+      </a>
+    </ng-container>
+  </div>
+
+  <!-- Lista delle categorie -->
+  <div *ngIf="categories.length > 0 && !loading; else noCategories">
+    <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg p-4 mb-4">
+      <div class="flex justify-between items-center">
+        <!-- Nome della categoria -->
+        <a [routerLink]="['/categories', category.id, 'artworks']" class="block hover:underline text-xl font-semibold text-blue-600">
+          {{ category.name }}
+        </a>
+
+        <!-- Matite per la gestione, visibili solo per gli artisti -->
+        <ng-container *ngIf="isArtist">
+          <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700">
+            <i class="fas fa-edit fa-2x"></i> Crea Opera
+          </a>
+        </ng-container>
+      </div>
+
+      <!-- Se hai delle immagini di categoria -->
+      <img *ngIf="category.image"
+           [src]="category.image"
+           alt="Categoria"
+           loading="lazy"
+           class="w-full h-32 object-cover mb-4">
+    </div>
+  </div>
+
+  <!-- Messaggio se non ci sono categorie disponibili -->
+  <ng-template #noCategories>
+    <p class="text-gray-500">Non ci sono categorie disponibili al momento.</p>
+  </ng-template>
+</div>

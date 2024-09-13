@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { iUser } from '../../Models/i-user';
-import { UserService } from '../../services/user.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { iUser } from '../Models/i-user';
+import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-profile',

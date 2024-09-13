@@ -50,7 +50,6 @@ namespace NovaVerse.Services
                 return null;
             }
 
-            // Converte Artwork in ArtworkDto
             return new ArtworkDto
             {
                 Id = artwork.Id,
@@ -91,6 +90,7 @@ namespace NovaVerse.Services
                 Price = artworkDto.Price,
                 Photo = artworkDto.Photo,
                 CategoryId = artworkDto.CategoryId,
+                Type = artworkDto.Type,
                 ArtistId = artworkDto.ArtistId,
                 CreateDate = DateTime.UtcNow
             };
@@ -98,7 +98,6 @@ namespace NovaVerse.Services
             _context.Artworks.Add(newArtwork);
             await _context.SaveChangesAsync();
 
-            // Restituisce il nuovo Artwork come ArtworkDto
             return new ArtworkDto
             {
                 Id = newArtwork.Id,
@@ -107,9 +106,11 @@ namespace NovaVerse.Services
                 Price = newArtwork.Price,
                 Photo = newArtwork.Photo,
                 CategoryId = newArtwork.CategoryId,
+                Type = newArtwork.Type,
                 ArtistId = newArtwork.ArtistId
             };
         }
+
 
         // Aggiorna un'opera esistente
         public async Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto)

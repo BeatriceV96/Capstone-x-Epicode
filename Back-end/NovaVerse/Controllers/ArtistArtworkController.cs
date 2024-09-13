@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NovaVerse.Context;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
@@ -16,10 +18,13 @@ namespace NovaVerse.Controllers
     {
         private readonly IArtworkService _artworkService;
 
-        public ArtistArtworkController(IArtworkService artworkService)
+        public ArtistArtworkController(IArtworkService artworkService, NovaVerseDbContext context)
         {
             _artworkService = artworkService;
+            _context = context;
         }
+
+        private readonly NovaVerseDbContext _context;
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllArtworks()
@@ -49,17 +54,13 @@ namespace NovaVerse.Controllers
         [HttpGet("category/{categoryId}/artworks")]
         public async Task<IActionResult> GetArtworksByCategory(int categoryId)
         {
-            try
-            {
-                var artworks = await _artworkService.GetArtworksByCategoryAsync(categoryId);
-                return Ok(artworks);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return StatusCode(500, "Errore interno del server.");
-            }
+            var artworks = await _context.Artworks
+                .Where(a => a.CategoryId == categoryId)
+                .ToListAsync();
+
+            return Ok(artworks);
         }
+
 
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
@@ -70,17 +71,16 @@ namespace NovaVerse.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Se l'utente carica un file immagine
+            // Gestisci il caricamento dell'immagine dal file
             if (photoFile != null && photoFile.Length > 0)
             {
-                // Gestione dell'immagine caricata come file
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + photoFile.FileName;
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photoFile.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -88,22 +88,20 @@ namespace NovaVerse.Controllers
                     await photoFile.CopyToAsync(fileStream);
                 }
 
-                artworkDto.Photo = "/uploads/" + uniqueFileName; // Salva il percorso relativo
-            }
-            // Caso in cui nessuna immagine venga fornita (opzionale)
-            else
-            {
-                artworkDto.Photo = null; // Non viene fornita alcuna immagine
+                artworkDto.Photo = "/uploads/" + uniqueFileName;  // Imposta il percorso della foto caricata
             }
 
-            // Imposta l'ID dell'artista dall'utente autenticato
+            // Se viene fornito un URL, usa quello come foto
+            if (!string.IsNullOrWhiteSpace(artworkDto.ImageUrl))
+            {
+                artworkDto.Photo = artworkDto.ImageUrl;  // Usa l'URL come foto
+            }
+
+            // Imposta l'ID dell'artista autenticato
             var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             artworkDto.ArtistId = artistId;
 
-            // Debug: log dei dati ricevuti nel DTO per verificare
-            Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}, ArtistId: {artworkDto.ArtistId}, Photo: {artworkDto.Photo}");
-
-            // Crea l'opera tramite il servizio
+            // Crea l'opera nel database
             var createdArtwork = await _artworkService.AddArtworkAsync(artworkDto);
             if (createdArtwork == null)
             {

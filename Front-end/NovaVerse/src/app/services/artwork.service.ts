@@ -1,64 +1,75 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { Artwork } from '../Models/artwork';
+import { ArtworkResponse } from '../Models/artwork-response';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArtworkService {
   private baseUrl = 'http://localhost:5034/api/artistArtwork';
-  private artworkSubject = new BehaviorSubject<Artwork[]>([]);
+  private artworkSubject = new BehaviorSubject<Artwork[]>([]);  // Inizializza con un array vuoto
   public artworks$: Observable<Artwork[]> = this.artworkSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  // Ottieni tutte le opere associate a una categoria
-  getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
-    return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true })
-      .pipe(
-        tap((artworks: Artwork[]) => this.artworkSubject.next(artworks)),
-        catchError(this.handleError)
-      );
+  // Ottieni opere per categoria con paginazione
+ // Se artworks viene ricevuto come oggetto, convertilo in un array prima di restituirlo.
+getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
+  return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true }).pipe(
+    map(response => Object.values(response)),  // Converti oggetto in array se necessario
+    catchError(this.handleError)
+  );
+}
+
+  // Carica l'immagine separatamente
+  uploadImage(file: File): Observable<{ imageUrl: string }> {
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      return throwError('Tipo di file non supportato. Accettati solo JPEG o PNG.');
+    }
+
+    const formData = new FormData();
+    formData.append('imageFile', file);
+
+    return this.http.post<{ imageUrl: string }>(`${this.baseUrl}/upload-image`, formData, { withCredentials: true });
   }
 
-  // Crea una nuova opera
+  // Crea una nuova opera con l'URL dell'immagine
   createArtwork(artworkData: FormData): Observable<Artwork> {
-    return this.http.post<Artwork>(`${this.baseUrl}/create`, artworkData, { withCredentials: true })
-      .pipe(
-        tap((newArtwork: Artwork) => {
-          const updatedArtworks = [...this.artworkSubject.value, newArtwork];
-          this.artworkSubject.next(updatedArtworks);
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.post<Artwork>(`${this.baseUrl}/create`, artworkData, { withCredentials: true }).pipe(
+      tap((newArtwork: Artwork) => {
+        this.artworkSubject.next([...this.artworkSubject.value, newArtwork]);
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // Aggiorna un'opera esistente
   updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
-    return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true })
-      .pipe(
-        tap((updatedArtwork: Artwork) => {
-          const updatedArtworks = this.artworkSubject.value.map(artwork => artwork.id === id ? updatedArtwork : artwork);
-          this.artworkSubject.next(updatedArtworks);
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true }).pipe(
+      tap((updatedArtwork: Artwork) => {
+        const updatedArtworks = this.artworkSubject.value.map(artwork => artwork.id === id ? updatedArtwork : artwork);
+        this.artworkSubject.next(updatedArtworks);
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // Elimina un'opera
   deleteArtwork(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
-      .pipe(
-        tap(() => {
-          const updatedArtworks = this.artworkSubject.value.filter(artwork => artwork.id !== id);
-          this.artworkSubject.next(updatedArtworks);
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true }).pipe(
+      tap(() => {
+        const updatedArtworks = this.artworkSubject.value.filter(artwork => artwork.id !== id);
+        this.artworkSubject.next(updatedArtworks);
+      }),
+      catchError(this.handleError)
+    );
   }
 
+  // Gestione degli errori
   private handleError(error: any): Observable<never> {
     console.error('Errore nel servizio ArtworkService:', error);
     return throwError(error);
