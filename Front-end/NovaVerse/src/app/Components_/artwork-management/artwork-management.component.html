@@ -1,41 +1,68 @@
-<form (ngSubmit)="createArtwork()">
-  <!-- Campi titolo, descrizione, prezzo, categoria, tipo -->
-  <div class="form-group">
-    <label for="title">Titolo</label>
-    <input type="text" class="form-control" id="title" [(ngModel)]="artworkForm.title" name="title" required>
-  </div>
-  <div class="form-group">
-    <label for="description">Descrizione</label>
-    <textarea class="form-control" id="description" [(ngModel)]="artworkForm.description" name="description" required></textarea>
-  </div>
-  <div class="form-group">
-    <label for="price">Prezzo</label>
-    <input type="number" class="form-control" id="price" [(ngModel)]="artworkForm.price" name="price" required>
-  </div>
-  <div class="form-group">
-    <label for="categoryId">Categoria</label>
-    <select class="form-control" id="categoryId" [(ngModel)]="artworkForm.categoryId" name="categoryId" required>
-      <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="type">Tipo di Opera</label>
-    <select class="form-control" id="type" [(ngModel)]="artworkForm.type" name="type" required>
-      <option *ngFor="let type of artworkTypes" [value]="type">{{ type }}</option>
-    </select>
-  </div>
+<div class="container mx-auto mt-8">
+  <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-white mb-6">Crea una nuova opera</h2>
 
-  <!-- Caricamento immagine tramite file -->
-  <div class="form-group">
-    <label for="photoFile">Carica Immagine (facoltativo)</label>
-    <input type="file" (change)="onFileSelected($event)" accept="image/*">
-  </div>
+    <form class="contact-form" (ngSubmit)="createArtwork()">
+      <!-- Titolo -->
+      <div class="form-group mb-4">
+        <label for="title" class="block text-sm text-white mb-2">Titolo</label>
+        <input type="text" id="title" name="title" placeholder="Inserisci il titolo" [(ngModel)]="artworkForm.title"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required />
+      </div>
 
-  <!-- Campo per l'URL dell'immagine -->
-  <div class="form-group">
-    <label for="imageUrl">URL dell'Immagine (facoltativo)</label>
-    <input type="text" class="form-control" id="imageUrl" [(ngModel)]="artworkForm.imageUrl" name="imageUrl">
-  </div>
+      <!-- Descrizione -->
+      <div class="form-group mb-4">
+        <label for="description" class="block text-sm text-white mb-2">Descrizione</label>
+        <textarea id="description" name="description" placeholder="Descrivi l'opera" [(ngModel)]="artworkForm.description"
+                  class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required></textarea>
+      </div>
 
-  <button type="submit" class="btn btn-primary">Crea Opera</button>
-</form>
+      <!-- Prezzo -->
+      <div class="form-group mb-4">
+        <label for="price" class="block text-sm text-white mb-2">Prezzo</label>
+        <input type="number" id="price" name="price" step="0.01" placeholder="Inserisci il prezzo" [(ngModel)]="artworkForm.price"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required />
+      </div>
+
+      <!-- Categoria -->
+      <div class="form-group mb-4">
+        <label for="categoryId" class="block text-sm text-white mb-2">Categoria</label>
+        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" id="categoryId"
+                [(ngModel)]="artworkForm.categoryId" name="categoryId" required>
+          <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+        </select>
+      </div>
+
+      <!-- Tipo di Opera -->
+      <div class="form-group mb-4">
+        <label for="type" class="block text-sm text-white mb-2">Tipo di Opera</label>
+        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" id="type"
+                [(ngModel)]="artworkForm.type" name="type" required>
+          <option *ngFor="let type of artworkTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <!-- Immagine File -->
+      <div class="form-group mb-4">
+        <label for="photoFile" class="block text-sm text-white mb-2">Carica Immagine</label>
+        <input (change)="onFileSelected($event)" id="photoFile" name="photoFile" type="file" accept="image/*"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" />
+      </div>
+
+      <!-- Immagine URL -->
+      <div class="form-group mb-4">
+        <label for="imageUrl" class="block text-sm text-white mb-2">O inserisci URL immagine</label>
+        <input [(ngModel)]="artworkForm.imageUrl" name="imageUrl" id="imageUrl" type="text" placeholder="https://example.com/immagine.jpg"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" />
+      </div>
+
+      <!-- Bottone di caricamento -->
+      <div class="mt-5">
+        <button type="submit" class="btn btn-primary w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg" [disabled]="loading">
+          <span *ngIf="!loading">Crea Opera</span>
+          <span *ngIf="loading" class="animate-spin">Caricamento...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

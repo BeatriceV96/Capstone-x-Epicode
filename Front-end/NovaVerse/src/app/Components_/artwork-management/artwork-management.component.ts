@@ -6,7 +6,6 @@ import { Category } from '../../Models/category';
 import { ArtworkService } from '../../services/artwork.service';
 import { CategoryService } from '../../services/category.service';
 
-
 @Component({
   selector: 'app-artwork-management',
   templateUrl: './artwork-management.component.html',
@@ -59,6 +58,9 @@ export class ArtworkManagementComponent implements OnInit {
   }
 
   createArtwork(): void {
+    if (this.loading) return; // Evita richieste multiple mentre carica
+
+    this.loading = true;
     const formData = new FormData();
 
     if (this.artworkForm.title) {
@@ -89,10 +91,12 @@ export class ArtworkManagementComponent implements OnInit {
 
     this.artworkService.createArtwork(formData).subscribe(
       () => {
+        this.loading = false;
         console.log('Opera creata con successo');
         this.resetForm();
       },
       (error) => {
+        this.loading = false;
         console.error('Errore durante la creazione dell\'opera', error);
       }
     );
