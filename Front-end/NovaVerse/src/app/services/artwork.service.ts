@@ -16,13 +16,12 @@ export class ArtworkService {
   constructor(private http: HttpClient) {}
 
   // Ottieni opere per categoria con paginazione
- // Se artworks viene ricevuto come oggetto, convertilo in un array prima di restituirlo.
-getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
-  return this.http.get<Artwork[]>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true }).pipe(
-    map(response => Object.values(response)),  // Converti oggetto in array se necessario
-    catchError(this.handleError)
-  );
-}
+  getArtworksByCategory(categoryId: number): Observable<Artwork[]> {        //NON MODIFICARE QUETSO!!!
+    return this.http.get<{ $values: Artwork[] }>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true }).pipe(
+      map(response => response.$values),  // Estrai l'array degli artworks
+      catchError(this.handleError)
+    );
+  }
 
   // Carica l'immagine separatamente
   uploadImage(file: File): Observable<{ imageUrl: string }> {
