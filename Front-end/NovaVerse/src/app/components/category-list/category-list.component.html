@@ -1,11 +1,12 @@
 <div class="container mx-auto mt-5">
+  <!-- Header della pagina categorie -->
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-bold">Categorie disponibili</h1>
 
-    <!-- Mostra l'icona della matita solo se l'utente è un artista -->
+    <!-- Mostra il pulsante di gestione categorie se l'utente è un artista -->
     <ng-container *ngIf="isArtist">
       <a routerLink="/category-management" class="text-blue-500 hover:text-blue-700">
-        <i class="fas fa-edit fa-2x"></i>
+        <i class="fas fa-edit fa-2x"></i> Gestisci Categorie
       </a>
     </ng-container>
   </div>
@@ -15,29 +16,32 @@
     <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
   </div>
 
-  <!-- Mostra un messaggio di errore se c'è stato un errore durante il caricamento -->
+  <!-- Messaggio di errore -->
   <div *ngIf="errorMessage" class="text-red-500 font-semibold text-center">
     {{ errorMessage }}
   </div>
 
-  <!-- Elenco delle categorie -->
+  <!-- Lista delle categorie -->
   <div *ngIf="categories.length > 0 && !loading; else noCategories">
     <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg p-4 mb-4">
-      <!-- Nome della categoria (routerLink per vedere le opere) -->
-      <a [routerLink]="['/categories', category.id, 'artworks']" class="block hover:underline text-xl font-semibold text-blue-600">
-        {{ category.name }}
-      </a>
+      <div class="flex justify-between items-center">
+        <!-- Nome della categoria -->
+        <a [routerLink]="['/categories', category.id, 'artworks']" class="block hover:underline text-xl font-semibold text-blue-600">
+          {{ category.name }}
+        </a>
+
+        <!-- Matita per creare un'opera nella categoria, visibile solo se l'utente è un artista -->
+        <ng-container *ngIf="isArtist">
+          <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700">
+            <i class="fas fa-edit fa-2x"></i> Gestisci Opere
+          </a>
+        </ng-container>
+      </div>
+
       <p>{{ category.description }}</p>
 
-      <!-- Mostra la matita solo se l'utente è un artista -->
-      <ng-container *ngIf="isArtist">
-        <a routerLink="/category-management" class="text-blue-500 hover:text-blue-700">
-          <i class="fas fa-edit fa-2x"></i>
-        </a>
-      </ng-container>
-
-      <!-- Mostra le opere associate alla categoria solo se esistono e sono state caricate -->
-      <div *ngIf="artworksByCategory && artworksByCategory[category.id] && artworksByCategory[category.id].length > 0" class="mt-4">
+      <!-- Mostra opere associate a una categoria (se esistono) -->
+      <div *ngIf="artworksByCategory[category.id] && artworksByCategory[category.id].length > 0" class="mt-4">
         <h3 class="text-lg font-semibold mb-2">Opere associate a {{ category.name }}</h3>
         <ul>
           <li *ngFor="let artwork of artworksByCategory[category.id]" class="border-b py-2">
@@ -45,6 +49,7 @@
           </li>
         </ul>
       </div>
+
       <!-- Messaggio se non ci sono opere associate -->
       <div *ngIf="artworksByCategory[category.id]?.length === 0" class="text-gray-500">
         Nessuna opera associata a questa categoria.
@@ -52,7 +57,8 @@
     </div>
   </div>
 
-  <!-- Messaggio se non ci sono categorie -->
+  <!-- Messaggio se non ci sono categorie disponibili -->
   <ng-template #noCategories>
     <p class="text-gray-500">Non ci sono categorie disponibili al momento.</p>
   </ng-template>
+</div>

@@ -2,46 +2,22 @@
 <div class="mb-4">
   <h3 class="text-lg font-semibold mb-4">{{ editing ? 'Modifica Opera' : 'Aggiungi Nuova Opera' }}</h3>
 
-  <form (ngSubmit)="editing ? updateArtwork() : createArtwork()">
-    <!-- Titolo -->
+  <form (ngSubmit)="editing ? updateArtwork() : createArtwork()" enctype="multipart/form-data">
     <div class="mb-4">
       <label for="title" class="block mb-1">Titolo</label>
-      <input
-        type="text"
-        id="title"
-        class="border border-gray-300 px-4 py-2 w-full"
-        [(ngModel)]="artworkForm.title"
-        name="title"
-        required
-      />
+      <input type="text" id="title" class="border px-4 py-2 w-full" [(ngModel)]="artworkForm.title" name="title" required />
     </div>
 
-    <!-- Descrizione -->
     <div class="mb-4">
       <label for="description" class="block mb-1">Descrizione</label>
-      <textarea
-        id="description"
-        class="border border-gray-300 px-4 py-2 w-full"
-        [(ngModel)]="artworkForm.description"
-        name="description"
-        required
-      ></textarea>
+      <textarea id="description" class="border px-4 py-2 w-full" [(ngModel)]="artworkForm.description" name="description" required></textarea>
     </div>
 
-    <!-- Prezzo -->
     <div class="mb-4">
       <label for="price" class="block mb-1">Prezzo</label>
-      <input
-        type="number"
-        id="price"
-        class="border border-gray-300 px-4 py-2 w-full"
-        [(ngModel)]="artworkForm.price"
-        name="price"
-        required
-      />
+      <input type="number" id="price" class="border px-4 py-2 w-full" [(ngModel)]="artworkForm.price" name="price" required />
     </div>
 
-    <!-- Categoria -->
     <div class="mb-4">
       <label for="category" class="block mb-1">Categoria</label>
       <select id="category" [(ngModel)]="artworkForm.categoryId" name="categoryId" required>
@@ -50,99 +26,40 @@
       </select>
     </div>
 
-    <!-- Tipo di Opera -->
     <div class="mb-4">
       <label for="type" class="block mb-1">Tipo di Opera</label>
-      <select
-        id="type"
-        class="border border-gray-300 px-4 py-2 w-full"
-        [(ngModel)]="artworkForm.type"
-        name="type"
-        required
-      >
+      <select id="type" class="border px-4 py-2 w-full" [(ngModel)]="artworkForm.type" name="type" required>
         <option [value]="'Opere'">Opere</option>
         <option [value]="'NFT'">NFT</option>
       </select>
     </div>
 
-    <!-- Caricamento immagine tramite URL -->
     <div class="mb-4">
-      <label for="imageUrl" class="block mb-1">Inserisci URL Immagine (Opzionale)</label>
-      <input
-        type="text"
-        id="imageUrl"
-        class="border border-gray-300 px-4 py-2 w-full"
-        [(ngModel)]="artworkForm.imageUrl"
-        name="imageUrl"
-        placeholder="https://example.com/immagine.jpg"
-      />
+      <label for="imageUrl" class="block mb-1">Inserisci URL Immagine</label>
+      <input type="text" id="imageUrl" class="border px-4 py-2 w-full" [(ngModel)]="artworkForm.imageUrl" name="imageUrl" />
     </div>
 
-    <!-- Caricamento immagine dal PC -->
     <div class="mb-4">
-      <label class="block mb-1">Carica Immagine (Opzionale)</label>
+      <label class="block mb-1">Carica Immagine</label>
       <input type="file" (change)="onFileChange($event)" accept="image/*" />
     </div>
 
-    <!-- Pulsante di invio -->
+    <!-- Anteprima immagine -->
+    <div *ngIf="imagePreview" class="mb-4">
+      <h4>Anteprima Immagine:</h4>
+      <img [src]="imagePreview" alt="Anteprima Immagine" class="w-48 h-48 object-cover" />
+    </div>
+
     <div class="mb-4">
-      <button
-        type="submit"
-        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        [disabled]="loading"
-      >
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" [disabled]="loading">
         {{ loading ? 'Caricamento...' : (editing ? 'Aggiorna Opera' : 'Aggiungi Opera') }}
       </button>
     </div>
   </form>
 </div>
 
-<!-- Messaggio di errore o successo -->
 <div *ngIf="message" class="mb-4">
-  <div [ngClass]="{ 'bg-green-500 text-white p-4 rounded': success, 'bg-red-500 text-white p-4 rounded': !success }">
+  <div [ngClass]="{ 'bg-green-500': success, 'bg-red-500': !success }" class="text-white p-4 rounded">
     {{ message }}
   </div>
-</div>
-
-<!-- Elenco delle opere -->
-<div *ngIf="artworks$ | async as artworks">
-  <table class="min-w-full bg-white border-collapse">
-    <thead>
-      <tr>
-        <th class="px-4 py-2">Titolo</th>
-        <th class="px-4 py-2">Descrizione</th>
-        <th class="px-4 py-2">Prezzo</th>
-        <th class="px-4 py-2">Immagine</th>
-        <th class="px-4 py-2">Azioni</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let artwork of artworks" class="border-t">
-        <td class="px-4 py-2">{{ artwork.title }}</td>
-        <td class="px-4 py-2">{{ artwork.description }}</td>
-        <td class="px-4 py-2">{{ artwork.price | currency }}</td>
-        <td class="px-4 py-2">
-          <img *ngIf="artwork.photo" [src]="artwork.photo" alt="Opera" class="w-20 h-20 object-cover" />
-        </td>
-        <td class="px-4 py-2">
-          <button
-            (click)="editArtwork(artwork)"
-            class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
-          >
-            Modifica
-          </button>
-          <button
-            (click)="deleteArtwork(artwork.id)"
-            class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2"
-            [disabled]="loading"
-          >
-            Elimina
-          </button>
-        </td>
-      </tr>
-      <tr *ngIf="artworks.length === 0">
-        <td colspan="5" class="px-4 py-2 text-center text-gray-500">Non ci sono opere disponibili nella categoria selezionata.</td>
-      </tr>
-    </tbody>
-  </table>
 </div>

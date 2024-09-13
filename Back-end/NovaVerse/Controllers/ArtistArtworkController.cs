@@ -61,7 +61,6 @@ namespace NovaVerse.Controllers
             }
         }
 
-
         [Authorize(Policy = "ArtistOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
@@ -75,24 +74,35 @@ namespace NovaVerse.Controllers
             if (photoFile != null && photoFile.Length > 0)
             {
                 // Gestione dell'immagine caricata come file
-                using (var ms = new MemoryStream())
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                if (!Directory.Exists(uploadsFolder))
                 {
-                    await photoFile.CopyToAsync(ms);
-                    artworkDto.Photo = Convert.ToBase64String(ms.ToArray());
+                    Directory.CreateDirectory(uploadsFolder);
                 }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + photoFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photoFile.CopyToAsync(fileStream);
+                }
+
+                artworkDto.Photo = "/uploads/" + uniqueFileName; // Salva il percorso relativo
             }
             // Caso in cui nessuna immagine venga fornita (opzionale)
             else
             {
                 artworkDto.Photo = null; // Non viene fornita alcuna immagine
             }
+
             // Imposta l'ID dell'artista dall'utente autenticato
             var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             artworkDto.ArtistId = artistId;
 
             // Debug: log dei dati ricevuti nel DTO per verificare
             Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}, ArtistId: {artworkDto.ArtistId}, Photo: {artworkDto.Photo}");
-            
+
             // Crea l'opera tramite il servizio
             var createdArtwork = await _artworkService.AddArtworkAsync(artworkDto);
             if (createdArtwork == null)

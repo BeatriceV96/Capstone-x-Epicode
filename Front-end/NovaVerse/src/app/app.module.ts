@@ -16,6 +16,7 @@ import { CategoryDetailComponent } from './components/category-detail/category-d
 import { ProfileComponent } from './components/profile/profile.component';
 import { ArtworkManagementComponent } from './components/artwork-management/artwork-management.component';
 import { ArtworkListComponent } from './components/artwork-list/artwork-list.component';
+import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { ArtworkListComponent } from './components/artwork-list/artwork-list.com
     ProfileComponent,
     ArtworkManagementComponent,
     ArtworkListComponent,
+    ShoppingCartComponent,
   ],
   imports: [
     BrowserModule,

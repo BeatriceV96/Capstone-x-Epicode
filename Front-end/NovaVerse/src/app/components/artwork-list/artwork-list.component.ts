@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router'; // Aggiungi Router per la navigazione
+import { ActivatedRoute } from '@angular/router';
 import { ArtworkService } from '../../services/artwork.service';
-import { AuthService } from '../../services/auth.service';
 import { Artwork } from '../../Models/artwork';
-import { CategoryService } from '../../services/category.service'; // Importa il CategoryService
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-artwork-list',
@@ -11,63 +10,40 @@ import { CategoryService } from '../../services/category.service'; // Importa il
   styleUrls: ['./artwork-list.component.scss']
 })
 export class ArtworkListComponent implements OnInit {
-  artworks: Artwork[] = [];
+  artworks$: Observable<Artwork[]> = new Observable<Artwork[]>();
   categoryId: number | null = null;
-  loading: boolean = true;
-  errorMessage: string | null = null;
-  isArtist: boolean = false;
   categoryName: string = '';
+  loading: boolean = true;
+  errorMessage: string = '';
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
     private artworkService: ArtworkService,
-    private categoryService: CategoryService,
-    private authService: AuthService
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.categoryId = +params['id'];
+      this.categoryId = +params['id']; // Ottiene l'ID della categoria dai parametri URL
       if (this.categoryId) {
-        this.loadArtworks(this.categoryId);
-        this.loadCategoryDetails(this.categoryId);
-        this.isArtist = this.authService.isArtist();
+        this.loadArtworks(); // Carica le opere per la categoria specifica
       }
     });
   }
 
-  // Carica le opere della categoria
-  loadArtworks(categoryId: number): void {
-    this.loading = true;
-    this.artworkService.getArtworksByCategory(categoryId).subscribe(
-      (artworks: Artwork[]) => {
-        this.artworks = artworks;
-        this.loading = false;
-      },
-      (error) => {
-        this.errorMessage = 'Errore nel caricamento delle opere';
-        this.loading = false;
-      }
-    );
-  }
-
-  // Carica i dettagli della categoria (come il nome)
-  loadCategoryDetails(categoryId: number): void {
-    this.categoryService.getCategoryById(categoryId).subscribe(
-      (category) => {
-        this.categoryName = category.name; // Imposta il nome della categoria
-      },
-      (error) => {
-        this.errorMessage = 'Errore nel caricamento della categoria';
-      }
-    );
-  }
-
-  // Aggiungi questo metodo per navigare alla pagina di gestione opere
-  navigateToManage(): void {
+  loadArtworks(): void {
     if (this.categoryId) {
-      this.router.navigate([`/categories/${this.categoryId}/artworks/manage`]);
+      this.loading = true;
+      this.artworks$ = this.artworkService.getArtworksByCategory(this.categoryId); // Utilizza l'Observable artworks$
+      this.artworks$.subscribe({
+        next: () => {
+          this.loading = false;
+        },
+        error: (err) => {
+          this.loading = false;
+          this.errorMessage = 'Errore nel caricamento delle opere per la categoria selezionata.';
+          console.error(err);
+        }
+      });
     }
   }
 }

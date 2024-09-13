@@ -12,19 +12,19 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
-   // Ottieni tutte le categorie
-   getAllCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.baseUrl}/all`, { withCredentials: true })
+  // Ottieni tutte le categorie
+  getAllCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.baseUrl}/all`)
       .pipe(
-        catchError(error => {
+        catchError((error) => {
           console.error('Errore durante il caricamento delle categorie:', error);
           return throwError(error);
         })
       );
   }
 
-   // Ottieni una categoria specifica dall'ID
-   getCategoryById(id: number): Observable<Category> {
+  // Ottieni una categoria specifica dall'ID
+  getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(`${this.baseUrl}/${id}`)
       .pipe(
         catchError((error) => {
@@ -67,8 +67,8 @@ export class CategoryService {
       );
   }
 
-   // Cancella una categoria
-   deleteCategory(id: number): Observable<void> {
+  // Cancella una categoria
+  deleteCategory(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
       .pipe(
         catchError((error) => {
