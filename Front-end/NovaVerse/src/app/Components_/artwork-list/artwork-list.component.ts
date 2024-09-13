@@ -30,17 +30,16 @@ export class ArtworkListComponent implements OnInit {
     });
   }
 
-
   loadArtworks(): void {
     if (this.categoryId) {
       this.artworks$ = this.artworkService.getArtworksByCategory(this.categoryId).pipe(
         tap((artworks) => {
-          console.log('Artworks caricati:', artworks); // Log dei dati ricevuti
+          console.log('Artworks caricati:', artworks); // Controllo dei dati in console
         }),
         catchError(error => {
           this.errorMessage = 'Errore nel caricamento delle opere.';
           this.loading = false;
-          return of([]);
+          return of([]); // Restituisce un array vuoto in caso di errore
         })
       );
       this.loading = false;
