@@ -8,8 +8,13 @@ export interface Artwork {
   categoryId: number;
   type: ArtworkType;
   artistId: number;
+  artistName?: string; // Nome o username dell'artista (opzionale)
   createDate: Date;
   viewCount: number;
+  soldOut?: boolean;
+  likesCount?: number;  // Numero di "mi piace"
+  commentsCount?: number;  // Numero di commenti
+  isFavorite?: boolean;  // Indica se l'opera è tra i preferiti dell'utente attuale
 }
 
 export enum ArtworkType {

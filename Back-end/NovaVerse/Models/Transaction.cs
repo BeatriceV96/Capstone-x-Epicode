@@ -34,5 +34,7 @@ namespace NovaVerse.Models
         [Required]
         [StringLength(20)]
         public string TransactionStatus { get; set; }
+
+        public virtual ICollection<TransactionArtworks> TransactionArtworks { get; set; } = new List<TransactionArtworks>();
     }
 }

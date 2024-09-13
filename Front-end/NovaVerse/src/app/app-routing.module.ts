@@ -23,6 +23,9 @@ const routes: Routes = [
   // Lazy-loaded Profile
   { path: 'profile', loadChildren: () => import('./Components_/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
 
+  // Lazy-loaded Artwork Detail'
+  { path: 'artworks/:id', loadChildren: () => import('./Components_/artwork-detail/artwork-detail.module').then(m => m.ArtworkDetailModule) },
+
   // Modulo di autenticazione lazy-loaded
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
 

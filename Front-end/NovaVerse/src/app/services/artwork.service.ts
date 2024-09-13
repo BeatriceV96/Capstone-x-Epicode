@@ -23,6 +23,11 @@ export class ArtworkService {
     );
   }
 
+  getArtworkById(id: number): Observable<Artwork> {
+    return this.http.get<Artwork>(`${this.baseUrl}/artworks/${id}`, { withCredentials: true })
+      .pipe(catchError(this.handleError));
+  }
+
   // Carica l'immagine separatamente
   uploadImage(file: File): Observable<{ imageUrl: string }> {
     const allowedTypes = ['image/jpeg', 'image/png'];

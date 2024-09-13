@@ -51,6 +51,13 @@ namespace NovaVerse.Context
                 .HasForeignKey(a => a.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Relazione uno-a-uno tra Artwork e Transaction
+            modelBuilder.Entity<Artwork>()
+                .HasOne(a => a.Transaction)
+                .WithOne(t => t.Artwork)
+                .HasForeignKey<Transaction>(t => t.ArtworkId)  // Specifica che Transaction è il lato dipendente
+                .OnDelete(DeleteBehavior.Restrict);
+
             // Relazione uno-a-uno tra ShoppingCart e User
             modelBuilder.Entity<ShoppingCart>()
                 .HasOne(c => c.User)
@@ -79,17 +86,10 @@ namespace NovaVerse.Context
                 .HasForeignKey<NFTMetadata>(nft => nft.ArtworkId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relazione uno-a-uno tra Artwork e Transaction
-            modelBuilder.Entity<Artwork>()
-                .HasOne(a => a.Transaction)
-                .WithOne(t => t.Artwork)
-                .HasForeignKey<Artwork>(a => a.TransactionId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Relazione uno-a-molti tra TransactionArtworks e Transaction
             modelBuilder.Entity<TransactionArtworks>()
                 .HasOne(ta => ta.Transaction)
-                .WithMany()
+                .WithMany(t => t.TransactionArtworks)  // Definisci la collezione TransactionArtworks su Transaction
                 .HasForeignKey(ta => ta.TransactionId)
                 .OnDelete(DeleteBehavior.Cascade);
 

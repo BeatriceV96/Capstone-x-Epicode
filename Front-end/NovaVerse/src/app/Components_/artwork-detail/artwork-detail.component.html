@@ -1,0 +1,69 @@
+<div class="container mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg max-w-xl text-white">
+  <h2 class="text-3xl font-semibold mb-4 text-center">{{ (artwork$ | async)?.title }}</h2>
+
+  <!-- Sezione immagine -->
+  <div class="flex justify-center mb-6">
+    <img [src]="(artwork$ | async)?.photo || (artwork$ | async)?.imageUrl" alt="{{ (artwork$ | async)?.title }}"
+         class="rounded-lg max-w-xs shadow-lg object-cover">
+  </div>
+
+  <!-- Dettagli dell'opera -->
+  <div class="space-y-4">
+    <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
+    <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency }}</p>
+    <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
+    <p><strong>Creato da:</strong> {{ (artwork$ | async)?.artistId }}</p>
+    <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
+    <p><strong>Visualizzazioni:</strong> {{ (artwork$ | async)?.viewCount }}</p>
+    <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
+  </div>
+
+  <!-- Azioni utente -->
+  <div class="mt-6 space-y-4">
+    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+      Aggiungi ai Preferiti
+    </button>
+    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+      Aggiungi al Carrello
+    </button>
+  </div>
+
+  <!-- Edit e Delete solo se l'utente è l'artista -->
+  <div *ngIf="artwork$ | async as artwork">
+    <div *ngIf="isArtist(artwork)">
+      <button (click)="editArtwork(artwork)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">
+        Modifica Opera
+      </button>
+      <button (click)="deleteArtwork(artwork)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+        Elimina Opera
+      </button>
+      <button (click)="markAsSoldOut(artwork)" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg">
+        {{ artwork.soldOut ? 'Rendi Disponibile' : 'Segna come Venduto' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Sezione commenti/recensioni -->
+  <div class="mt-6 space-y-4">
+    <h2 class="text-2xl font-semibold">Recensioni</h2>
+    <div *ngIf="comments.length > 0; else noComments">
+      <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2">
+        <p class="text-gray-300">{{ comment.content }}</p>
+        <small class="text-gray-400">Recensito da: {{ comment.user?.username }}</small>
+      </div>
+    </div>
+
+    <!-- Messaggio di fallback per nessuna recensione -->
+    <ng-template #noComments>
+      <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
+    </ng-template>
+
+    <!-- Lascio una nuova recensione -->
+    <div class="mt-4">
+      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..."
+                class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
+      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+        Invia Recensione</button>
+    </div>
+  </div>
+</div>
