@@ -95,7 +95,6 @@ namespace NovaVerse.Services
                 CreateDate = DateTime.UtcNow
             };
 
-
             _context.Artworks.Add(newArtwork);
             await _context.SaveChangesAsync();
 
