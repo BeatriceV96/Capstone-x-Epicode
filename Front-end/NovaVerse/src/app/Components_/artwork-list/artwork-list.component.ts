@@ -11,10 +11,11 @@ import { Artwork } from '../../Models/artwork';
   styleUrls: ['./artwork-list.component.scss']
 })
 export class ArtworkListComponent implements OnInit {
-  artworks$: Observable<Artwork[]> = new Observable<Artwork[]>();
   categoryId: number | null = null;
   loading: boolean = true;
   errorMessage: string | null = null;
+  noArtworks: boolean = false;
+  artworks$: Observable<Artwork[]> | undefined;
 
   constructor(
     private artworkService: ArtworkService,
@@ -32,9 +33,12 @@ export class ArtworkListComponent implements OnInit {
 
   loadArtworks(): void {
     if (this.categoryId) {
+      this.loading = true; // Imposta loading su true prima di iniziare il caricamento
       this.artworks$ = this.artworkService.getArtworksByCategory(this.categoryId).pipe(
         tap((artworks) => {
           console.log('Artworks caricati:', artworks); // Controllo dei dati in console
+          this.loading = false; // Imposta loading su false dopo il caricamento
+          this.noArtworks = artworks.length === 0; // Controlla se non ci sono opere
         }),
         catchError(error => {
           this.errorMessage = 'Errore nel caricamento delle opere.';
@@ -42,7 +46,6 @@ export class ArtworkListComponent implements OnInit {
           return of([]); // Restituisce un array vuoto in caso di errore
         })
       );
-      this.loading = false;
     }
   }
 }
