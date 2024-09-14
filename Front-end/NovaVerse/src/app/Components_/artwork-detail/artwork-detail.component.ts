@@ -1,33 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ArtworkService } from '../../services/artwork.service';
 import { AuthService } from '../../services/auth.service';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { Artwork } from '../../Models/artwork';
-import { catchError, filter, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Observable, of, Subscription } from 'rxjs';
-import { CommentService } from '../../services/comment.service.service';
 import { CategoryService } from '../../services/category.service';
+import { CommentDto } from '../../Models/commentDto';
+import { CommentService } from '../../services/comment-service.service';
 
 @Component({
   selector: 'app-artwork-detail',
   templateUrl: './artwork-detail.component.html',
   styleUrls: ['./artwork-detail.component.scss']
 })
-export class ArtworkDetailComponent implements OnInit {
-  artwork: Artwork | null = null;  // Rimuovi async pipe dal template
+export class ArtworkDetailComponent implements OnInit, OnDestroy {
+  artwork: Artwork | null = null;
   artwork$: Observable<Artwork | null> | null = null;
-  artist: any = null;
+  artist: any = null;  // Modificato a 'any' per gestire i dati dell'artista
   category: any = null;
-  comments: any[] = [];
+  comments$: Observable<CommentDto[]> | null = null;  // Observable per i commenti
   newComment: string = '';
   editing: boolean = false;
   editedArtwork: Partial<Artwork> = {};
   loading: boolean = true;
   artworkSubscription: Subscription | null = null;
   saveLoading: boolean = false;
-
 
   constructor(
     private artworkService: ArtworkService,
@@ -54,41 +54,28 @@ export class ArtworkDetailComponent implements OnInit {
       this.loading = false;
       if (artwork) {
         this.loadComments(artwork.id);
-        this.loadArtist(artwork.artistId);
+        this.loadArtist(artwork.artistId);  // Carica le informazioni dell'artista
       }
     });
   }
 
-  loadArtwork(): void {
-    this.artworkSubscription = this.route.paramMap.pipe(
-      switchMap(params => {
-        const artworkId = Number(params.get('id'));
-        return this.artworkService.getArtworkById(artworkId).pipe(
-          tap(artwork => {
-            this.artwork = artwork;
-            this.loadComments(artwork.id);
-            this.loadArtist(artwork.artistId);
-          }),
-          catchError(error => {
-            console.error('Errore nel caricamento dell\'opera:', error);
-            this.loading = false;
-            return of(null);  // In caso di errore
-          })
-        );
-      })
-    ).subscribe();
-  }
-
   loadComments(artworkId: number): void {
-    this.commentService.getCommentsByArtwork(artworkId).subscribe(
-      (comments) => this.comments = comments,
-      (error) => console.error('Errore nel caricamento dei commenti:', error)
+    this.comments$ = this.commentService.getCommentsByArtwork(artworkId).pipe(
+      catchError((error) => {
+        console.error('Errore nel caricamento dei commenti:', error);
+        return of([]);  // Restituisci un array vuoto in caso di errore
+      })
     );
   }
 
+
+
   loadArtist(artistId: number): void {
+    console.log('Artist ID:', artistId); // Debug
     this.authService.getUserById(artistId).subscribe(
-      (artist) => this.artist = artist,
+      (artist) => {
+        this.artist = artist;
+      },
       (error) => console.error('Errore nel caricamento delle informazioni dell\'artista:', error)
     );
   }
@@ -139,7 +126,7 @@ export class ArtworkDetailComponent implements OnInit {
 
       const artworkData = new FormData();
       Object.entries(updatedArtwork).forEach(([key, value]) => {
-        artworkData.append(key, value);
+        artworkData.append(key, value as string);
       });
 
       this.artworkService.updateArtwork(updatedArtwork.id, artworkData).subscribe(
@@ -162,16 +149,33 @@ export class ArtworkDetailComponent implements OnInit {
     }
   }
 
-  leaveReview(content: string): void {
-    if (this.artwork) {
-      const commentDto = { artworkId: this.artwork.id, content };
+  leaveReview(): void {
+    if (this.artwork && this.newComment.trim()) {
+      const commentDto: CommentDto = {
+        artworkId: this.artwork.id,
+        userId: 0, // Il backend gestirà l'assegnazione dell'utente autenticato
+        commentText: this.newComment,
+      };
+
       this.commentService.addComment(commentDto).subscribe(
-        newComment => {
-          this.comments.push(newComment);  // Aggiorna subito la lista di commenti
-          this.newComment = '';  // Pulisci il campo
+        (newComment: CommentDto) => {
+          // Aggiorna l'osservabile dei commenti in modo asincrono
+          if (this.comments$) {
+            this.comments$ = this.comments$.pipe(
+              switchMap((comments) => {
+                return of([...comments, newComment]);
+              })
+            );
+          } else {
+            // Nel caso in cui comments$ sia null, lo inizializziamo con il nuovo commento
+            this.comments$ = of([newComment]);
+          }
+
+          // Pulisci il campo del nuovo commento
+          this.newComment = '';
           console.log('Recensione inviata');
         },
-        error => console.error('Errore nell\'invio della recensione', error)
+        (error: any) => console.error('Errore nell\'invio della recensione', error)
       );
     }
   }

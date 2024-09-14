@@ -110,7 +110,7 @@ export class AuthService {
   }
 
   getUserById(userId: number): Observable<iUser> {
-    return this.http.get<iUser>(`${this.baseUrl}/${userId}`);
+    return this.http.get<iUser>(`${this.baseUrl}/users/${userId}`);
   }
 
   // Ripristina l'utente dal backend al caricamento della pagina

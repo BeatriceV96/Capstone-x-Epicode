@@ -18,26 +18,7 @@ namespace NovaVerse.Services
             _context = context;
         }
 
-        // Restituisce tutte le opere come ArtworkDto
-        public async Task<List<ArtworkDto>> GetAllArtworksAsync()
-        {
-            return await _context.Artworks
-                .Include(a => a.Category)
-                .Include(a => a.Artist)
-                .Select(a => new ArtworkDto
-                {
-                    Id = a.Id,
-                    Title = a.Title,
-                    Description = a.Description,
-                    Price = a.Price,
-                    Photo = a.Photo,
-                    CategoryId = a.CategoryId,
-                    ArtistId = a.ArtistId
-                })
-                .ToListAsync();
-        }
 
-        // Restituisce un'opera specifica per ID come ArtworkDto
         // Restituisce tutte le opere come ArtworkDto
         public async Task<List<ArtworkDto>> GetAllArtworksAsync()
         {

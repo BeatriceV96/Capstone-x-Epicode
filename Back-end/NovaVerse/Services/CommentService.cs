@@ -1,70 +1,121 @@
 ﻿using NovaVerse.Context;
+using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
-using NovaVerse.Dto;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace NovaVerse.Services
+public class CommentService : ICommentService
 {
-    public class CommentService : ICommentService
+    private readonly NovaVerseDbContext _context;
+
+    public CommentService(NovaVerseDbContext context)
     {
-        private readonly NovaVerseDbContext _context;
+        _context = context;
+    }
 
-        public CommentService(NovaVerseDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<List<Comment>> GetCommentsByArtworkAsync(int artworkId)
-        {
-            return await _context.Comments
-                .Include(c => c.User)
-                .Where(c => c.ArtworkId == artworkId)
-                .ToListAsync();
-        }
-
-        public async Task<Comment> AddCommentAsync(CommentDto commentDto)
-        {
-            var comment = new Comment
+    // Restituisce i commenti per un'opera specifica
+    public async Task<List<CommentDto>> GetCommentsByArtworkAsync(int artworkId)
+    {
+        var comments = await _context.Comments
+            .Include(c => c.User)  // Include per ottenere il nome dell'utente
+            .Where(c => c.ArtworkId == artworkId)
+            .Select(c => new CommentDto
             {
-                UserId = commentDto.UserId,
-                ArtworkId = commentDto.ArtworkId,
-                CommentText = commentDto.CommentText,
-                CreateDate = DateTime.Now
-            };
+                Id = c.Id,
+                UserId = c.UserId,
+                Username = c.User.Username,  // Nome dell'utente
+                ArtworkId = c.ArtworkId,
+                CommentText = c.CommentText,
+                CreateDate = c.CreateDate
+            })
+            .ToListAsync();
 
-            _context.Comments.Add(comment);
-            await _context.SaveChangesAsync();
+        return comments;
+    }
 
-            return comment;
-        }
-
-        public async Task<Comment> UpdateCommentAsync(int commentId, CommentDto commentDto)
-        {
-            var comment = await _context.Comments.FindAsync(commentId);
-            if (comment == null || comment.UserId != commentDto.UserId)
+    // Restituisce un singolo commento per ID
+    public async Task<CommentDto> GetCommentByIdAsync(int commentId)
+    {
+        var comment = await _context.Comments
+            .Include(c => c.User)
+            .Where(c => c.Id == commentId)
+            .Select(c => new CommentDto
             {
-                return null; // Il commento non esiste o l'utente non è autorizzato a modificarlo
-            }
+                Id = c.Id,
+                UserId = c.UserId,
+                Username = c.User.Username,
+                ArtworkId = c.ArtworkId,
+                CommentText = c.CommentText,
+                CreateDate = c.CreateDate
+            })
+            .FirstOrDefaultAsync();
 
-            comment.CommentText = commentDto.CommentText;
-            await _context.SaveChangesAsync();
+        return comment;
+    }
 
-            return comment;
-        }
-
-        public async Task<bool> DeleteCommentAsync(int commentId, int userId)
+    // Aggiunge un nuovo commento
+    public async Task<CommentDto> AddCommentAsync(CommentDto commentDto)
+    {
+        var comment = new Comment
         {
-            var comment = await _context.Comments.FindAsync(commentId);
-            if (comment == null || comment.UserId != userId)
-            {
-                return false; // Il commento non esiste o l'utente non è autorizzato a cancellarlo
-            }
+            UserId = commentDto.UserId,
+            ArtworkId = commentDto.ArtworkId,
+            CommentText = commentDto.CommentText,
+            CreateDate = commentDto.CreateDate ?? DateTime.Now
+        };
 
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+        _context.Comments.Add(comment);
+        await _context.SaveChangesAsync();
 
-            return true;
+        // Mappa il commento creato al CommentDto
+        return new CommentDto
+        {
+            Id = comment.Id,
+            UserId = comment.UserId,
+            ArtworkId = comment.ArtworkId,
+            CommentText = comment.CommentText,
+            CreateDate = comment.CreateDate,
+            Username = (await _context.Users.FindAsync(comment.UserId))?.Username
+        };
+    }
+
+    // Aggiorna un commento esistente
+    public async Task<CommentDto> UpdateCommentAsync(int commentId, CommentDto commentDto)
+    {
+        var comment = await _context.Comments.FindAsync(commentId);
+        if (comment == null || comment.UserId != commentDto.UserId)
+        {
+            return null;
         }
+
+        comment.CommentText = commentDto.CommentText;
+        await _context.SaveChangesAsync();
+
+        return new CommentDto
+        {
+            Id = comment.Id,
+            UserId = comment.UserId,
+            ArtworkId = comment.ArtworkId,
+            CommentText = comment.CommentText,
+            CreateDate = comment.CreateDate,
+            Username = (await _context.Users.FindAsync(comment.UserId))?.Username
+        };
+    }
+
+    // Cancella un commento
+    public async Task<bool> DeleteCommentAsync(int commentId, int userId)
+    {
+        var comment = await _context.Comments.FindAsync(commentId);
+        if (comment == null || comment.UserId != userId)
+        {
+            return false;
+        }
+
+        _context.Comments.Remove(comment);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

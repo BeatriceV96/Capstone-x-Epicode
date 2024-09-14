@@ -25,22 +25,27 @@ namespace NovaVerse.Controllers
             return Ok(comments);
         }
 
+
+
         [HttpPost("add")]
-        [Authorize] // Solo utenti autenticati possono aggiungere commenti
+        [Authorize]  // Solo utenti autenticati possono aggiungere commenti
         public async Task<IActionResult> AddComment([FromBody] CommentDto commentDto)
         {
+            // Recupera l'ID dell'utente autenticato
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            commentDto.UserId = userId;
+            commentDto.UserId = userId;  // Assegna l'ID dell'utente al DTO
+
             var comment = await _commentService.AddCommentAsync(commentDto);
             return Ok(comment);
         }
 
         [HttpPut("update/{commentId}")]
-        [Authorize] // Solo l'autore del commento o un admin può modificarlo
+        [Authorize]  // Solo l'autore del commento o un admin può modificarlo
         public async Task<IActionResult> UpdateComment(int commentId, [FromBody] CommentDto commentDto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             commentDto.UserId = userId;
+
             var comment = await _commentService.UpdateCommentAsync(commentId, commentDto);
             if (comment == null)
             {
@@ -50,7 +55,7 @@ namespace NovaVerse.Controllers
         }
 
         [HttpDelete("delete/{commentId}")]
-        [Authorize] // Solo l'autore del commento o un admin può eliminarlo
+        [Authorize]  // Solo l'autore del commento o un admin può eliminarlo
         public async Task<IActionResult> DeleteComment(int commentId)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

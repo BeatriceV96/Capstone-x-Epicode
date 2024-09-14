@@ -20,6 +20,10 @@ export class UserService {
       );
   }
 
+  getUserById(userId: number): Observable<iUser> {
+    return this.http.get<iUser>(`${this.apiUrl}/users/${userId}`);
+  }
+
   // Ottiene il profilo utente dal backend
   getUserProfile(): Observable<iUser> {
     return this.http.get<iUser>(`${this.apiUrl}/profile`)

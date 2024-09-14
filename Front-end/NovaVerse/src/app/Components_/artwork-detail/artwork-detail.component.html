@@ -3,7 +3,8 @@
 
   <!-- Sezione immagine -->
   <div class="flex justify-center mb-6">
-    <img [src]="'http://localhost:5034' + (artwork$ | async)?.photo || (artwork$ | async)?.imageUrl" alt="{{ (artwork$ | async)?.title }}"
+    <img [src]="'http://localhost:5034' + (artwork$ | async)?.photo || (artwork$ | async)?.imageUrl"
+         alt="{{ (artwork$ | async)?.title }}"
          class="rounded-lg max-w-xs shadow-lg object-cover">
   </div>
 
@@ -12,7 +13,7 @@
     <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
     <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency }}</p>
     <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
-    <p><strong>Creato da:</strong> {{ artist?.username }}</p>
+    <p><strong>Creato da:</strong> {{ artist?.username }}</p>  <!-- Corretto -->
     <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
     <p><strong>Visualizzazioni:</strong> {{ (artwork$ | async)?.viewCount }}</p>
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
@@ -28,25 +29,33 @@
 
   <!-- Azioni utente -->
   <div class="mt-6 space-y-4" *ngIf="!editing">
-    <button (click)="artwork && addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">Aggiungi ai Preferiti</button>
-    <button (click)="artwork && addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">Aggiungi al Carrello</button>
+    <button (click)="artwork && addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+      Aggiungi ai Preferiti
+    </button>
+    <button (click)="artwork && addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+      Aggiungi al Carrello
+    </button>
 
-    <!-- Edit e Delete solo se l'utente è l'artista -->
-    <div *ngIf="artwork && isArtist(artwork)"></div>
-      <button (click)="editArtwork()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">Modifica Opera</button>
-      <button (click)="deleteArtwork()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">Elimina Opera</button>
+    <div *ngIf="artwork && isArtist(artwork)">
+      <button (click)="editArtwork()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">
+        Modifica Opera
+      </button>
+      <button (click)="deleteArtwork()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+        Elimina Opera
+      </button>
     </div>
   </div>
 
   <!-- Sezione commenti/recensioni -->
   <div class="mt-6 space-y-4">
     <h2 class="text-2xl font-semibold">Recensioni</h2>
-    <div *ngIf="comments.length > 0; else noComments">
+    <div *ngIf="comments$ | async as comments; else noComments">
       <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2">
-        <p class="text-gray-300">{{ comment.content }}</p>
-        <small class="text-gray-400">Recensito da: {{ comment.user?.username }}</small>
+        <p class="text-gray-300">{{ comment.commentText }}</p>
+        <small class="text-gray-400">Recensito da: {{ comment.username }}</small>
       </div>
     </div>
+
 
     <ng-template #noComments>
       <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
@@ -54,7 +63,11 @@
 
     <!-- Lascio una nuova recensione -->
     <div class="mt-4">
-      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
-      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Invia Recensione</button>
+      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..."
+                class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
+      <button (click)="leaveReview()" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+        Invia Recensione
+      </button>
     </div>
   </div>
+</div>
