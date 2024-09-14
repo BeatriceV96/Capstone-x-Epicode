@@ -5,6 +5,7 @@ import { Artwork, ArtworkType } from '../../Models/artwork';
 import { Category } from '../../Models/category';
 import { ArtworkService } from '../../services/artwork.service';
 import { CategoryService } from '../../services/category.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-artwork-management',
@@ -28,7 +29,8 @@ export class ArtworkManagementComponent implements OnInit {
   constructor(
     private artworkService: ArtworkService,
     private route: ActivatedRoute,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private authService: AuthService,
   ) {
     this.route.params.subscribe(params => {
       this.categoryId = params['id'] ? +params['id'] : null;
@@ -58,7 +60,7 @@ export class ArtworkManagementComponent implements OnInit {
   }
 
   createArtwork(): void {
-    if (this.loading) return; // Evita richieste multiple mentre carica
+    if (this.loading) return;
 
     this.loading = true;
     const formData = new FormData();
@@ -89,6 +91,16 @@ export class ArtworkManagementComponent implements OnInit {
       formData.append('imageUrl', this.artworkForm.imageUrl);
     }
 
+    // Aggiungi il nome dell'artista
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser && currentUser.username) {
+      formData.append('artistName', currentUser.username);
+    } else {
+      console.error('Nome dell\'artista non trovato.');
+      this.loading = false;
+      return;
+    }
+
     this.artworkService.createArtwork(formData).subscribe(
       () => {
         this.loading = false;
@@ -101,6 +113,7 @@ export class ArtworkManagementComponent implements OnInit {
       }
     );
   }
+
 
   resetForm(): void {
     this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere, imageUrl: '' };

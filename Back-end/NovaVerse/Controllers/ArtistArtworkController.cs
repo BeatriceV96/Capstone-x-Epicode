@@ -53,13 +53,18 @@ namespace NovaVerse.Controllers
             return Ok(artwork);
         }
 
-
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Se il campo ArtistName è richiesto
+            if (string.IsNullOrWhiteSpace(artworkDto.ArtistName))
+            {
+                return BadRequest(new { errors = new { ArtistName = new[] { "The ArtistName field is required." } } });
             }
 
             // Gestisci il caricamento dell'immagine dal file
@@ -101,6 +106,7 @@ namespace NovaVerse.Controllers
 
             return Ok(createdArtwork);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArtwork(int id, [FromBody] ArtworkDto artworkDto)
