@@ -109,6 +109,10 @@ export class AuthService {
     return this.authSubject.value;
   }
 
+  getUserById(userId: number): Observable<iUser> {
+    return this.http.get<iUser>(`${this.baseUrl}/${userId}`);
+  }
+
   // Ripristina l'utente dal backend al caricamento della pagina
   restoreUser(): void {
     this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`, { withCredentials: true }).subscribe(

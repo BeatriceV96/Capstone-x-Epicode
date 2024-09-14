@@ -3,7 +3,7 @@
 
   <!-- Sezione immagine -->
   <div class="flex justify-center mb-6">
-    <img [src]="(artwork$ | async)?.photo || (artwork$ | async)?.imageUrl" alt="{{ (artwork$ | async)?.title }}"
+    <img [src]="'http://localhost:5034' + (artwork$ | async)?.photo || (artwork$ | async)?.imageUrl" alt="{{ (artwork$ | async)?.title }}"
          class="rounded-lg max-w-xs shadow-lg object-cover">
   </div>
 
@@ -12,33 +12,28 @@
     <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
     <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency }}</p>
     <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
-    <p><strong>Creato da:</strong> {{ (artwork$ | async)?.artistId }}</p>
+    <p><strong>Creato da:</strong> {{ artist?.username }}</p>  <!-- Usa il nome dell'artista -->
     <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
     <p><strong>Visualizzazioni:</strong> {{ (artwork$ | async)?.viewCount }}</p>
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
   <!-- Azioni utente -->
-  <div class="mt-6 space-y-4">
-    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+  <div class="mt-6 space-y-4" *ngIf="artwork$ | async as artwork">
+    <button (click)="addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
       Aggiungi ai Preferiti
     </button>
-    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+    <button (click)="addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
       Aggiungi al Carrello
     </button>
-  </div>
 
-  <!-- Edit e Delete solo se l'utente è l'artista -->
-  <div *ngIf="artwork$ | async as artwork">
+    <!-- Edit e Delete solo se l'utente è l'artista -->
     <div *ngIf="isArtist(artwork)">
       <button (click)="editArtwork(artwork)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">
         Modifica Opera
       </button>
       <button (click)="deleteArtwork(artwork)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
         Elimina Opera
-      </button>
-      <button (click)="markAsSoldOut(artwork)" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg">
-        {{ artwork.soldOut ? 'Rendi Disponibile' : 'Segna come Venduto' }}
       </button>
     </div>
   </div>
@@ -63,7 +58,8 @@
       <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..."
                 class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
       <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-        Invia Recensione</button>
+        Invia Recensione
+      </button>
     </div>
   </div>
 </div>

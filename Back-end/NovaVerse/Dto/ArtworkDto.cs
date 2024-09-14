@@ -11,4 +11,5 @@ public class ArtworkDto
     public int CategoryId { get; set; }
     public ArtworkType Type { get; set; }
     public int ArtistId { get; set; }
+    public string ArtistName { get; set; } 
 }

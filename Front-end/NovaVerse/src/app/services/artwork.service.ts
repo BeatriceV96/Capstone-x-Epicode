@@ -24,7 +24,8 @@ export class ArtworkService {
   }
 
   getArtworkById(id: number): Observable<Artwork> {
-    return this.http.get<Artwork>(`${this.baseUrl}/artworks/${id}`, { withCredentials: true })
+    // Modifica l'URL per corrispondere alla rotta del backend
+    return this.http.get<Artwork>(`${this.baseUrl}/${id}`, { withCredentials: true })
       .pipe(catchError(this.handleError));
   }
 

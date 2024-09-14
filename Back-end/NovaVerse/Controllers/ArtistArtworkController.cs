@@ -31,24 +31,6 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetArtwork(int id)
-        {
-            var artwork = await _artworkService.GetArtworkByIdAsync(id);
-            if (artwork == null)
-            {
-                return NotFound("Opera non trovata.");
-            }
-
-            var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            if (artwork.ArtistId != artistId)
-            {
-                return Unauthorized("Non puoi accedere a questa opera.");
-            }
-
-            return Ok(artwork);
-        }
-
         [HttpGet("category/{categoryId}/artworks")]
         public async Task<IActionResult> GetArtworksByCategory(int categoryId)
         {
@@ -58,6 +40,19 @@ namespace NovaVerse.Controllers
 
             return Ok(artworks);
         }
+
+       [HttpGet("{id}")]
+        public async Task<IActionResult> GetArtworkById(int id)
+        {
+            var artwork = await _artworkService.GetArtworkByIdAsync(id);
+            if (artwork == null)
+            {
+                return NotFound(new { message = $"Artwork with ID {id} not found." });
+            }
+
+            return Ok(artwork);
+        }
+
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
@@ -107,44 +102,33 @@ namespace NovaVerse.Controllers
             return Ok(createdArtwork);
         }
 
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateArtwork(int id, [FromBody] ArtworkDto artworkDto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var artwork = await _artworkService.GetArtworkByIdAsync(id);
-
-            if (artwork.ArtistId != userId)
+            if (artworkDto == null || id != artworkDto.Id)
             {
-                return Unauthorized("Non sei autorizzato a modificare questa opera.");
+                return BadRequest(new { message = "Invalid artwork data." });
             }
 
             var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
             if (updatedArtwork == null)
             {
-                return BadRequest("Failed to update artwork.");
+                return NotFound(new { message = $"Artwork with ID {id} not found." });
             }
 
             return Ok(updatedArtwork);
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArtwork(int id)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var artwork = await _artworkService.GetArtworkByIdAsync(id);
-
-            if (artwork.ArtistId != userId)
-            {
-                return Unauthorized("Non sei autorizzato a eliminare questa opera.");
-            }
-
             var success = await _artworkService.DeleteArtworkAsync(id);
             if (!success)
             {
-                return BadRequest("Failed to delete artwork.");
+                return NotFound(new { message = $"Artwork with ID {id} not found." });
             }
 
-            return Ok("Artwork deleted successfully.");
+            return NoContent();
         }
     }
 }

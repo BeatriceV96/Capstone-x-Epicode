@@ -38,6 +38,27 @@ namespace NovaVerse.Services
         }
 
         // Restituisce un'opera specifica per ID come ArtworkDto
+        // Restituisce tutte le opere come ArtworkDto
+        public async Task<List<ArtworkDto>> GetAllArtworksAsync()
+        {
+            return await _context.Artworks
+                .Include(a => a.Category)
+                .Include(a => a.Artist)
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Price = a.Price,
+                    Photo = a.Photo,
+                    CategoryId = a.CategoryId,
+                    ArtistId = a.ArtistId,
+                    ArtistName = a.Artist.Username  // Recupera il nome dell'artista
+                })
+                .ToListAsync();
+        }
+
+        // Restituisce un'opera specifica per ID come ArtworkDto
         public async Task<ArtworkDto> GetArtworkByIdAsync(int id)
         {
             var artwork = await _context.Artworks
@@ -58,9 +79,12 @@ namespace NovaVerse.Services
                 Price = artwork.Price,
                 Photo = artwork.Photo,
                 CategoryId = artwork.CategoryId,
-                ArtistId = artwork.ArtistId
+                ArtistId = artwork.ArtistId,
+                ArtistName = artwork.Artist.Username  
             };
         }
+
+
 
         // Restituisce tutte le opere di una categoria come ArtworkDto
         public async Task<List<ArtworkDto>> GetArtworksByCategoryAsync(int categoryId)

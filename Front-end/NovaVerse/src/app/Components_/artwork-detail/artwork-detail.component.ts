@@ -21,6 +21,7 @@ export class ArtworkDetailComponent implements OnInit {
   category: any = null;
   comments: any[] = [];
   newComment: string = '';
+  loading: boolean = true;
 
   constructor(
     private artworkService: ArtworkService,
@@ -41,6 +42,7 @@ export class ArtworkDetailComponent implements OnInit {
       }),
       filter(artwork => !!artwork) // Filtro per assicurarsi che artwork non sia null
     );
+
     // Carica i commenti per l'opera specifica
     this.artwork$.subscribe(artwork => {
       if (artwork) {
@@ -80,11 +82,25 @@ export class ArtworkDetailComponent implements OnInit {
   }
 
   // Modifica l'opera
-  editArtwork(artwork: Artwork): void {
-    if (artwork) {
-      console.log('Modifica opera:', artwork.id);
-    }
+  updateArtwork(artwork: Artwork): void {
+    const formData = new FormData();
+    formData.append('title', artwork.title);
+    formData.append('description', artwork.description);
+    formData.append('price', artwork.price.toString());
+    this.artworkService.updateArtwork(artwork.id, formData).subscribe(
+      () => console.log('Opera aggiornata'),
+      (error) => console.error('Errore nell\'aggiornamento dell\'opera', error)
+    );
   }
+
+  // Aggiungi la funzione di modifica
+editArtwork(artwork: Artwork): void {
+  if (artwork) {
+    // Qui puoi decidere come gestire la modifica, ad esempio attivare la modifica del form
+    console.log('Modifica opera:', artwork.id);
+    // Puoi reindirizzare l'utente a una pagina di modifica o semplicemente attivare un form di modifica.
+  }
+}
 
   // Elimina l'opera
   deleteArtwork(artwork: Artwork): void {
