@@ -14,7 +14,7 @@ export interface Artwork {
   soldOut?: boolean;
   likesCount?: number;  // Numero di "mi piace"
   commentsCount?: number;  // Numero di commenti
-  isFavorite?: boolean;  // Indica se l'opera è tra i preferiti dell'utente attuale
+  isFavorite?: boolean;
 }
 
 export enum ArtworkType {

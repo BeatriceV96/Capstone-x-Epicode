@@ -12,29 +12,29 @@
     <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
     <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency }}</p>
     <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
-    <p><strong>Creato da:</strong> {{ artist?.username }}</p>  <!-- Usa il nome dell'artista -->
+    <p><strong>Creato da:</strong> {{ artist?.username }}</p>
     <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
     <p><strong>Visualizzazioni:</strong> {{ (artwork$ | async)?.viewCount }}</p>
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
+  <!-- Sezione di modifica -->
+  <div *ngIf="editing" class="space-y-4">
+    <input [(ngModel)]="editedArtwork.title" placeholder="Modifica Titolo" class="w-full p-2 rounded">
+    <input [(ngModel)]="editedArtwork.description" placeholder="Modifica Descrizione" class="w-full p-2 rounded">
+    <input [(ngModel)]="editedArtwork.price" type="number" placeholder="Modifica Prezzo" class="w-full p-2 rounded">
+    <button (click)="saveArtwork()" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">Salva</button>
+  </div>
+
   <!-- Azioni utente -->
-  <div class="mt-6 space-y-4" *ngIf="artwork$ | async as artwork">
-    <button (click)="addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
-      Aggiungi ai Preferiti
-    </button>
-    <button (click)="addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
-      Aggiungi al Carrello
-    </button>
+  <div class="mt-6 space-y-4" *ngIf="!editing">
+    <button (click)="artwork && addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">Aggiungi ai Preferiti</button>
+    <button (click)="artwork && addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">Aggiungi al Carrello</button>
 
     <!-- Edit e Delete solo se l'utente è l'artista -->
-    <div *ngIf="isArtist(artwork)">
-      <button (click)="editArtwork(artwork)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">
-        Modifica Opera
-      </button>
-      <button (click)="deleteArtwork(artwork)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
-        Elimina Opera
-      </button>
+    <div *ngIf="artwork && isArtist(artwork)"></div>
+      <button (click)="editArtwork()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg">Modifica Opera</button>
+      <button (click)="deleteArtwork()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">Elimina Opera</button>
     </div>
   </div>
 
@@ -48,18 +48,13 @@
       </div>
     </div>
 
-    <!-- Messaggio di fallback per nessuna recensione -->
     <ng-template #noComments>
       <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
     </ng-template>
 
     <!-- Lascio una nuova recensione -->
     <div class="mt-4">
-      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..."
-                class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
-      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-        Invia Recensione
-      </button>
+      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
+      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Invia Recensione</button>
     </div>
   </div>
-</div>
