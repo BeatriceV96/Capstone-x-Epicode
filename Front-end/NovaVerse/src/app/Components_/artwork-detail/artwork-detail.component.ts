@@ -96,28 +96,32 @@ export class ArtworkDetailComponent implements OnInit {
   }
 
   // Salva le modifiche all'opera
-  saveChanges(artwork: Artwork): void {
-    const formData = new FormData();
-    formData.append('title', this.artworkData.title || '');
-    formData.append('description', this.artworkData.description || '');
-    formData.append('price', this.artworkData.price?.toString() || '0');
-    formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
+saveChanges(artwork: Artwork): void {
+  const formData = new FormData();
+  formData.append('title', this.artworkData.title || '');
+  formData.append('description', this.artworkData.description || '');
+  formData.append('price', this.artworkData.price?.toString() || '0');
+  formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
+  formData.append('artistName', this.artworkData.artistName || '');
+  formData.append('artistId', this.artworkData.artistId?.toString() || '');
 
-    if (this.selectedImage) {
-      formData.append('photoFile', this.selectedImage); // Aggiungi l'immagine se presente
-    }
-
-    this.artworkService.updateArtwork(artwork.id, formData)
-      .subscribe(
-        () => {
-          this.toggleEdit(); // Disattiva la modalità di modifica
-          console.log('Opera aggiornata con successo');
-        },
-        error => {
-          console.error('Errore durante l\'aggiornamento dell\'opera:', error);
-        }
-      );
+  // Se c'è un'immagine selezionata, la aggiungiamo al form
+  if (this.selectedImage) {
+      formData.append('photoFile', this.selectedImage);
   }
+
+  this.artworkService.updateArtwork(artwork.id, formData)
+      .subscribe(
+          () => {
+              this.toggleEdit(); // Disattiva la modalità di modifica
+              console.log('Opera aggiornata con successo');
+          },
+          error => {
+              console.error('Errore durante l\'aggiornamento dell\'opera:', error);
+          }
+      );
+}
+
 
   // Elimina l'opera
   deleteArtwork(artworkId: number): void {

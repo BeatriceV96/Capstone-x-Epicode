@@ -48,6 +48,11 @@ export class ArtworkService {
 
   // Aggiorna un'opera esistente
   updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
+    // Log per vedere cosa stiamo inviando
+    for (let pair of (artworkData as any).entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
     return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true })
       .pipe(
         tap((updatedArtwork: Artwork) => {
@@ -59,6 +64,8 @@ export class ArtworkService {
         catchError(this.handleError)
       );
   }
+
+
 
   // Elimina un'opera
   deleteArtwork(id: number): Observable<void> {

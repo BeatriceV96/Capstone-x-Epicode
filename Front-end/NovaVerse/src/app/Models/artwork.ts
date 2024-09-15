@@ -8,7 +8,7 @@ export interface Artwork {
   categoryId: number;
   type: ArtworkType;
   artistId: number;
-  artistName?: string; // Nome o username dell'artista (opzionale)
+  artistName: string; // Nome o username dell'artista (ora obbligatorio)
   createDate: Date;
   viewCount: number;
   soldOut?: boolean;

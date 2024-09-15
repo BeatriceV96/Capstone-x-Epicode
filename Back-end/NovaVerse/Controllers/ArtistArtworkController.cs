@@ -110,16 +110,26 @@ namespace NovaVerse.Controllers
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
         {
+            // Log per vedere i dati ricevuti
+            Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}");
+
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var artwork = await _artworkService.GetArtworkByIdAsync(id);
+
+            if (artwork == null)
+            {
+                return NotFound(new { message = $"Artwork with ID {id} not found." });
+            }
 
             if (artwork.ArtistId != userId)
             {
                 return Unauthorized("Non sei autorizzato a modificare questa opera.");
             }
 
-            // Log dei dati ricevuti
-            Console.WriteLine($"ID: {id}, Titolo: {artworkDto.Title}, Descrizione: {artworkDto.Description}, Prezzo: {artworkDto.Price}, Categoria: {artworkDto.CategoryId}");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             // Gestisci il caricamento dell'immagine
             if (photoFile != null && photoFile.Length > 0)
@@ -141,15 +151,10 @@ namespace NovaVerse.Controllers
                 artworkDto.Photo = "/uploads/" + uniqueFileName;
             }
 
-            if (!string.IsNullOrWhiteSpace(artworkDto.ImageUrl))
-            {
-                artworkDto.Photo = artworkDto.ImageUrl;
-            }
-
             var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
             if (updatedArtwork == null)
             {
-                return BadRequest("Failed to update artwork.");
+                return BadRequest("Errore durante l'aggiornamento dell'opera.");
             }
 
             return Ok(updatedArtwork);

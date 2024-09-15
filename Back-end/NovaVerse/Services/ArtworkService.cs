@@ -116,7 +116,6 @@ namespace NovaVerse.Services
             };
         }
 
-
         // Aggiorna un'opera esistente
         public async Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto)
         {
@@ -148,9 +147,11 @@ namespace NovaVerse.Services
                 Price = artwork.Price,
                 Photo = artwork.Photo,
                 CategoryId = artwork.CategoryId,
-                ArtistId = artwork.ArtistId
+                ArtistId = artwork.ArtistId,
+                ArtistName = artwork.Artist.Username
             };
         }
+
 
         // Cancella un'opera
         public async Task<bool> DeleteArtworkAsync(int id)
