@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { iUser } from '../Models/i-user';
+import { Artwork } from '../Models/artwork';
 
 @Injectable({
   providedIn: 'root'
@@ -13,21 +14,28 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // Aggiorna il profilo utente
-  // Aggiorna il profilo utente (compreso l'URL dell'immagine di profilo)
   updateUserProfile(user: iUser): Observable<iUser> {
-    return this.http.put<iUser>(`${this.apiUrl}/update-profile`, user, { withCredentials: true })
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });  // Aggiungi gli headers
+    return this.http.put<iUser>(`${this.apiUrl}/update-profile`, user, { headers: headers, withCredentials: true })
       .pipe(
         catchError(this.handleError)
       );
   }
 
+
   // Aggiorna l'immagine del profilo tramite FormData
   updateProfilePicture(profilePictureData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/user/updateProfilePicture`, profilePictureData, { withCredentials: true })
+    return this.http.put(`${this.apiUrl}/update-profile-picture`, profilePictureData, { withCredentials: true })
       .pipe(
         catchError(this.handleError)
       );
   }
+
+
+  getArtworksByUserId(userId: number): Observable<Artwork[]> {
+    return this.http.get<Artwork[]>(`${this.apiUrl}/artworks/user/${userId}`);
+  }
+
 
   getUserById(userId: number): Observable<iUser> {
     return this.http.get<iUser>(`${this.apiUrl}/users/${userId}`);

@@ -27,12 +27,16 @@ namespace NovaVerse.Controllers
             // Gestione upload file immagine
             if (profilePicture != null && profilePicture.Length > 0)
             {
-                var filePath = Path.Combine("wwwroot/uploads", profilePicture.FileName);
+                var fileName = Path.GetFileName(profilePicture.FileName);
+                var filePath = Path.Combine("wwwroot/uploads", fileName);
+
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await profilePicture.CopyToAsync(stream);
                 }
-                profilePictureUrl = filePath;
+
+                // Salva solo il percorso relativo
+                profilePictureUrl = $"/uploads/{fileName}";
             }
 
             // Se non esiste un file, usa l'URL dell'immagine fornito
@@ -55,6 +59,7 @@ namespace NovaVerse.Controllers
 
             return Ok(user);  // Restituisci i dettagli dell'utente
         }
+
 
 
 

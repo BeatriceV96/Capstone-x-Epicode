@@ -36,6 +36,18 @@ export class ArtworkService {
       );
   }
 
+  // In artwork.service.ts
+  getArtworksByUserId(userId: number): Observable<Artwork[]> {
+    return this.http.get<Artwork[]>(`${this.baseUrl}/user/${userId}`, { withCredentials: true }).pipe(
+      tap((artworks: Artwork[]) => {
+        this.artworkSubject.next(artworks); // Aggiorna la lista delle opere per l'utente
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+
+
   // Crea una nuova opera con l'URL dell'immagine
   createArtwork(artworkData: FormData): Observable<Artwork> {
     return this.http.post<Artwork>(`${this.baseUrl}/create`, artworkData, { withCredentials: true }).pipe(

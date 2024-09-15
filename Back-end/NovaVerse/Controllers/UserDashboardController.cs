@@ -1,24 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NovaVerse.Context;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 
 namespace NovaVerse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] // Consente l'accesso sia agli Artisti che ai Clienti
     public class UserDashboardController : ControllerBase
     {
         private readonly IUserDashboardService _userDashboardService;
+        private readonly NovaVerseDbContext _context;
 
-        public UserDashboardController(IUserDashboardService userDashboardService)
+        public UserDashboardController(IUserDashboardService userDashboardService, NovaVerseDbContext context)
         {
             _userDashboardService = userDashboardService;
+            _context = context;
         }
 
         private int GetUserId()
@@ -30,20 +32,38 @@ namespace NovaVerse.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserProfile()
         {
-            var userId = GetUserId();
-            var user = await _userDashboardService.GetUserById(userId);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
             {
                 return NotFound("User not found.");
             }
 
-            return Ok(user); // Restituisce il profilo utente
+            var userProfile = new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Bio = user.Bio,
+                ProfilePicture = user.ProfilePicture, 
+                Role = user.Role.ToString(),
+                CreateDate = user.CreateDate
+            };
+
+            return Ok(userProfile);
         }
+
+
 
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserDto userDto)
         {
+            if (!ModelState.IsValid)  // Verifica se il modello è valido
+            {
+                return BadRequest(ModelState);
+            }
+
             var userId = GetUserId();
             var updatedUser = await _userDashboardService.UpdateUserProfileAsync(userId, userDto);
 
@@ -56,26 +76,54 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPut("update-profile-picture")]
-        public async Task<IActionResult> UpdateProfilePicture([FromBody] string profilePicture)
+        public async Task<IActionResult> UpdateProfilePicture([FromForm] IFormFile profilePicture)
         {
-            var userId = GetUserId();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value); // Recupera l'ID dell'utente loggato
+            var user = await _context.Users.FindAsync(userId);
 
-            if (string.IsNullOrEmpty(profilePicture))
+            if (user == null)
             {
-                return BadRequest("No profile picture provided.");
+                return NotFound("User not found");
             }
 
-            var success = await _userDashboardService.UpdateProfilePictureAsync(userId, profilePicture);
-
-            if (!success)
+            // Verifica che il file immagine sia presente
+            if (profilePicture != null && profilePicture.Length > 0)
             {
-                return BadRequest("Failed to update profile picture.");
-            }
+                // Crea il percorso dove salvare l'immagine
+                var uploadsFolder = Path.Combine("wwwroot/uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
 
-            return Ok(new { Message = "Profile picture updated successfully." });
+                // Genera un nome unico per il file immagine
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(profilePicture.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Salva il file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await profilePicture.CopyToAsync(stream);
+                }
+
+                // Aggiorna l'URL del profilo immagine nel database
+                user.ProfilePicture = "/uploads/" + uniqueFileName;
+
+                // Salva le modifiche nel database
+                await _context.SaveChangesAsync();
+
+                return Ok(new { ProfilePicture = user.ProfilePicture });
+            }
+            else
+            {
+                return BadRequest("No image file provided");
+            }
         }
 
 
+
+
+        // Aggiungi un'opera ai preferiti
         [HttpPost("favorites/{artworkId}")]
         public async Task<IActionResult> AddFavorite(int artworkId)
         {
@@ -90,6 +138,7 @@ namespace NovaVerse.Controllers
             return Ok("Favorite added.");
         }
 
+        // Rimuovi un'opera dai preferiti
         [HttpDelete("favorites/{artworkId}")]
         public async Task<IActionResult> RemoveFavorite(int artworkId)
         {

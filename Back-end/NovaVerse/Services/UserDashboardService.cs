@@ -16,32 +16,6 @@ public class UserDashboardService : IUserDashboardService
         _context = context;
     }
 
-    public async Task<List<UserActivityDto>> GetUserActivitiesAsync(int userId)
-    {
-        return await _context.Comments
-            .Where(c => c.UserId == userId)
-            .Select(c => new UserActivityDto
-            {
-                ActivityDate = c.CreateDate,
-                ActivityDescription = $"Commentato su {c.Artwork.Title}"
-            })
-            .ToListAsync();
-    }
-
-    public async Task<List<PurchaseSummaryDto>> GetUserPurchasesAsync(int userId)
-    {
-        return await _context.Transactions
-            .Where(t => t.BuyerId == userId)
-            .Select(t => new PurchaseSummaryDto
-            {
-                ArtworkId = t.ArtworkId,
-                ArtworkTitle = t.Artwork.Title,
-                PurchaseDate = t.TransactionDate,
-                PurchasePrice = t.Amount
-            })
-            .ToListAsync();
-    }
-
     public async Task<UserDto> GetUserById(int userId)
     {
         var user = await _context.Users.FindAsync(userId);
@@ -63,6 +37,7 @@ public class UserDashboardService : IUserDashboardService
         var user = await _context.Users.FindAsync(userId);
         if (user == null) return null;
 
+        // Aggiorna i dati del profilo
         user.Username = userDto.Username;
         user.Email = userDto.Email;
         user.Bio = userDto.Bio;
@@ -83,18 +58,17 @@ public class UserDashboardService : IUserDashboardService
         };
     }
 
-    public async Task<bool> UpdateProfilePictureAsync(int userId, string profilePictureBase64OrUrl)
+    public async Task<bool> UpdateProfilePictureAsync(int userId, string profilePictureUrl)
     {
         var user = await _context.Users.FindAsync(userId);
-        if (user == null) return false;
-
-        if (!string.IsNullOrEmpty(profilePictureBase64OrUrl))
+        if (user == null)
         {
-            // Accetta sia URL che base64
-            user.ProfilePicture = profilePictureBase64OrUrl;
+            return false;
         }
 
-        await _context.SaveChangesAsync();
+        user.ProfilePicture = profilePictureUrl;  // Aggiorna l'URL dell'immagine
+        await _context.SaveChangesAsync();  // Salva le modifiche nel database
+
         return true;
     }
 
@@ -125,5 +99,31 @@ public class UserDashboardService : IUserDashboardService
         await _context.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<List<UserActivityDto>> GetUserActivitiesAsync(int userId)
+    {
+        return await _context.Comments
+            .Where(c => c.UserId == userId)
+            .Select(c => new UserActivityDto
+            {
+                ActivityDate = c.CreateDate,
+                ActivityDescription = $"Commentato su {c.Artwork.Title}"
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<PurchaseSummaryDto>> GetUserPurchasesAsync(int userId)
+    {
+        return await _context.Transactions
+            .Where(t => t.BuyerId == userId)
+            .Select(t => new PurchaseSummaryDto
+            {
+                ArtworkId = t.ArtworkId,
+                ArtworkTitle = t.Artwork.Title,
+                PurchaseDate = t.TransactionDate,
+                PurchasePrice = t.Amount
+            })
+            .ToListAsync();
     }
 }

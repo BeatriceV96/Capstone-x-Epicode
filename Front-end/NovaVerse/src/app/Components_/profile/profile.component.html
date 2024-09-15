@@ -1,46 +1,52 @@
 <div *ngIf="user" class="profile-container">
   <!-- Immagine del profilo -->
-  <div class="profile-picture-container">
-    <img *ngIf="user?.profilePicture"
-     [src]="sanitizer.bypassSecurityTrustUrl('data:image/jpeg;base64,' + profilePictureBase64(user.profilePicture))"
-     alt="Immagine del profilo di {{ user.username }}"
-     class="profile-picture img-thumbnail">
-    <div *ngIf="!user.profilePicture" class="no-profile-picture">
-      <p>Nessuna immagine del profilo disponibile.</p>
+  <div *ngIf="user" class="profile-container">
+    <!-- Immagine del profilo -->
+    <div class="profile-picture-container">
+      <img *ngIf="profileImageUrl"
+           [src]="profileImageUrl"
+           alt="Immagine del profilo di {{ user.username }}"
+           class="profile-picture img-thumbnail">
+      <div *ngIf="!profileImageUrl" class="no-profile-picture">
+        <p>Nessuna immagine del profilo disponibile.</p>
+      </div>
     </div>
-  </div>
 
   <!-- Caricamento dell'immagine del profilo -->
   <div class="profile-field">
     <strong>Cambia immagine del profilo:</strong>
     <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file mt-2">
-    <button *ngIf="selectedFile" class="btn btn-primary mt-2" (click)="uploadProfilePicture()">Carica immagine</button>
+    <button *ngIf="selectedFile" class="btn btn-primary mt-2" (click)="uploadProfilePicture()">Salva immagine</button>
   </div>
 
   <!-- Sezione del profilo utente -->
   <h2>Profilo di {{ user.username }}</h2>
 
+   <!-- Dati del profilo -->
+   <div class="profile-field">
+    <strong>Username:</strong>
+    <span>{{ user.username }}</span>
+  </div>
   <div class="profile-field">
     <strong>Email:</strong>
     <span>{{ user.email }}</span>
   </div>
-
   <div class="profile-field">
     <strong>Ruolo:</strong>
     <span>{{ user.role }}</span>
   </div>
-
   <div class="profile-field">
     <strong>Creato il:</strong>
     <span>{{ user.createDate | date: 'medium' }}</span>
   </div>
+</div>
 
   <!-- Visualizzazione e modifica della biografia -->
-  <div class="profile-field">
+  <div class="profile-field mt-3">
     <strong>Biografia:</strong>
     <div *ngIf="!isEditingBio">
       <p>{{ user.bio || 'Nessuna biografia fornita.' }}</p>
-      <button class="btn btn-secondary" (click)="enableBioEdit()">Modifica Biografia</button>
+      <button class="btn btn-secondary mt-2" (click)="enableBioEdit()">Modifica Biografia</button>
     </div>
     <div *ngIf="isEditingBio">
       <textarea [(ngModel)]="updatedBio" class="form-control"></textarea>
@@ -48,8 +54,22 @@
       <button class="btn btn-secondary mt-2" (click)="cancelBioEdit()">Annulla</button>
     </div>
   </div>
-</div>
 
+  <!-- Sezione opere create -->
+  <div class="profile-field mt-4" *ngIf="user?.role === 'Artist'">
+    <strong>Opere create ({{ artworks.length }}):</strong>
+    <div class="artwork-list mt-2" *ngIf="artworks.length > 0; else noArtworks">
+      <div *ngFor="let artwork of artworks" class="artwork-item">
+        <img [src]="artwork.photo || artwork.imageUrl" alt="{{ artwork.title }}" class="artwork-img">
+        <p>{{ artwork.title }}</p>
+      </div>
+    </div>
+    <ng-template #noArtworks>
+      <p>L'utente non ha creato nessuna opera.</p>
+    </ng-template>
+  </div>
+
+<!-- Se l'utente non è ancora stato caricato -->
 <div *ngIf="!user">
   <p>Caricamento dati utente...</p>
 </div>
