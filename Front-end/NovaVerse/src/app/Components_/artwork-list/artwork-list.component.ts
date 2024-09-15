@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { ArtworkService } from '../../services/artwork.service';
@@ -19,7 +19,8 @@ export class ArtworkListComponent implements OnInit {
 
   constructor(
     private artworkService: ArtworkService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -47,5 +48,9 @@ export class ArtworkListComponent implements OnInit {
         })
       );
     }
+  }
+
+  goToCategories(): void {
+    this.router.navigate(['/categories']);
   }
 }

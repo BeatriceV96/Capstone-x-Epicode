@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { Category } from '../../Models/category';
   styleUrls: ['./category-management.component.scss']
 })
 export class CategoryManagementComponent implements OnInit {
+
   categories: Category[] = [];
   categoryForm: Partial<Category> = { name: '', description: '' };
   editing: boolean = false;
@@ -19,6 +20,8 @@ export class CategoryManagementComponent implements OnInit {
   loading: boolean = false;
   message: string = '';
   success: boolean = true;
+
+  @ViewChild('lastCategory', { static: false }) lastCategory: ElementRef | undefined;
 
   constructor(private categoryService: CategoryService, private router: Router) {}
 
@@ -48,9 +51,17 @@ export class CategoryManagementComponent implements OnInit {
       this.loading = true;
       this.categoryService.createCategory(this.categoryForm).pipe(
         tap((newCategory: Category) => {
-          this.categories.push(newCategory); // Aggiorna la lista direttamente
+          this.categories.push(newCategory);  // Aggiorna la lista direttamente
           this.message = 'Categoria creata con successo';
           this.success = true;
+
+          // Scroll all'ultima categoria creata con animazione
+          setTimeout(() => {
+            if (this.lastCategory) {
+              this.lastCategory.nativeElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 100);
+
           this.resetForm();
         }),
         catchError(error => {
@@ -58,7 +69,12 @@ export class CategoryManagementComponent implements OnInit {
           this.success = false;
           return of(null);  // Restituisce null in caso di errore
         })
-      ).subscribe().add(() => this.loading = false);  // Fine caricamento
+      ).subscribe(() => {
+        this.loading = false;  // Fine caricamento
+      });
+    } else {
+      this.message = 'Per favore, riempi tutti i campi!';
+      this.success = false;
     }
   }
 

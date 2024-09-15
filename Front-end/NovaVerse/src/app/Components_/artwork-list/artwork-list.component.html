@@ -1,4 +1,4 @@
-<div class="container mx-auto mt-5">
+<div class="container mx-auto mt-5 mb-20"> <!-- Aggiunta di mb-20 per il distacco -->
   <!-- Sezione per mostrare le opere associate -->
   <div *ngIf="artworks$ | async as artworks; else noArtworks">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -27,4 +27,11 @@
   <ng-template #noArtworks>
     <p class="text-center text-gray-500">Non ci sono opere associate a questa categoria.</p>
   </ng-template>
+
+  <!-- Bottone per tornare alla pagina delle categorie -->
+  <div class="flex justify-center mt-10">
+    <button (click)="goToCategories()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+      Torna alle Categorie
+    </button>
+  </div>
 </div>

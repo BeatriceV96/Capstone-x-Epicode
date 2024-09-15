@@ -1,20 +1,20 @@
-<div class="container mx-auto mt-5">
+<div class="container mx-auto mt-8">
   <!-- Header della pagina categorie -->
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold">Categorie disponibili</h1>
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-extrabold text-gray-800">Categorie Disponibili</h1>
 
     <!-- Mostra il pulsante di gestione categorie se l'utente è un artista -->
     <ng-container *ngIf="isArtist">
-      <a routerLink="/category-management" class="text-blue-500 hover:text-blue-700">
-        <i class="fas fa-edit fa-2x"></i> Gestisci Categorie
+      <a routerLink="/category-management" class="text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-300 py-2 px-4 rounded-full shadow-md flex items-center">
+        <i class="fas fa-edit mr-2"></i> Gestisci Categorie
       </a>
     </ng-container>
   </div>
 
   <!-- Lista delle categorie -->
   <div *ngIf="categories.length > 0 && !loading; else noCategories">
-    <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg p-4 mb-4">
-      <div class="flex justify-between items-center">
+    <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg overflow-hidden mb-6 transition-transform transform hover:scale-105 duration-300">
+      <div class="flex justify-between items-center p-4">
         <!-- Nome della categoria -->
         <a [routerLink]="['/categories', category.id, 'artworks']" class="block hover:underline text-xl font-semibold text-blue-600">
           {{ category.name }}
@@ -22,8 +22,8 @@
 
         <!-- Matite per la gestione, visibili solo per gli artisti -->
         <ng-container *ngIf="isArtist">
-          <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700">
-            <i class="fas fa-edit fa-2x"></i> Crea Opera
+          <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700 transition-colors duration-300">
+            <i class="fas fa-edit"></i> Crea Opera
           </a>
         </ng-container>
       </div>
@@ -33,12 +33,12 @@
            [src]="category.image"
            alt="Categoria"
            loading="lazy"
-           class="w-full h-32 object-cover mb-4">
+           class="w-full h-48 object-cover mb-4">
     </div>
   </div>
 
   <!-- Messaggio se non ci sono categorie disponibili -->
   <ng-template #noCategories>
-    <p class="text-gray-500">Non ci sono categorie disponibili al momento.</p>
+    <p class="text-center text-gray-500">Non ci sono categorie disponibili al momento.</p>
   </ng-template>
 </div>

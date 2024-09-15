@@ -47,24 +47,26 @@ export class ArtworkService {
   }
 
   // Aggiorna un'opera esistente
-  updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
-    // Log per vedere cosa stiamo inviando
-    for (let pair of (artworkData as any).entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    }
-
-    return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true })
-      .pipe(
-        tap((updatedArtwork: Artwork) => {
-          const currentArtworks = this.artworkSubject.value.map(artwork =>
-            artwork.id === id ? updatedArtwork : artwork
-          );
-          this.artworkSubject.next(currentArtworks);  // Aggiorna in tempo reale
-        }),
-        catchError(this.handleError)
-      );
+  // Aggiorna un'opera esistente
+updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
+  // Log per vedere cosa stiamo inviando
+  for (let pair of (artworkData as any).entries()) {
+    console.log(`${pair[0]}: ${pair[1]}`);
   }
 
+  return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true })
+    .pipe(
+      tap((updatedArtwork: Artwork) => {
+        // Qui usiamo 'updatedArtwork' e non 'updatedArtworks'
+        const currentArtworks = this.artworkSubject.value.map(artwork =>
+          artwork.id === id ? updatedArtwork : artwork
+        );
+        // Aggiorna la lista degli artworks in tempo reale
+        this.artworkSubject.next(currentArtworks);  // Usa currentArtworks qui
+      }),
+      catchError(this.handleError)
+    );
+}
 
 
   // Elimina un'opera

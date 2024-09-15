@@ -4,7 +4,8 @@
   <!-- Sezione immagine -->
   <div class="flex justify-center mb-6">
     <img [src]="'http://localhost:5034' + (artwork$ | async)?.photo || (artwork$ | async)?.imageUrl"
-         alt="{{ (artwork$ | async)?.title }}" class="rounded-lg max-w-xs shadow-lg object-cover">
+     alt="{{ (artwork$ | async)?.title }}" class="rounded-lg max-w-xs shadow-lg object-cover">
+
   </div>
 
   <!-- Dettagli dell'opera -->
@@ -27,44 +28,47 @@
     </div>
 
     <!-- Form di modifica -->
-    <form *ngIf="editMode" (ngSubmit)="saveChanges(artwork)" class="mt-6 space-y-4" enctype="multipart/form-data">
-      <div>
-        <label for="title" class="block text-gray-300">Titolo</label>
-        <input id="title" [(ngModel)]="artworkData.title" name="title" class="w-full bg-gray-700 p-2 rounded-lg" required />
-      </div>
+<ng-container *ngIf="editMode">
+  <form (ngSubmit)="saveChanges(artwork)" class="mt-6 space-y-4" enctype="multipart/form-data">
+    <div>
+      <label for="title" class="block text-gray-300">Titolo</label>
+      <input id="title" [(ngModel)]="artworkData.title" name="title" class="w-full bg-gray-700 p-2 rounded-lg" required />
+    </div>
 
-      <div>
-        <label for="description" class="block text-gray-300">Descrizione</label>
-        <textarea id="description" [(ngModel)]="artworkData.description" name="description" class="w-full bg-gray-700 p-2 rounded-lg"></textarea>
-      </div>
+    <div>
+      <label for="description" class="block text-gray-300">Descrizione</label>
+      <textarea id="description" [(ngModel)]="artworkData.description" name="description" class="w-full bg-gray-700 p-2 rounded-lg"></textarea>
+    </div>
 
-      <div>
-        <label for="price" class="block text-gray-300">Prezzo</label>
-        <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
-      </div>
+    <div>
+      <label for="price" class="block text-gray-300">Prezzo</label>
+      <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
+    </div>
 
-      <div>
-        <label for="categoryId" class="block text-gray-300">Categoria</label>
-        <input id="categoryId" type="number" [(ngModel)]="artworkData.categoryId" name="categoryId" class="w-full bg-gray-700 p-2 rounded-lg" required />
-      </div>
+    <div>
+      <label for="categoryId" class="block text-gray-300">Categoria</label>
+      <input id="categoryId" type="number" [(ngModel)]="artworkData.categoryId" name="categoryId" class="w-full bg-gray-700 p-2 rounded-lg" required />
+    </div>
 
-      <div>
-        <label for="artistName" class="block text-gray-300">Creato da</label>
-        <input id="artistName" [(ngModel)]="artworkData.artistName" name="artistName" class="w-full bg-gray-700 p-2 rounded-lg" disabled />
-      </div>
+    <div>
+      <label for="artistName" class="block text-gray-300">Creato da</label>
+      <input id="artistName" [(ngModel)]="artworkData.artistName" name="artistName" class="w-full bg-gray-700 p-2 rounded-lg" disabled />
+    </div>
 
-      <!-- Sezione per modificare l'immagine -->
-      <div>
-        <label for="image" class="block text-gray-300">Immagine</label>
-        <input id="image" type="file" (change)="onImageSelected($event)" class="w-full bg-gray-700 p-2 rounded-lg" />
-      </div>
+    <!-- Sezione per modificare l'immagine -->
+    <div>
+      <label for="image" class="block text-gray-300">Immagine</label>
+      <input id="image" type="file" (change)="onImageSelected($event)" class="w-full bg-gray-700 p-2 rounded-lg" />
+    </div>
 
-      <div class="flex justify-end">
-        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
-          Salva Modifiche
-        </button>
-      </div>
-    </form>
+    <div class="flex justify-end">
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+        Salva Modifiche
+      </button>
+    </div>
+  </form>
+</ng-container>
+
 
     <!-- Azioni utente -->
     <div class="mt-6 space-y-4">
@@ -104,6 +108,13 @@
       <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
       <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
         Invia Recensione
+      </button>
+    </div>
+
+    <!-- Pulsante per tornare alla pagina della categoria -->
+    <div class="mt-6">
+      <button (click)="goBackToCategory()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+        Torna alla Lista delle Opere
       </button>
     </div>
   </div>

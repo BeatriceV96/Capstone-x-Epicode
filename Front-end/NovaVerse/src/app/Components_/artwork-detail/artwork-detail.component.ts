@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ArtworkService } from '../../services/artwork.service';
 import { AuthService } from '../../services/auth.service';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
@@ -34,19 +34,18 @@ export class ArtworkDetailComponent implements OnInit {
     private authService: AuthService,
     private favoriteService: FavoriteService,
     private shoppingCartService: ShoppingCartService,
-    private commentService: CommentService
+    private commentService: CommentService,
+    private router: Router,           // Aggiungi Router qui
   ) {}
 
   ngOnInit(): void {
-    // Carica i dettagli dell'opera e popola i campi modificabili
+    // Carica i dettagli dell'opera
     this.artwork$ = this.route.paramMap.pipe(
       switchMap(params => {
         const id = +params.get('id')!;
         return this.artworkService.getArtworkById(id);
       })
     );
-
-    // Popola i dati modificabili quando l'opera viene caricata
     this.artwork$.subscribe(artwork => {
       if (artwork) {
         this.artworkData = { ...artwork };
@@ -96,31 +95,31 @@ export class ArtworkDetailComponent implements OnInit {
   }
 
   // Salva le modifiche all'opera
-saveChanges(artwork: Artwork): void {
-  const formData = new FormData();
-  formData.append('title', this.artworkData.title || '');
-  formData.append('description', this.artworkData.description || '');
-  formData.append('price', this.artworkData.price?.toString() || '0');
-  formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
-  formData.append('artistName', this.artworkData.artistName || '');
-  formData.append('artistId', this.artworkData.artistId?.toString() || '');
+  saveChanges(artwork: Artwork): void {
+    const formData = new FormData();
+    formData.append('title', this.artworkData.title || '');
+    formData.append('description', this.artworkData.description || '');
+    formData.append('price', this.artworkData.price?.toString() || '0');
+    formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
+    formData.append('artistName', this.artworkData.artistName || '');
+    formData.append('artistId', this.artworkData.artistId?.toString() || '');
 
-  // Se c'è un'immagine selezionata, la aggiungiamo al form
-  if (this.selectedImage) {
-      formData.append('photoFile', this.selectedImage);
+    // Se c'è un'immagine selezionata, la aggiungiamo al form
+    if (this.selectedImage) {
+        formData.append('photoFile', this.selectedImage);
+    }
+
+    this.artworkService.updateArtwork(artwork.id, formData)
+        .subscribe(
+            () => {
+                this.toggleEdit(); // Disattiva la modalità di modifica
+                console.log('Opera aggiornata con successo');
+            },
+            error => {
+                console.error('Errore durante l\'aggiornamento dell\'opera:', error);
+            }
+        );
   }
-
-  this.artworkService.updateArtwork(artwork.id, formData)
-      .subscribe(
-          () => {
-              this.toggleEdit(); // Disattiva la modalità di modifica
-              console.log('Opera aggiornata con successo');
-          },
-          error => {
-              console.error('Errore durante l\'aggiornamento dell\'opera:', error);
-          }
-      );
-}
 
 
   // Elimina l'opera
@@ -175,6 +174,17 @@ saveChanges(artwork: Artwork): void {
         }
       });
     }
+  }
+
+  // Funzione per tornare alla categoria
+  goBackToCategory(): void {
+    // Usa l'osservabile artwork$ per ottenere l'ID della categoria
+    this.artwork$?.subscribe(artwork => {
+      if (artwork) {
+        const categoryId = artwork.categoryId;  // Ottieni l'ID della categoria dall'opera d'arte
+        this.router.navigate(['/categories', categoryId, 'artworks']);  // Naviga alla lista delle opere d'arte per quella categoria
+      }
+    });
   }
 
   // Metodo per ottenere l'ID dell'utente corrente

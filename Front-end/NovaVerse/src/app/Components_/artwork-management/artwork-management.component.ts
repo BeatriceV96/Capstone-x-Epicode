@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Artwork, ArtworkType } from '../../Models/artwork';
 import { Category } from '../../Models/category';
@@ -31,6 +31,7 @@ export class ArtworkManagementComponent implements OnInit {
     private route: ActivatedRoute,
     private categoryService: CategoryService,
     private authService: AuthService,
+    private router: Router,
   ) {
     this.route.params.subscribe(params => {
       this.categoryId = params['id'] ? +params['id'] : null;
@@ -114,6 +115,10 @@ export class ArtworkManagementComponent implements OnInit {
     );
   }
 
+  goBackToArtworkList(): void {
+    const categoryId = this.route.snapshot.paramMap.get('id'); // Ottieni l'ID della categoria dall'URL
+    this.router.navigate([`/categories/${categoryId}/artworks`]);
+  }
 
   resetForm(): void {
     this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere, imageUrl: '' };
