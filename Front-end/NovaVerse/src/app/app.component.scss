@@ -1,0 +1,20 @@
+html, body {
+  height: 100%; /* Imposta l'altezza di html e body al 100% */
+  margin: 0; /* Rimuovi margini predefiniti */
+}
+
+.min-h-screen {
+  min-height: 100vh; /* Altezza minima dello schermo intero */
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column; /* Disposizione degli elementi in colonna */
+}
+
+.flex-grow {
+  flex-grow: 1; /* Il contenuto principale si espande per occupare lo spazio */
+}

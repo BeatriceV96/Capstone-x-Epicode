@@ -9,6 +9,7 @@ import { HomeComponent } from './Pages/home/home.component';
 import { AuthModule } from './auth/auth.module';
 import { NavbarComponent } from './Main-component/navbar/navbar.component';
 import { RouterModule } from '@angular/router';
+import { FooterComponent } from './Main-component/footer/footer.component';
 // **Rimuovi CategoryManagementComponent** da qui
 
 @NgModule({
@@ -16,6 +17,7 @@ import { RouterModule } from '@angular/router';
     AppComponent,
     HomeComponent,
     NavbarComponent,
+    FooterComponent,
   ],
   imports: [
     BrowserModule,

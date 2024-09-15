@@ -41,7 +41,7 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
-       [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetArtworkById(int id)
         {
             var artwork = await _artworkService.GetArtworkByIdAsync(id);
@@ -107,34 +107,74 @@ namespace NovaVerse.Controllers
             return Ok(createdArtwork);
         }
 
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArtwork(int id, [FromBody] ArtworkDto artworkDto)
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
         {
-            if (artworkDto == null || id != artworkDto.Id)
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var artwork = await _artworkService.GetArtworkByIdAsync(id);
+
+            if (artwork.ArtistId != userId)
             {
-                return BadRequest(new { message = "Invalid artwork data." });
+                return Unauthorized("Non sei autorizzato a modificare questa opera.");
+            }
+
+            // Log dei dati ricevuti
+            Console.WriteLine($"ID: {id}, Titolo: {artworkDto.Title}, Descrizione: {artworkDto.Description}, Prezzo: {artworkDto.Price}, Categoria: {artworkDto.CategoryId}");
+
+            // Gestisci il caricamento dell'immagine
+            if (photoFile != null && photoFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photoFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await photoFile.CopyToAsync(fileStream);
+                }
+
+                artworkDto.Photo = "/uploads/" + uniqueFileName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(artworkDto.ImageUrl))
+            {
+                artworkDto.Photo = artworkDto.ImageUrl;
             }
 
             var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
             if (updatedArtwork == null)
             {
-                return NotFound(new { message = $"Artwork with ID {id} not found." });
+                return BadRequest("Failed to update artwork.");
             }
 
             return Ok(updatedArtwork);
         }
 
-        [HttpDelete("{id}")]
+
+
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteArtwork(int id)
         {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var artwork = await _artworkService.GetArtworkByIdAsync(id);
+
+            if (artwork.ArtistId != userId)
+            {
+                return Unauthorized("Non sei autorizzato a eliminare questa opera.");
+            }
+
             var success = await _artworkService.DeleteArtworkAsync(id);
             if (!success)
             {
-                return NotFound(new { message = $"Artwork with ID {id} not found." });
+                return BadRequest("Failed to delete artwork.");
             }
 
-            return NoContent();
+            return Ok("Artwork deleted successfully.");
         }
     }
 }
