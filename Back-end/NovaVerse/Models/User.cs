@@ -20,7 +20,11 @@ namespace NovaVerse.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        public string ProfilePicture { get; set; } // Modificato da string a byte[]
+        // Questo campo sarà usato per memorizzare il percorso o l'URL dell'immagine del profilo
+        public string ProfilePicture { get; set; }
+
+        // Campo opzionale per l'URL remoto dell'immagine
+        public string? ProfilePictureUrl { get; set; }
 
         [Required]
         public string Bio { get; set; }
@@ -38,6 +42,7 @@ namespace NovaVerse.Models
             //Admin??
         }
 
+        // Relazioni con altre entità
         public virtual ICollection<Artwork> Artworks { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; }
         public virtual ShoppingCart ShoppingCart { get; set; }

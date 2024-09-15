@@ -24,7 +24,7 @@ export class RegisterComponent {
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      role: ['Buyer', Validators.required],
+      role: ['Buyer', Validators.required],  // Default role as Buyer
       bio: [''],
       profilePicture: [null]  // Campo per l'immagine del profilo
     });
@@ -38,9 +38,10 @@ export class RegisterComponent {
     }
   }
 
+  // Metodo di invio del modulo
   onSubmit() {
-    if (this.registerForm.valid && this.selectedFile) {
-      this.isLoading = true;  // Mostra il caricamento
+    if (this.registerForm.valid) {
+      this.isLoading = true;
 
       const formData = new FormData();
       formData.append('username', this.registerForm.get('username')?.value);
@@ -48,21 +49,30 @@ export class RegisterComponent {
       formData.append('password', this.registerForm.get('password')?.value);
       formData.append('role', this.registerForm.get('role')?.value);
       formData.append('bio', this.registerForm.get('bio')?.value);
-      formData.append('profilePicture', this.selectedFile);  // Aggiungi l'immagine
+
+      // Se esiste un file selezionato, aggiungilo a formData
+      if (this.selectedFile) {
+        formData.append('profilePicture', this.selectedFile);  // Aggiungi il file immagine
+      }
+
+      // Aggiungi l'URL dell'immagine del profilo se esiste
+      if (this.registerForm.get('profilePictureUrl')?.value) {
+        formData.append('profilePictureUrl', this.registerForm.get('profilePictureUrl')?.value);
+      }
 
       this.authService.register(formData).subscribe(
         (response) => {
           console.log('Registrazione avvenuta con successo', response);
-          this.isLoading = false;  // Nascondi il caricamento
-          this.router.navigate(['/']);  // Reindirizza alla home dopo la registrazione
+          this.isLoading = false;
+          this.router.navigate(['/']);
         },
         (error: any) => {
           console.error('Registrazione fallita', error);
-          this.isLoading = false;  // Nascondi il caricamento anche in caso di errore
+          this.isLoading = false;
         }
       );
     } else {
-      this.errorMessage = "Tutti i campi sono obbligatori e devi caricare un'immagine.";
+      this.errorMessage = "Tutti i campi sono obbligatori e devi caricare un'immagine o fornire un URL.";
     }
   }
 }

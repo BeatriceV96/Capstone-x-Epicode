@@ -13,8 +13,17 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // Aggiorna il profilo utente
+  // Aggiorna il profilo utente (compreso l'URL dell'immagine di profilo)
   updateUserProfile(user: iUser): Observable<iUser> {
     return this.http.put<iUser>(`${this.apiUrl}/update-profile`, user, { withCredentials: true })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  // Aggiorna l'immagine del profilo tramite FormData
+  updateProfilePicture(profilePictureData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/updateProfilePicture`, profilePictureData, { withCredentials: true })
       .pipe(
         catchError(this.handleError)
       );
@@ -24,19 +33,14 @@ export class UserService {
     return this.http.get<iUser>(`${this.apiUrl}/users/${userId}`);
   }
 
-  // Ottiene il profilo utente dal backend
-  getUserProfile(): Observable<iUser> {
-    return this.http.get<iUser>(`${this.apiUrl}/profile`)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
 
-  // Aggiorna l'immagine del profilo
-  updateProfilePicture(profilePictureData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/user/updateProfilePicture`, profilePictureData, { withCredentials: true });
-  }
-
+// Ottiene il profilo utente dal backend
+getUserProfile(): Observable<iUser> {
+  return this.http.get<iUser>(`${this.apiUrl}/profile`, { withCredentials: true })
+    .pipe(
+      catchError(this.handleError)
+    );
+}
   // Aggiunge un'opera ai preferiti
   addFavorite(artworkId: number): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/favorites/${artworkId}`, {}, { withCredentials: true })

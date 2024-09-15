@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NovaVerse.Context;
 
@@ -11,9 +12,11 @@ using NovaVerse.Context;
 namespace NovaVerse.Migrations
 {
     [DbContext(typeof(NovaVerseDbContext))]
-    partial class NovaVerseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240915181208_ProfilePictureUrlxUser")]
+    partial class ProfilePictureUrlxUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

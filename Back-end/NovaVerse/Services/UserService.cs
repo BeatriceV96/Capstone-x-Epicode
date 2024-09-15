@@ -24,6 +24,15 @@ namespace NovaVerse.Services
 
         public async Task<bool> Register(RegisterDto registerDto)
         {
+            // Verifica se c'è un URL immagine fornito o se l'utente ha caricato un'immagine
+            string profilePicturePath = registerDto.ProfilePictureUrl;
+
+            if (!string.IsNullOrEmpty(registerDto.ProfilePicture))  // Controlla se è stato caricato un file
+            {
+                // Se il file è stato caricato, salva l'immagine e aggiorna il percorso
+                profilePicturePath = "/uploads/" + registerDto.ProfilePicture;  // Esempio di percorso del server
+            }
+
             var user = new User
             {
                 Username = registerDto.Username,
@@ -31,7 +40,7 @@ namespace NovaVerse.Services
                 Email = registerDto.Email,
                 Bio = registerDto.Bio,
                 Role = Enum.Parse<User.UserRole>(registerDto.Role),
-                ProfilePicture = registerDto.ProfilePicture,  // Accetta stringa URL o base64
+                ProfilePicture = profilePicturePath,  // Salva il percorso o l'URL qui
                 CreateDate = DateTime.UtcNow
             };
 
@@ -39,6 +48,7 @@ namespace NovaVerse.Services
             var result = await _context.SaveChangesAsync();
             return result > 0;
         }
+
 
         public async Task<UserDto> Login(LoginDto loginDto)
         {

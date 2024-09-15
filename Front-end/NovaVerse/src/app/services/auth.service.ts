@@ -33,9 +33,11 @@ export class AuthService {
 
   // Registrazione di un nuovo utente
   register(newUser: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/register`, newUser).pipe(
+    return this.http.post(`${this.baseUrl}/auth/register`, newUser, {
+      withCredentials: true // Rimuovi l'impostazione manuale degli headers
+    }).pipe(
       tap(() => {
-        this.router.navigate(['/login']);  // Reindirizza alla pagina di login dopo la registrazione
+        this.router.navigate(['/login']);
       }),
       catchError((error) => {
         console.error('Errore durante la registrazione', error);
@@ -43,6 +45,7 @@ export class AuthService {
       })
     );
   }
+
 
   // Effettua il login e aggiorna lo stato dell'utente
   login(authData: IAuthData): Observable<iAuthResponse> {

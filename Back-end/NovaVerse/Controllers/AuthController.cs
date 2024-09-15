@@ -20,19 +20,40 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto, IFormFile profilePicture)
         {
+            string profilePictureUrl = null;
+
+            // Gestione upload file immagine
+            if (profilePicture != null && profilePicture.Length > 0)
+            {
+                var filePath = Path.Combine("wwwroot/uploads", profilePicture.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await profilePicture.CopyToAsync(stream);
+                }
+                profilePictureUrl = filePath;
+            }
+
+            // Se non esiste un file, usa l'URL dell'immagine fornito
+            if (!string.IsNullOrEmpty(registerDto.ProfilePictureUrl))
+            {
+                profilePictureUrl = registerDto.ProfilePictureUrl;
+            }
+
+            // Aggiungi l'URL o il percorso dell'immagine al DTO
+            registerDto.ProfilePicture = profilePictureUrl;
+
+            // Esegui la registrazione
             var result = await _userService.Register(registerDto);
             if (!result)
             {
-                return BadRequest("Registration failed.");
+                return BadRequest("Registrazione fallita.");
             }
 
-            // Recupera l'utente appena creato
             var user = await _userService.Login(new LoginDto { Username = registerDto.Username, Password = registerDto.Password });
 
-            // Restituisci i dettagli dell'utente registrato
-            return Ok(user);
+            return Ok(user);  // Restituisci i dettagli dell'utente
         }
 
 

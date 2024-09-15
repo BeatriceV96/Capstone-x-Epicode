@@ -4,6 +4,6 @@ export interface iUser {
   email: string;
   role: string;        // Ruolo dell'utente (Artist o Buyer)
   bio: string;         // Biografia dell'utente
-  profilePicture: Uint8Array; // La foto profilo come byte[]
+  profilePicture?: string;
   createDate: Date;    // Data di creazione
 }

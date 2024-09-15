@@ -1,57 +1,71 @@
 <div class="container mx-auto mt-8">
   <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-semibold text-white mb-6">Register</h2>
+    <h2 class="text-2xl font-semibold text-white mb-6">Registrati</h2>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+      <!-- Username -->
       <div class="form-group mb-4">
         <label for="username" class="block text-sm text-white mb-2">Username</label>
-        <input formControlName="username" id="username" placeholder="Enter Username"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <input formControlName="username" id="username" placeholder="Inserisci Username"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500" />
         <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="text-red-500 text-sm mt-2">
           Il campo username è obbligatorio.
         </div>
       </div>
 
+      <!-- Email -->
       <div class="form-group mb-4">
         <label for="email" class="block text-sm text-white mb-2">Email</label>
-        <input formControlName="email" id="email" type="email" placeholder="Enter Email"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <input formControlName="email" id="email" type="email" placeholder="Inserisci Email"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500" />
         <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-red-500 text-sm mt-2">
           Inserisci un'email valida.
         </div>
       </div>
 
+      <!-- Password -->
       <div class="form-group mb-4">
         <label for="password" class="block text-sm text-white mb-2">Password</label>
-        <input formControlName="password" id="password" type="password" placeholder="Password"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+        <input formControlName="password" id="password" type="password" placeholder="Inserisci Password"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500" />
         <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-red-500 text-sm mt-2">
           La password è obbligatoria.
         </div>
       </div>
 
+      <!-- Role -->
       <div class="form-group mb-4">
         <label for="role" class="block text-sm text-white mb-2">Ruolo</label>
-        <select formControlName="role" class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black border border-gray-500">
+        <select formControlName="role" class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white border border-gray-500">
           <option value="Artist">Artista</option>
           <option value="Buyer">Acquirente</option>
         </select>
       </div>
 
+      <!-- Bio -->
       <div class="form-group mb-4">
         <label for="bio" class="block text-sm text-white mb-2">Biografia</label>
         <textarea formControlName="bio" id="bio" placeholder="Raccontaci di te"
-                  class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500"></textarea>
+                  class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500"></textarea>
       </div>
 
+      <!-- Profile Picture -->
       <div class="form-group mb-4">
         <label for="profilePicture" class="block text-sm text-white mb-2">Immagine Profilo</label>
         <input type="file" (change)="onFileSelected($event)" id="profilePicture"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-black placeholder-gray-400 border border-gray-500" />
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500" />
       </div>
 
-      <button type="submit" [disabled]="registerForm.invalid || !selectedFile" class="btn btn-primary w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
-        {{ isLoading ? 'Registrazione in corso...' : 'Register' }}
+      <!-- Profile Picture URL -->
+      <div class="form-group mb-4">
+        <label for="profilePictureUrl" class="block text-sm text-white mb-2">URL Immagine Profilo</label>
+        <input formControlName="profilePictureUrl" id="profilePictureUrl" type="text" placeholder="Inserisci l'URL dell'immagine"
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-600 text-white placeholder-gray-400 border border-gray-500" />
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+        {{ isLoading ? 'Registrazione in corso...' : 'Registrati' }}
       </button>
     </form>
 
