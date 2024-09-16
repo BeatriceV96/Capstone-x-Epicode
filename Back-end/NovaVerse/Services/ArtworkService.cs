@@ -166,5 +166,25 @@ namespace NovaVerse.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<ArtworkDto>> GetRandomArtworksAsync()
+        {
+            var randomArtworks = await _context.Artworks
+                .OrderBy(r => Guid.NewGuid()) // Ordina casualmente
+                .Take(4) // Prendi un numero casuale di opere, ad esempio 5
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Price = a.Price,
+                    Photo = a.Photo,
+                    ArtistId = a.ArtistId,
+                    ArtistName = a.Artist.Username
+                })
+                .ToListAsync();
+
+            return randomArtworks;
+        }
     }
 }

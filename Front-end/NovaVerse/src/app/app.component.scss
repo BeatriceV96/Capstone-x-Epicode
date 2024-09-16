@@ -1,10 +1,15 @@
 html, body {
-  height: 100%; /* Imposta l'altezza di html e body al 100% */
-  margin: 0; /* Rimuovi margini predefiniti */
+  height: 100%; /* Imposta l'altezza di tutto il documento */
+  margin: 0;
+  padding: 0;
 }
 
 .min-h-screen {
-  min-height: 100vh; /* Altezza minima dello schermo intero */
+  min-height: 100vh; /* Altezza minima per coprire tutto lo schermo */
+}
+
+.mySwiper {
+  height: 100vh; /* Altezza del carosello su tutto lo schermo */
 }
 
 .flex {
@@ -16,6 +21,5 @@ html, body {
 }
 
 .flex-grow {
-  flex-grow: 1; /* Il contenuto principale si espande per occupare lo spazio */
+  flex-grow: 1; /* Il contenuto principale si espande per riempire lo spazio */
 }
-

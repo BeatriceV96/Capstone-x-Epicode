@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <title>NovaVerse</title>
   <base href="/">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Swiper CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <!-- Bootstrap CSS (aggiunto per il carosello) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -18,26 +19,8 @@
 <body>
   <app-root></app-root>
 
-  <!-- Swiper JS -->
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Inizializzazione di Swiper -->
-  <script>
-    var swiper = new Swiper('.swiper-container', {
-      loop: true,
-      pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-      },
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-      autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-      },
-    });
-  </script>
 </body>
 </html>

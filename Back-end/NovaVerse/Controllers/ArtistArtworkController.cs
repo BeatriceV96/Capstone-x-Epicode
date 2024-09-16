@@ -181,5 +181,18 @@ namespace NovaVerse.Controllers
 
             return Ok("Artwork deleted successfully.");
         }
+
+        [AllowAnonymous] // Per permettere l'accesso anche agli utenti non autenticati
+        [HttpGet("random")]
+        public async Task<IActionResult> GetRandomArtworks()
+        {
+            var artworks = await _artworkService.GetRandomArtworksAsync();
+            if (artworks == null || !artworks.Any())
+            {
+                return NotFound("No artworks found.");
+            }
+            return Ok(artworks);
+        }
+
     }
 }

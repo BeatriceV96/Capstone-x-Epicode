@@ -46,7 +46,12 @@ export class ArtworkService {
     );
   }
 
-
+  getRandomArtworks(): Observable<Artwork[]> {
+    return this.http.get<Artwork[]>(`${this.baseUrl}/random`, { withCredentials: true }) // Assicurati che la proprietà apiUrl sia corretta
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 
   // Crea una nuova opera con l'URL dell'immagine
   createArtwork(artworkData: FormData): Observable<Artwork> {
@@ -58,7 +63,6 @@ export class ArtworkService {
     );
   }
 
-  // Aggiorna un'opera esistente
   // Aggiorna un'opera esistente
 updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
   // Log per vedere cosa stiamo inviando
