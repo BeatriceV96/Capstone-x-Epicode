@@ -1,75 +1,66 @@
-<div *ngIf="user" class="profile-container">
-  <!-- Immagine del profilo -->
-  <div *ngIf="user" class="profile-container">
-    <!-- Immagine del profilo -->
-    <div class="profile-picture-container">
-      <img *ngIf="profileImageUrl"
-           [src]="profileImageUrl"
-           alt="Immagine del profilo di {{ user.username }}"
-           class="profile-picture img-thumbnail">
-      <div *ngIf="!profileImageUrl" class="no-profile-picture">
-        <p>Nessuna immagine del profilo disponibile.</p>
+<div class="bg-gray-900 text-white min-h-screen">
+  <div class="container mx-auto py-10">
+    <div class="bg-gray-800 shadow-md rounded-lg p-8 max-w-4xl mx-auto">
+      <div class="flex flex-col items-center">
+        <!-- Immagine del profilo -->
+        <div class="relative mb-8">
+          <img *ngIf="profileImageUrl"
+               [src]="profileImageUrl"
+               alt="Immagine del profilo di {{ user?.username }}"
+               class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+          <div *ngIf="!profileImageUrl" class="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
+            <p>Nessuna immagine</p>
+          </div>
+        </div>
+
+        <!-- Cambia immagine del profilo -->
+        <div class="text-center mb-8">
+          <label for="file-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-full">
+            Cambia immagine del profilo
+          </label>
+          <input id="file-upload" type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          <button *ngIf="selectedFile && !isImageSaved" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full ml-2" (click)="uploadProfilePicture()">Salva immagine</button>
+        </div>
+
+        <!-- Informazioni del profilo utente -->
+        <div class="w-full text-center mb-6">
+          <h2 class="text-3xl font-bold mb-4">{{ user?.username }}</h2>
+          <p class="text-gray-400 mb-4"><strong>Email:</strong> {{ user?.email }}</p>
+          <p class="text-gray-400 mb-4"><strong>Ruolo:</strong> {{ user?.role }}</p>
+          <p class="text-gray-400"><strong>Creato il:</strong> {{ user?.createDate | date: 'medium' }}</p>
+        </div>
+
+
+        <!-- Modifica biografia -->
+        <div class="mt-6 w-full text-center mb-8">
+          <strong class="text-lg">Biografia:</strong>
+          <div *ngIf="!isEditingBio" class="mt-2">
+            <p class="mt-2 text-gray-300">{{ user?.bio || 'Nessuna biografia fornita.' }}</p>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mt-4" (click)="enableBioEdit()">Modifica Biografia</button>
+          </div>
+          <div *ngIf="isEditingBio" class="mt-4">
+            <textarea [(ngModel)]="updatedBio" class="form-control w-full bg-gray-700 text-gray-700 p-3 rounded-lg"></textarea>
+            <div class="flex space-x-2 mt-4 justify-center">
+              <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full" (click)="saveBio()">Salva</button>
+              <button class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4  rounded-full" (click)="cancelBioEdit()">Annulla</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opere create (solo per artisti) -->
+        <div class="mt-8 w-full" *ngIf="user?.role === 'Artist'">
+          <strong class="text-lg">Opere create ({{ artworks.length }}):</strong>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6" *ngIf="artworks.length > 0; else noArtworks">
+            <div *ngFor="let artwork of artworks" class="relative bg-gray-700 shadow-md rounded-lg p-4">
+              <img [src]="artwork.photo || artwork.imageUrl" alt="{{ artwork.title }}" class="w-full h-48 object-cover rounded-lg">
+              <p class="mt-2 text-white">{{ artwork.title }}</p>
+            </div>
+          </div>
+          <ng-template #noArtworks>
+            <p class="text-center text-gray-400 mt-4">L'utente non ha creato nessuna opera.</p>
+          </ng-template>
+        </div>
       </div>
     </div>
-
-  <!-- Caricamento dell'immagine del profilo -->
-  <div class="profile-field">
-    <strong>Cambia immagine del profilo:</strong>
-    <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file mt-2">
-    <button *ngIf="selectedFile" class="btn btn-primary mt-2" (click)="uploadProfilePicture()">Salva immagine</button>
   </div>
-
-  <!-- Sezione del profilo utente -->
-  <h2>Profilo di {{ user.username }}</h2>
-
-   <!-- Dati del profilo -->
-   <div class="profile-field">
-    <strong>Username:</strong>
-    <span>{{ user.username }}</span>
-  </div>
-  <div class="profile-field">
-    <strong>Email:</strong>
-    <span>{{ user.email }}</span>
-  </div>
-  <div class="profile-field">
-    <strong>Ruolo:</strong>
-    <span>{{ user.role }}</span>
-  </div>
-  <div class="profile-field">
-    <strong>Creato il:</strong>
-    <span>{{ user.createDate | date: 'medium' }}</span>
-  </div>
-</div>
-
-  <!-- Visualizzazione e modifica della biografia -->
-  <div class="profile-field mt-3">
-    <strong>Biografia:</strong>
-    <div *ngIf="!isEditingBio">
-      <p>{{ user.bio || 'Nessuna biografia fornita.' }}</p>
-      <button class="btn btn-secondary mt-2" (click)="enableBioEdit()">Modifica Biografia</button>
-    </div>
-    <div *ngIf="isEditingBio">
-      <textarea [(ngModel)]="updatedBio" class="form-control"></textarea>
-      <button class="btn btn-success mt-2" (click)="saveBio()">Salva</button>
-      <button class="btn btn-secondary mt-2" (click)="cancelBioEdit()">Annulla</button>
-    </div>
-  </div>
-
-  <!-- Sezione opere create -->
-  <div class="profile-field mt-4" *ngIf="user?.role === 'Artist'">
-    <strong>Opere create ({{ artworks.length }}):</strong>
-    <div class="artwork-list mt-2" *ngIf="artworks.length > 0; else noArtworks">
-      <div *ngFor="let artwork of artworks" class="artwork-item">
-        <img [src]="artwork.photo || artwork.imageUrl" alt="{{ artwork.title }}" class="artwork-img">
-        <p>{{ artwork.title }}</p>
-      </div>
-    </div>
-    <ng-template #noArtworks>
-      <p>L'utente non ha creato nessuna opera.</p>
-    </ng-template>
-  </div>
-
-<!-- Se l'utente non è ancora stato caricato -->
-<div *ngIf="!user">
-  <p>Caricamento dati utente...</p>
 </div>

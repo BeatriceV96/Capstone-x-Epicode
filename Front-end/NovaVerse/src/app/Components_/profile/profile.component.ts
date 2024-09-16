@@ -18,6 +18,7 @@ export class ProfileComponent implements OnInit {
   selectedFile: File | null = null; // Per l'immagine del profilo
   artworks: Artwork[] = [];  // Lista delle opere dell'artista
   profileImageUrl: any;  // Variabile per visualizzare l'immagine
+  isImageSaved: boolean = false;
 
   constructor(
     private authService: AuthService,
