@@ -1,8 +1,10 @@
 ﻿using NovaVerse.Context;
+using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
-using NovaVerse.Dto;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NovaVerse.Services
 {
@@ -19,7 +21,7 @@ namespace NovaVerse.Services
         {
             var cart = await _context.ShoppingCarts
                 .Include(c => c.ShoppingCartItems)
-                .ThenInclude(ci => ci.Artwork)
+                .ThenInclude(ci => ci.Artwork) // Include dell'opera d'arte
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
@@ -36,7 +38,9 @@ namespace NovaVerse.Services
                 {
                     Id = ci.Id,
                     ArtworkId = ci.ArtworkId,
-                    ArtworkTitle = ci.Artwork.Title,
+                    ArtworkTitle = ci.Artwork.Title, // Titolo dell'opera
+                    ArtworkPhoto = ci.Artwork.Photo, // Percorso immagine locale
+                    ArtworkImageUrl = ci.Artwork.ImageUrl, // URL immagine remota, se esiste
                     PriceAtAddTime = ci.PriceAtAddTime,
                     Quantity = ci.Quantity
                 }).ToList(),
@@ -63,25 +67,27 @@ namespace NovaVerse.Services
                 _context.ShoppingCarts.Add(cart);
             }
 
-            var existingItem = cart.ShoppingCartItems.FirstOrDefault(ci => ci.ArtworkId == itemDto.ArtworkId);
-            if (existingItem != null)
+            var artwork = await _context.Artworks.FindAsync(itemDto.ArtworkId);
+            var newItem = new ShoppingCartItem
             {
-                existingItem.Quantity += itemDto.Quantity;
-            }
-            else
-            {
-                var artwork = await _context.Artworks.FindAsync(itemDto.ArtworkId);
-                var newItem = new ShoppingCartItem
-                {
-                    ArtworkId = itemDto.ArtworkId,
-                    PriceAtAddTime = artwork.Price,
-                    Quantity = itemDto.Quantity
-                };
-                cart.ShoppingCartItems.Add(newItem);
-            }
+                ArtworkId = artwork.Id,
+                PriceAtAddTime = artwork.Price,
+                Quantity = itemDto.Quantity
+            };
+            cart.ShoppingCartItems.Add(newItem);
 
             await _context.SaveChangesAsync();
-            return itemDto;
+
+            return new ShoppingCartItemDto
+            {
+                Id = newItem.Id,
+                ArtworkId = artwork.Id,
+                ArtworkTitle = artwork.Title,
+                ArtworkPhoto = artwork.Photo,
+                ArtworkImageUrl = artwork.ImageUrl,
+                PriceAtAddTime = newItem.PriceAtAddTime,
+                Quantity = newItem.Quantity
+            };
         }
 
         public async Task<bool> RemoveItemFromCartAsync(int userId, int itemId)
@@ -116,9 +122,6 @@ namespace NovaVerse.Services
             {
                 return false;
             }
-
-            // Processare il pagamento (da implementare in base al gateway di pagamento scelto)
-            // Creare una transazione per ogni articolo nel carrello
 
             _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
             await _context.SaveChangesAsync();

@@ -20,6 +20,7 @@ namespace NovaVerse.Models
 
         
         public string? Photo { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]

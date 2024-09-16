@@ -9,6 +9,7 @@ import { switchMap, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CommentService } from '../../services/comment-service.service';
+import { CartItem } from '../../Models/cart';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -25,7 +26,8 @@ export class ArtworkDetailComponent implements OnInit {
   artistName: string = '';
   editMode = false;
   artworkData: Partial<Artwork> = {}; // Contiene i dati modificabili dell'opera
-  selectedImage: File | null = null; // Per gestire l'immagine selezionata
+  selectedImage: File | null = null;
+  selectedArtwork: Artwork | null = null;
 
   constructor(
     private artworkService: ArtworkService,
@@ -83,14 +85,6 @@ export class ArtworkDetailComponent implements OnInit {
     this.favoriteService.addFavorite(artwork.id).subscribe(
       () => console.log('Opera aggiunta ai preferiti'),
       (error) => console.error('Errore nell\'aggiunta ai preferiti', error)
-    );
-  }
-
-  // Aggiungi l'opera al carrello
-  addToCart(artwork: Artwork): void {
-    this.shoppingCartService.addItemToCart(artwork.id).subscribe(
-      () => console.log('Opera aggiunta al carrello'),
-      (error) => console.error('Errore nell\'aggiunta al carrello', error)
     );
   }
 
@@ -174,6 +168,33 @@ export class ArtworkDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Metodo per aggiungere l'opera al carrello
+  addToCart(artwork: Artwork | null): void {
+    if (!artwork) {
+      console.error('Opera non valida');
+      return;
+    }
+
+    const cartItem: CartItem = {
+      id: 0, // L'id sarà generato dal backend
+      artworkId: artwork.id,
+      artworkTitle: artwork.title,
+      priceAtAddTime: artwork.price,
+      quantity: 1,
+      totalPrice: artwork.price,
+      artistName: ''
+    };
+
+    this.shoppingCartService.addItemToCart(cartItem).subscribe(
+      () => {
+        console.log('Opera aggiunta al carrello');
+      },
+      (error) => {
+        console.error('Errore durante l\'aggiunta dell\'opera al carrello:', error);
+      }
+    );
   }
 
   // Funzione per tornare alla categoria

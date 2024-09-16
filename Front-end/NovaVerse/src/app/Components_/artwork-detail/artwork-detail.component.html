@@ -75,9 +75,13 @@
       <button (click)="addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
         Aggiungi ai Preferiti
       </button>
+
       <button (click)="addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
         Aggiungi al Carrello
       </button>
+
+
+
 
       <!-- Elimina l'opera solo se l'utente è l'artista -->
       <div *ngIf="isArtist(artwork)">

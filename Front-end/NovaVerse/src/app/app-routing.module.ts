@@ -28,6 +28,7 @@ const routes: Routes = [
 
   // Modulo di autenticazione lazy-loaded
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
+  { path: 'cart', loadChildren: () => import('./Components_/cart/cart.module').then(m => m.CartModule) },
 
   // Gestisci rotte non valide
   { path: '**', redirectTo: '', pathMatch: 'full' }
