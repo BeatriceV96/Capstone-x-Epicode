@@ -1,7 +1,9 @@
 <div class="container mx-auto mt-5 mb-20">
-  <div *ngIf="cart && cart.items && cart.items.length > 0; else noItems">
+  <div *ngIf="cart$ | async as cart; else noItems">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div *ngFor="let item of cart.items; let i = index" [ngClass]="{'animate-fadeOut': item.removing}" class="relative bg-white shadow-md rounded-lg p-4 transition-all duration-500">
+      <div *ngFor="let item of cart.items; let i = index"
+           [@fadeInOut]="item.removing ? 'out' : 'in'"
+           class="relative bg-white shadow-md rounded-lg p-4 transition-transform duration-500 ease-in-out transform">
         <!-- Pulsante di rimozione -->
         <button (click)="removeItem(item.id, i)" class="absolute top-0 right-0 p-2 text-red-600 hover:text-red-800">
           &times;
@@ -17,7 +19,7 @@
 
         <!-- Dettagli dell'opera -->
         <h4 class="text-xl font-bold mb-2">{{ item.artworkTitle }}</h4>
-        <p class="text-gray-600">{{ item.priceAtAddTime | currency }}</p>
+        <p class="text-gray-600">{{ item.priceAtAddTime | currency:'EUR' }}</p>
 
         <!-- Aumenta e diminuisci la quantità -->
         <div class="flex items-center justify-between">
@@ -26,7 +28,6 @@
           <button (click)="increaseQuantity(item)" class="text-green-600">+</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -34,6 +35,11 @@
   <ng-template #noItems>
     <p class="text-center text-gray-500">Il carrello è vuoto.</p>
   </ng-template>
+
+  <!-- Totale del carrello -->
+  <div class="flex justify-end mt-10">
+    <h3 class="text-xl font-bold">Totale: {{ totalCost$ | async | currency:'EUR' }}</h3>
+  </div>
 
   <!-- Bottone per il checkout -->
   <div class="flex justify-center mt-10">

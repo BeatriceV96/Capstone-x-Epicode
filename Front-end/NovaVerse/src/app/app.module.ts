@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { NavbarComponent } from './Main-component/navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { FooterComponent } from './Main-component/footer/footer.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // **Rimuovi CategoryManagementComponent** da qui
 
 @NgModule({
@@ -25,7 +26,8 @@ import { FooterComponent } from './Main-component/footer/footer.component';
     NgbModule,
     FormsModule,
     AuthModule,
-    RouterModule
+    RouterModule,
+    BrowserAnimationsModule,
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

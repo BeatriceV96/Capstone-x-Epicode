@@ -18,69 +18,92 @@ export class ShoppingCartService {
   loadCart(): void {
     this.http.get<Cart>(`${this.baseUrl}`, { withCredentials: true }).pipe(
       tap((cart: Cart) => {
-        // Se il server restituisce una proprietà $values, la gestiamo
         if (cart && cart.items && (cart.items as any).$values) {
-          cart.items = (cart.items as any).$values; // Converte $values in un array normale
+          cart.items = (cart.items as any).$values;
         }
         this.cartSubject.next(cart); // Aggiorna il BehaviorSubject
       }),
       catchError(this.handleError)
-    ).subscribe(); // Esegui la richiesta e aggiorna il BehaviorSubject
+    ).subscribe();
   }
 
-  // Aggiungi un elemento al carrello
-  // Metodo per aggiungere un elemento al carrello
-addItemToCart(cartItem: CartItem): Observable<any> {
-  return this.http.post(`${this.baseUrl}/add`, cartItem, { withCredentials: true }).pipe(
-    tap(() => {
-      this.loadCart(); // Ricarica il carrello dopo l'aggiunta
-    }),
-    catchError(this.handleError)
-  );
-}
+  // Aggiungi un elemento al carrello o incrementa la quantità se esiste
+  addItemToCart(newItem: CartItem): Observable<any> {
+    const currentCart = this.cartSubject.value;
 
-removeItemFromCart(itemId: number): Observable<void> {
-  return this.http.delete<void>(`${this.baseUrl}/remove/${itemId}`, { withCredentials: true });
-}
+    if (currentCart) {
+      const existingItem = currentCart.items.find(item => item.artworkId === newItem.artworkId);
 
+      if (existingItem) {
+        existingItem.quantity += newItem.quantity;
+      } else {
+        currentCart.items.push(newItem);
+      }
 
-updateCart(cart$: Observable<Cart | null>): void {
-  // Emette il nuovo stato del carrello
-  cart$.subscribe(cart => {
-    if (cart) {
-      this.cartSubject.next(cart);
+      this.cartSubject.next(currentCart); // Aggiorna il BehaviorSubject
     }
-  });
-}
 
-  // Checkout
-  checkout(): Observable<void> {
-    return this.http.post<void>('http://localhost:5034/api/shoppingCart/checkout', {}).pipe(
-      tap(() => this.clearCart())
+    return this.http.post(`${this.baseUrl}/add`, newItem, { withCredentials: true }).pipe(
+      tap(() => this.loadCart()),
+      catchError(this.handleError)
     );
   }
 
+  // Incrementa la quantità di un articolo
+  increaseQuantity(item: CartItem): void {
+    const currentCart = this.cartSubject.value;
+
+    if (currentCart) {
+      const foundItem = currentCart.items.find(cartItem => cartItem.artworkId === item.artworkId);
+      if (foundItem) {
+        foundItem.quantity++;
+        this.cartSubject.next(currentCart); // Aggiorna il BehaviorSubject
+      }
+    }
+  }
+
+  // Decrementa la quantità di un articolo
+  decreaseQuantity(item: CartItem): void {
+    const currentCart = this.cartSubject.value;
+
+    if (currentCart) {
+      const foundItem = currentCart.items.find(cartItem => cartItem.artworkId === item.artworkId);
+      if (foundItem && foundItem.quantity > 1) {
+        foundItem.quantity--;
+        this.cartSubject.next(currentCart); // Aggiorna il BehaviorSubject
+      }
+    }
+  }
+
+  // Rimuovi un elemento dal carrello
+  removeItemFromCart(itemId: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/remove/${itemId}`, { withCredentials: true }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
+  checkout(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/checkout`, {}).pipe(
+      tap(() => this.clearCart()),
+      catchError(this.handleError)
+    );
+  }
 
   // Svuota il carrello
   clearCart(): void {
     this.cartSubject.next({ items: [] } as unknown as Cart); // Svuota il carrello
   }
 
-   // Metodo per gestire gli errori
-   private handleError(error: HttpErrorResponse): Observable<never> {
+  // Metodo per gestire gli errori
+  private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Errore sconosciuto';
     if (error.error instanceof ErrorEvent) {
-      // Errore lato client
       errorMessage = `Errore: ${error.error.message}`;
     } else {
-      // Errore lato server
       errorMessage = `Errore del server: ${error.status}\nMessaggio: ${error.message}`;
     }
     console.error(errorMessage);
     return throwError(errorMessage);
   }
 }
-
-
-
-

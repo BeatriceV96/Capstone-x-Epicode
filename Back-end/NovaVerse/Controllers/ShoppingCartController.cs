@@ -46,10 +46,11 @@ namespace NovaVerse.Controllers
             var success = await _shoppingCartService.RemoveItemFromCartAsync(userId, itemId);
             if (!success)
             {
-                return NotFound("Elemento non trovato nel carrello.");
+                return NotFound(new { message = "Elemento non trovato nel carrello." });
             }
-            return Ok("Elemento rimosso dal carrello.");
+            return Ok(new { message = "Elemento rimosso dal carrello." });
         }
+
 
 
         [HttpPost("checkout")]

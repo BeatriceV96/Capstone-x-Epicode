@@ -11,7 +11,22 @@
 
 .animate-fadeOut {
   opacity: 0;
-  transform: translateX(50%);
+  transform: scale(0.9);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.grid > div {
   transition: all 0.5s ease-in-out;
 }
 
+.opacity-0 {
+  opacity: 0;
+}
+
+.scale-90 {
+  transform: scale(0.9);
+}
+
+.transition-all {
+  transition: all 0.5s ease;
+}
