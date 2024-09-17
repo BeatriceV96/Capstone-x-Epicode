@@ -19,10 +19,11 @@ namespace NovaVerse.Services
         {
             return await _context.Favorites
                 .Include(f => f.Artwork)
-                .Include(f => f.Artist)
+                .Include(f => f.Artist) 
                 .Where(f => f.UserId == userId)
                 .ToListAsync();
         }
+
 
         public async Task<Favorite> AddFavoriteAsync(int userId, FavoriteDto favoriteDto)
         {

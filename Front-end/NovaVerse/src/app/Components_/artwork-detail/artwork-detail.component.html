@@ -4,8 +4,7 @@
   <!-- Sezione immagine -->
   <div class="flex justify-center mb-6">
     <img [src]="'http://localhost:5034' + (artwork$ | async)?.photo || (artwork$ | async)?.imageUrl"
-     alt="{{ (artwork$ | async)?.title }}" class="rounded-lg max-w-xs shadow-lg object-cover">
-
+         alt="{{ (artwork$ | async)?.title }}" class="rounded-lg max-w-xs shadow-lg object-cover">
   </div>
 
   <!-- Dettagli dell'opera -->
@@ -71,9 +70,14 @@
 
     <!-- Azioni utente -->
     <div class="mt-6 space-y-4">
-      <button (click)="addToFavorites(artwork)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+      <button (click)="addToFavorites(artwork.id)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
         Aggiungi ai Preferiti
       </button>
+
+      <!-- Pop-up di conferma -->
+      <div *ngIf="showPopup" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+        L'articolo è stato aggiunto ai preferiti!
+      </div>
 
       <button (click)="addToCart(artwork)" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
         Aggiungi al Carrello

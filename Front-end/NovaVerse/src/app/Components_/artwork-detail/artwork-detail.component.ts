@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CommentService } from '../../services/comment-service.service';
 import { CartItem } from '../../Models/cart';
+import { Favorite } from '../../Models/favorite';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -28,6 +29,7 @@ export class ArtworkDetailComponent implements OnInit {
   artworkData: Partial<Artwork> = {}; // Contiene i dati modificabili dell'opera
   selectedImage: File | null = null;
   selectedArtwork: Artwork | null = null;
+  showPopup = false;
 
   constructor(
     private artworkService: ArtworkService,
@@ -81,11 +83,12 @@ export class ArtworkDetailComponent implements OnInit {
   }
 
   // Aggiungi l'opera ai preferiti
-  addToFavorites(artwork: Artwork): void {
-    this.favoriteService.addFavorite(artwork.id).subscribe(
-      () => console.log('Opera aggiunta ai preferiti'),
-      (error) => console.error('Errore nell\'aggiunta ai preferiti', error)
-    );
+  addToFavorites(artworkId: number): void {
+    const favorite: Favorite = { artworkId: artworkId, artistId: null, id: 0, userId: 0, createDate: new Date() };
+    this.favoriteService.addFavorite(favorite).subscribe(() => {
+      this.showPopup = true;
+      setTimeout(() => this.showPopup = false, 3000);  // Popup for 3 seconds
+    });
   }
 
   // Salva le modifiche all'opera

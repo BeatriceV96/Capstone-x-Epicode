@@ -4,7 +4,6 @@ import { HomeComponent } from './Pages/home/home.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ArtistGuard } from './guards/artist.guard';
 
-
 const routes: Routes = [
   { path: '', component: HomeComponent },
 
@@ -23,20 +22,21 @@ const routes: Routes = [
   // Lazy-loaded Profile
   { path: 'profile', loadChildren: () => import('./Components_/profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
 
-  // Lazy-loaded Artwork Detail'
+  // Lazy-loaded Artwork Detail
   { path: 'artworks/:id', loadChildren: () => import('./Components_/artwork-detail/artwork-detail.module').then(m => m.ArtworkDetailModule) },
 
   // Modulo di autenticazione lazy-loaded
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
   { path: 'cart', loadChildren: () => import('./Components_/cart/cart.module').then(m => m.CartModule) },
+  { path: 'favorites', loadChildren: () => import('./Components_/favorites-list/favorites/favorites.module').then(m => m.FavoritesModule) },
+
 
   // Gestisci rotte non valide
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
-
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

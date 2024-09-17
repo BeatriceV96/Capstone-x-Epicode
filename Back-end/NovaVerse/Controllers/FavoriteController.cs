@@ -23,8 +23,10 @@ namespace NovaVerse.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var favorites = await _favoriteService.GetUserFavoritesAsync(userId);
+            Console.WriteLine(favorites); // Aggiungi questo per vedere il contenuto su console
             return Ok(favorites);
         }
+
 
         [HttpPost("add")]
         public async Task<IActionResult> AddFavorite([FromBody] FavoriteDto favoriteDto)

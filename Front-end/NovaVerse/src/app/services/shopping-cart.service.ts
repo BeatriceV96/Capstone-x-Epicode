@@ -84,7 +84,7 @@ export class ShoppingCartService {
 
 
   checkout(): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/checkout`, {}).pipe(
+    return this.http.post<void>(`${this.baseUrl}/checkout`,  { withCredentials: true }).pipe(
       tap(() => this.clearCart()),
       catchError(this.handleError)
     );

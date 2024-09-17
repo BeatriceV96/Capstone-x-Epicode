@@ -2,7 +2,6 @@
   <div class="container mx-auto flex justify-between items-center">
     <!-- Logo Section -->
     <div class="flex items-center">
-      <!--<img src="assets/logo.png" alt="NovaVerse Logo" class="w-12 h-12">  Immagine logo -->
       <span class="text-xl font-semibold text-white">NovaVerse</span>
     </div>
 
@@ -18,9 +17,13 @@
     <!-- Right Side Section -->
     <div class="flex items-center space-x-4">
       <ng-container *ngIf="isLoggedIn(); else guestLinks">
-        <!-- Icone Profilo, Carrello e Logout -->
+        <!-- Icone Profilo, Carrello, Preferiti e Logout -->
         <a routerLink="/profile" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
           <i class="fas fa-user"></i>
+        </a>
+
+        <a routerLink="/favorites" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
+          <i class="fas fa-heart"></i> <!-- Icona del cuoricino per i preferiti -->
         </a>
 
         <a routerLink="/cart" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">

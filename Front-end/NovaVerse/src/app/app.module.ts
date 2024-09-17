@@ -11,6 +11,7 @@ import { NavbarComponent } from './Main-component/navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { FooterComponent } from './Main-component/footer/footer.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FavoritesListComponent } from './Components_/favorites-list/favorites-list/favorites-list.component';
 // **Rimuovi CategoryManagementComponent** da qui
 
 @NgModule({
