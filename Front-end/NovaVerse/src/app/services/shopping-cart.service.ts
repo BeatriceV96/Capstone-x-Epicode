@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Cart, CartItem } from '../Models/cart';
@@ -10,7 +10,7 @@ import { Cart, CartItem } from '../Models/cart';
 export class ShoppingCartService {
   private baseUrl = 'http://localhost:5034/api/shoppingCart';
   private cartSubject = new BehaviorSubject<Cart | null>(null); // BehaviorSubject per il carrello
-  public cart$ = this.cartSubject.asObservable(); // Observable per il carrello
+  cart$: Observable<Cart | null> = this.cartSubject.asObservable(); // Observable per il carrello
 
   constructor(private http: HttpClient) {}
 
@@ -39,30 +39,48 @@ addItemToCart(cartItem: CartItem): Observable<any> {
   );
 }
 
+removeItemFromCart(itemId: number): Observable<void> {
+  return this.http.delete<void>(`${this.baseUrl}/remove/${itemId}`, { withCredentials: true });
+}
 
-  // Rimuovi un elemento dal carrello
-  removeItemFromCart(itemId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/remove/${itemId}`).pipe(
-      tap(() => {
-        this.loadCart(); // Ricarica il carrello dopo la rimozione
-      }),
-      catchError(this.handleError)
+
+updateCart(cart$: Observable<Cart | null>): void {
+  // Emette il nuovo stato del carrello
+  cart$.subscribe(cart => {
+    if (cart) {
+      this.cartSubject.next(cart);
+    }
+  });
+}
+
+  // Checkout
+  checkout(): Observable<void> {
+    return this.http.post<void>('http://localhost:5034/api/shoppingCart/checkout', {}).pipe(
+      tap(() => this.clearCart())
     );
   }
 
-  // Effettua il checkout
-  checkout(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/checkout`, {}).pipe(
-      tap(() => {
-        this.cartSubject.next(null); // Svuota il carrello dopo il checkout
-      }),
-      catchError(this.handleError)
-    );
+
+  // Svuota il carrello
+  clearCart(): void {
+    this.cartSubject.next({ items: [] } as unknown as Cart); // Svuota il carrello
   }
 
-  // Gestione degli errori
-  private handleError(error: any): Observable<never> {
-    console.error('Errore nel servizio ShoppingCartService:', error);
-    return throwError(error);
+   // Metodo per gestire gli errori
+   private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Errore sconosciuto';
+    if (error.error instanceof ErrorEvent) {
+      // Errore lato client
+      errorMessage = `Errore: ${error.error.message}`;
+    } else {
+      // Errore lato server
+      errorMessage = `Errore del server: ${error.status}\nMessaggio: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(errorMessage);
   }
 }
+
+
+
+

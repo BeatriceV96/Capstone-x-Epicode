@@ -51,6 +51,7 @@ namespace NovaVerse.Controllers
             return Ok("Elemento rimosso dal carrello.");
         }
 
+
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout()
         {

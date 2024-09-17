@@ -8,6 +8,7 @@ export interface CartItem {
   artworkPhoto?: string;
   artworkImageUrl?: string;
   artistName: string; // Nome dell'artista
+  removing?: boolean;
 }
 
 export interface Cart {

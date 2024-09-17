@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { Cart, CartItem } from '../../Models/cart';
 
@@ -13,15 +13,12 @@ export class CartComponent implements OnInit {
   loading: boolean = true; // Stato di caricamento
   errorMessage: string | null = null; // Messaggi di errore
 
-
   constructor(private shoppingCartService: ShoppingCartService) {}
 
   ngOnInit(): void {
     // Sottoscrizione all'Observable del carrello
     this.shoppingCartService.cart$.subscribe((cart) => {
-      console.log('Carrello caricato:', cart);
       this.loading = false;
-
       if (cart && cart.items) {
         this.cart = cart;
         this.calculateTotalCost(); // Calcola il costo totale
@@ -36,10 +33,10 @@ export class CartComponent implements OnInit {
 
   // Calcola il costo totale del carrello
   calculateTotalCost(): void {
-    this.totalCost = (this.cart?.items.reduce(
+    this.totalCost = this.cart?.items.reduce(
       (total, item) => total + item.priceAtAddTime * item.quantity,
       0
-    )) || 0;
+    ) || 0;
   }
 
   // Diminuisci la quantità di un articolo
@@ -56,15 +53,32 @@ export class CartComponent implements OnInit {
     this.calculateTotalCost();
   }
 
-  // Rimuovi un elemento dal carrello
-  removeItem(itemId: number): void {
-    this.shoppingCartService.removeItemFromCart(itemId).subscribe(() => {
-      if (this.cart) {
-        this.cart.items = this.cart.items.filter((item) => item.id !== itemId);
-        this.calculateTotalCost();
-      }
-    });
+  // Rimuovi un elemento dal carrello con animazione
+  removeItem(itemId: number, index: number): void {
+    // Imposta lo stato "removing" a true per l'animazione
+    if (this.cart) {
+      this.cart.items[index].removing = true;
+    }
+
+    // Imposta un timeout per l'animazione prima della rimozione effettiva
+    setTimeout(() => {
+      this.shoppingCartService.removeItemFromCart(itemId).subscribe({
+        next: () => {
+          if (this.cart) {
+            // Filtra l'elemento rimosso dal carrello
+            this.cart.items = this.cart.items.filter((item) => item.id !== itemId);
+            this.calculateTotalCost();
+          }
+        },
+        error: (err) => {
+          console.error('Errore durante la rimozione dell\'articolo:', err);
+          this.errorMessage = 'Errore durante la rimozione dell\'articolo.';
+        }
+      });
+    }, 500); // Attende 500ms per consentire l'animazione
   }
+
+
 
   // Effettua il checkout
   checkout(): void {
