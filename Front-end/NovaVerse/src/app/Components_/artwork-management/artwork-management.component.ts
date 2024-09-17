@@ -73,7 +73,7 @@ export class ArtworkManagementComponent implements OnInit {
       formData.append('description', this.artworkForm.description);
     }
     if (this.artworkForm.price !== undefined) {
-      formData.append('price', this.artworkForm.price.toString());
+      formData.append('price', (this.artworkForm.price).toString());
     }
     if (this.artworkForm.categoryId !== undefined) {
       formData.append('categoryId', this.artworkForm.categoryId.toString());

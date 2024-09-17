@@ -11,7 +11,7 @@
   <!-- Dettagli dell'opera -->
   <div class="space-y-4">
     <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
-    <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency }}</p>
+    <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency:'EUR' }}</p>
     <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
     <p><strong>Creato da:</strong> {{ (artwork$ | async)?.artistName }}</p>
     <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
@@ -28,47 +28,46 @@
     </div>
 
     <!-- Form di modifica -->
-<ng-container *ngIf="editMode">
-  <form (ngSubmit)="saveChanges(artwork)" class="mt-6 space-y-4" enctype="multipart/form-data">
-    <div>
-      <label for="title" class="block text-gray-300">Titolo</label>
-      <input id="title" [(ngModel)]="artworkData.title" name="title" class="w-full bg-gray-700 p-2 rounded-lg" required />
-    </div>
+    <ng-container *ngIf="editMode">
+      <form (ngSubmit)="saveChanges(artwork)" class="mt-6 space-y-4" enctype="multipart/form-data">
+        <div>
+          <label for="title" class="block text-gray-300">Titolo</label>
+          <input id="title" [(ngModel)]="artworkData.title" name="title" class="w-full bg-gray-700 p-2 rounded-lg" required />
+        </div>
 
-    <div>
-      <label for="description" class="block text-gray-300">Descrizione</label>
-      <textarea id="description" [(ngModel)]="artworkData.description" name="description" class="w-full bg-gray-700 p-2 rounded-lg"></textarea>
-    </div>
+        <div>
+          <label for="description" class="block text-gray-300">Descrizione</label>
+          <textarea id="description" [(ngModel)]="artworkData.description" name="description" class="w-full bg-gray-700 p-2 rounded-lg"></textarea>
+        </div>
 
-    <div>
-      <label for="price" class="block text-gray-300">Prezzo</label>
-      <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
-    </div>
+        <div>
+          <label for="price" class="block text-gray-300">Prezzo</label>
+          <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
+        </div>
 
-    <div>
-      <label for="categoryId" class="block text-gray-300">Categoria</label>
-      <input id="categoryId" type="number" [(ngModel)]="artworkData.categoryId" name="categoryId" class="w-full bg-gray-700 p-2 rounded-lg" required />
-    </div>
+        <div>
+          <label for="categoryId" class="block text-gray-300">Categoria</label>
+          <input id="categoryId" type="number" [(ngModel)]="artworkData.categoryId" name="categoryId" class="w-full bg-gray-700 p-2 rounded-lg" required />
+        </div>
 
-    <div>
-      <label for="artistName" class="block text-gray-300">Creato da</label>
-      <input id="artistName" [(ngModel)]="artworkData.artistName" name="artistName" class="w-full bg-gray-700 p-2 rounded-lg" disabled />
-    </div>
+        <div>
+          <label for="artistName" class="block text-gray-300">Creato da</label>
+          <input id="artistName" [(ngModel)]="artworkData.artistName" name="artistName" class="w-full bg-gray-700 p-2 rounded-lg" disabled />
+        </div>
 
-    <!-- Sezione per modificare l'immagine -->
-    <div>
-      <label for="image" class="block text-gray-300">Immagine</label>
-      <input id="image" type="file" (change)="onImageSelected($event)" class="w-full bg-gray-700 p-2 rounded-lg" />
-    </div>
+        <!-- Sezione per modificare l'immagine -->
+        <div>
+          <label for="image" class="block text-gray-300">Immagine</label>
+          <input id="image" type="file" (change)="onImageSelected($event)" class="w-full bg-gray-700 p-2 rounded-lg" />
+        </div>
 
-    <div class="flex justify-end">
-      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
-        Salva Modifiche
-      </button>
-    </div>
-  </form>
-</ng-container>
-
+        <div class="flex justify-end">
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg">
+            Salva Modifiche
+          </button>
+        </div>
+      </form>
+    </ng-container>
 
     <!-- Azioni utente -->
     <div class="mt-6 space-y-4">

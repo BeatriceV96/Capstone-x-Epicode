@@ -17,7 +17,7 @@
 
           <!-- Dettagli dell'opera -->
           <h4 class="text-xl font-bold mb-2">{{ artwork.title }}</h4>
-          <p class="text-gray-600">{{ artwork.price | currency }}</p>
+          <p class="text-gray-600">{{ artwork.price | currency:'EUR' }}</p> <!-- Modifica qui per mostrare in EUR -->
         </a>
       </div>
     </div>
