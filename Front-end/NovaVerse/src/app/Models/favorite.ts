@@ -8,3 +8,4 @@ export interface Favorite {
   artistId?: number | null;  // ID dell'artista se il preferito è un artista
   createDate: Date;
 }
+

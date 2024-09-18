@@ -27,11 +27,12 @@ const routes: Routes = [
 
   // Modulo di autenticazione lazy-loaded
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
+
   { path: 'cart', loadChildren: () => import('./Components_/cart/cart.module').then(m => m.CartModule) },
-  { path: 'favorites', loadChildren: () => import('./Components_/favorites-list/favorites/favorites.module').then(m => m.FavoritesModule) },
+
+  { path: 'favorite-list', loadChildren: () => import('./Components_/favorite-list/favorite-list.module').then(m => m.FavoriteListModule) },
 
 
-  // Gestisci rotte non valide
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 

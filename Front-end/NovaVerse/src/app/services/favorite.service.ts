@@ -1,28 +1,39 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, catchError, map, Observable, tap } from 'rxjs';
 import { Favorite } from '../Models/favorite';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FavoriteService {
-  private apiUrl = 'http://localhost:5034/api/favorite'; // Assicurati che l'URL sia corretto
+  private apiUrl = 'http://localhost:5034/api/favorite';
+  private favoritesSubject: BehaviorSubject<Favorite[]> = new BehaviorSubject<Favorite[]>([]);
+
+  get favorites$(): Observable<Favorite[]> {
+    return this.favoritesSubject.asObservable();
+  }
 
   constructor(private http: HttpClient) {}
 
-  // Recupera i favoriti dell'utente
   getUserFavorites(): Observable<Favorite[]> {
-    return this.http.get<Favorite[]>(`${this.apiUrl}/myfavorites`, { withCredentials: true });
+    return this.http.get<{$values:Favorite[]}>('http://localhost:5034/api/favorite/myfavorites', { withCredentials: true }).pipe(
+      map(response => response.$values),
+      //catchError(error => console.error('Errore nel caricamento dei preferiti:', error))
+    )
   }
 
-  // Aggiungi un'opera ai preferiti
-  addFavorite(favorite: Favorite): Observable<any> {
-    return this.http.post(`${this.apiUrl}/add`, favorite, { withCredentials: true });
+  addFavorite(favorite: Favorite): Observable<Favorite> {
+    return this.http.post<Favorite>(`${this.apiUrl}/add`, favorite, {
+      withCredentials: true
+    });
   }
 
-  // Rimuovi un'opera dai preferiti
-  removeFavorite(favoriteId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/remove/${favoriteId}`);
+  removeFavorite(favoriteId: number): void {
+    this.http.delete(`http://localhost:5034/api/favorite/remove/${favoriteId}`, { withCredentials: true })
+      .subscribe(() => {
+        const updatedFavorites = this.favoritesSubject.getValue().filter(fav => fav.id !== favoriteId);
+        this.favoritesSubject.next(updatedFavorites);  // Aggiorna la lista dei preferiti
+      });
   }
 }

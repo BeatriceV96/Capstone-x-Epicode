@@ -1,13 +1,13 @@
-<div class="container mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg max-w-xl text-white">
+<div class="container mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg max-w-xl text-white mb-20"> <!-- Aggiunto mb-20 per lo spazio -->
   <h2 class="text-3xl font-semibold mb-4 text-center">I tuoi preferiti</h2>
 
+  <!-- Sezione per mostrare i preferiti -->
   <ng-container *ngIf="favorites$ | async as favorites; else noFavorites">
-    <!-- Se ci sono preferiti, visualizzali -->
     <div *ngIf="favorites.length > 0; else noFavorites">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <!-- Itera sui preferiti -->
-        <div *ngFor="let favorite of favorites" class="relative bg-white shadow-md rounded-lg p-4">
-          <!-- Immagine dell'opera -->
+        <!-- Ciclo attraverso i preferiti -->
+        <div *ngFor="let favorite of favorites" class="relative bg-white shadow-md rounded-lg p-4 text-gray-900">
+          <!-- Immagine dell'opera preferita -->
           <div class="relative h-48 mb-4">
             <img *ngIf="favorite.artwork?.photo || favorite.artwork?.imageUrl"
                  [src]="favorite.artwork?.photo ? ('http://localhost:5034' + favorite.artwork?.photo) : favorite.artwork?.imageUrl"
@@ -16,14 +16,13 @@
           </div>
 
           <!-- Titolo dell'opera -->
-          <h4 class="text-xl font-bold mb-2" *ngIf="favorite.artwork?.title">{{ favorite.artwork?.title }}</h4>
+          <h4 class="text-xl font-bold mb-2">{{ favorite.artwork?.title }}</h4>
 
           <!-- Prezzo dell'opera -->
-          <p class="text-gray-600" *ngIf="favorite.artwork?.price">{{ favorite.artwork?.price | currency:'EUR' }}</p>
+          <p class="text-gray-600">{{ favorite.artwork?.price | currency:'EUR' }}</p>
 
           <!-- Pulsante per rimuovere dai preferiti -->
-          <button (click)="removeFromFavorites(favorite.id)"
-                  class="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+          <button (click)="removeFromFavorites(favorite.id)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg mt-4">
             Rimuovi dai preferiti
           </button>
         </div>
