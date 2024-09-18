@@ -1,17 +1,22 @@
 <div class="container mx-auto mt-5 mb-20">
   <div *ngIf="favorites$ | async as favorites; else noFavorites">
     <ul class="space-y-4"> <!-- Usa una lista per visualizzare le righe -->
-      <li *ngFor="let favorite of favorites" class="flex items-center bg-white p-4 rounded-lg shadow-md transition-transform duration-500 ease-in-out transform hover:scale-105">
+      <li *ngFor="let favorite of favorites"
+          class="flex items-center bg-white p-4 rounded-lg shadow-md transition-transform duration-500 ease-in-out transform hover:scale-105">
 
-        <!-- Immagine dell'opera preferita -->
-        <img *ngIf="favorite.artwork?.photo || favorite.artwork?.imageUrl"
-             [src]="favorite.artwork?.photo ? ('http://localhost:5034' + favorite.artwork?.photo) : favorite.artwork?.imageUrl"
-             alt="Opera preferita"
-             class="w-16 h-16 object-cover rounded-full mr-4"> <!-- Immagine tonda e piccola -->
+        <!-- Immagine dell'opera preferita, con routerLink per navigare al dettaglio -->
+        <a [routerLink]="['/artworks', favorite.artwork?.id]" class="flex items-center">
+          <img *ngIf="favorite.artwork?.photo || favorite.artwork?.imageUrl"
+               [src]="favorite.artwork?.photo ? ('http://localhost:5034' + favorite.artwork?.photo) : favorite.artwork?.imageUrl"
+               alt="Opera preferita"
+               class="w-16 h-16 object-cover rounded-full mr-4">
+        </a>
 
-        <!-- Dettagli dell'opera -->
+        <!-- Dettagli dell'opera, con routerLink per navigare al dettaglio -->
         <div class="flex-grow">
-          <h4 class="text-lg font-bold">{{ favorite.artwork?.title }}</h4>
+          <a [routerLink]="['/artworks', favorite.artwork?.id]" class="text-lg font-bold hover:underline">
+            {{ favorite.artwork?.title }}
+          </a>
           <p class="text-gray-500">{{ favorite.artwork?.artistName }}</p>
         </div>
 
