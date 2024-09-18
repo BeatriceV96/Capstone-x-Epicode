@@ -1,36 +1,29 @@
-<div class="container mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg max-w-xl text-white mb-20"> <!-- Aggiunto mb-20 per lo spazio -->
-  <h2 class="text-3xl font-semibold mb-4 text-center">I tuoi preferiti</h2>
+<div class="container mx-auto mt-5 mb-20">
+  <div *ngIf="favorites$ | async as favorites; else noFavorites">
+    <ul class="space-y-4"> <!-- Usa una lista per visualizzare le righe -->
+      <li *ngFor="let favorite of favorites" class="flex items-center bg-white p-4 rounded-lg shadow-md transition-transform duration-500 ease-in-out transform hover:scale-105">
 
-  <!-- Sezione per mostrare i preferiti -->
-  <ng-container *ngIf="favorites$ | async as favorites; else noFavorites">
-    <div *ngIf="favorites.length > 0; else noFavorites">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <!-- Ciclo attraverso i preferiti -->
-        <div *ngFor="let favorite of favorites" class="relative bg-white shadow-md rounded-lg p-4 text-gray-900">
-          <!-- Immagine dell'opera preferita -->
-          <div class="relative h-48 mb-4">
-            <img *ngIf="favorite.artwork?.photo || favorite.artwork?.imageUrl"
-                 [src]="favorite.artwork?.photo ? ('http://localhost:5034' + favorite.artwork?.photo) : favorite.artwork?.imageUrl"
-                 alt="Opera preferita"
-                 class="w-full h-full object-cover rounded-lg">
-          </div>
+        <!-- Immagine dell'opera preferita -->
+        <img *ngIf="favorite.artwork?.photo || favorite.artwork?.imageUrl"
+             [src]="favorite.artwork?.photo ? ('http://localhost:5034' + favorite.artwork?.photo) : favorite.artwork?.imageUrl"
+             alt="Opera preferita"
+             class="w-16 h-16 object-cover rounded-full mr-4"> <!-- Immagine tonda e piccola -->
 
-          <!-- Titolo dell'opera -->
-          <h4 class="text-xl font-bold mb-2">{{ favorite.artwork?.title }}</h4>
-
-          <!-- Prezzo dell'opera -->
-          <p class="text-gray-600">{{ favorite.artwork?.price | currency:'EUR' }}</p>
-
-          <!-- Pulsante per rimuovere dai preferiti -->
-          <button (click)="removeFromFavorites(favorite.id)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg mt-4">
-            Rimuovi dai preferiti
-          </button>
+        <!-- Dettagli dell'opera -->
+        <div class="flex-grow">
+          <h4 class="text-lg font-bold">{{ favorite.artwork?.title }}</h4>
+          <p class="text-gray-500">{{ favorite.artwork?.artistName }}</p>
         </div>
-      </div>
-    </div>
-  </ng-container>
 
-  <!-- Messaggio di fallback se non ci sono preferiti -->
+        <!-- Cuoricino che cambia stato al clic -->
+        <button (click)="removeFromFavorites(favorite)" class="text-red-500 text-xl transition-transform duration-300 hover:scale-125">
+          <i [class]="favorite.removing ? 'far fa-heart' : 'fas fa-heart'"></i>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Messaggio se non ci sono preferiti -->
   <ng-template #noFavorites>
     <p class="text-center text-gray-500">Non hai ancora aggiunto preferiti.</p>
   </ng-template>

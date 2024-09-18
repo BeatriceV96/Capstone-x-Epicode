@@ -7,5 +7,6 @@ export interface Favorite {
   artworkId?: number;
   artistId?: number | null;  // ID dell'artista se il preferito è un artista
   createDate: Date;
+  removing?: boolean;  // Flag per l'animazione di rimozione
 }
 

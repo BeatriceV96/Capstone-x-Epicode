@@ -36,4 +36,11 @@ export class FavoriteService {
         this.favoritesSubject.next(updatedFavorites);  // Aggiorna la lista dei preferiti
       });
   }
+
+
+  removeFavoriteFromList(favoriteId: number): void {
+    const currentFavorites = this.favoritesSubject.getValue();
+    const updatedFavorites = currentFavorites.filter(fav => fav.id !== favoriteId);
+    this.favoritesSubject.next(updatedFavorites);  // Update the BehaviorSubject with the updated list
+  }
 }
