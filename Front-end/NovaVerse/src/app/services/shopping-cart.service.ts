@@ -75,12 +75,22 @@ export class ShoppingCartService {
     }
   }
 
+  removeItemFromCart(item: CartItem): void {
+    let currentCart = this.cartSubject.value;
+
+    if (currentCart) {
+      const index = currentCart.items.findIndex(cartItem => cartItem.artworkId === item.artworkId);
+      const newCart = currentCart.items.splice(index, 1);
+        this.cartSubject.next(currentCart); // Aggiorna il BehaviorSubject
+      }
+    }
+
   // Rimuovi un elemento dal carrello
-  removeItemFromCart(itemId: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/remove/${itemId}`, { withCredentials: true }).pipe(
-      catchError(this.handleError)
-    );
-  }
+  // removeItemFromCart(itemId: number): Observable<any> {
+  //   return this.http.delete<any>(`${this.baseUrl}/remove/${itemId}`, { withCredentials: true }).pipe(
+  //     catchError(this.handleError)
+  //   );
+  // }
 
 
   checkout(): Observable<void> {

@@ -48,17 +48,21 @@ export class CartComponent implements OnInit {
     this.shoppingCartService.increaseQuantity(item);
   }
 
-  // Rimuovi un elemento dal carrello con animazione
-  removeItem(itemId: number, index: number): void {
-    this.cart$.subscribe(cart => {
-      if (cart) {
-        cart.items[index].removing = true; // Attiva l'animazione di rimozione
-        setTimeout(() => {
-          this.shoppingCartService.removeItemFromCart(itemId).subscribe();
-        }, 500); // Delay per l'animazione
-      }
-    });
+  removeItem(item: CartItem): void {
+    this.shoppingCartService.removeItemFromCart(item);
   }
+
+  // Rimuovi un elemento dal carrello con animazione
+  // removeItem(itemId: number, index: number): void {
+  //   this.cart$.subscribe(cart => {
+  //     if (cart) {
+  //       cart.items[index].removing = true; // Attiva l'animazione di rimozione
+  //       setTimeout(() => {
+  //         this.shoppingCartService.removeItemFromCart(itemId).subscribe();
+  //       }, 500); // Delay per l'animazione
+  //     }
+  //   });
+  // }
 
   // Effettua il checkout
   checkout(): void {
