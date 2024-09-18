@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { CommentDto } from '../Models/CommentDto';
 
 @Injectable({
@@ -11,9 +11,14 @@ export class CommentService {
 
   constructor(private http: HttpClient) {}
 
-  // Ottiene tutti i commenti per un'opera specifica
   getCommentsByArtwork(artworkId: number): Observable<CommentDto[]> {
-    return this.http.get<CommentDto[]>(`${this.baseUrl}/artwork/${artworkId}`);
+    return this.http.get<{$values: CommentDto[]}>(`${this.baseUrl}/artwork/${artworkId}`, { withCredentials: true }).pipe(
+      map(response => response.$values || []),  // Accediamo a $values come fatto per i preferiti
+      catchError(error => {
+        console.error('Errore nel caricamento dei commenti:', error);
+        return [];
+      })
+    );
   }
 
   // Aggiunge un nuovo commento

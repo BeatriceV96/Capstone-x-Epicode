@@ -92,28 +92,38 @@
     </div>
   </ng-container>
 
-  <!-- Sezione commenti/recensioni -->
-  <div class="mt-6 space-y-4">
-    <h2 class="text-2xl font-semibold">Recensioni</h2>
-    <div *ngIf="comments.length > 0; else noComments">
-      <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2">
-        <p class="text-gray-300">{{ comment.commentText }}</p>
-        <small class="text-gray-400">Recensito da: {{ comment.user?.username }}</small>
+ <!-- Sezione commenti/recensioni -->
+  <div class="mt-6 space-y-4"><!-- Sezione commenti/recensioni -->
+    <div class="mt-6 space-y-4">
+      <h2 class="text-2xl font-semibold">Recensioni</h2>
+
+      <!-- Mostra i commenti se presenti, altrimenti visualizza un messaggio -->
+      <div *ngIf="comments$ | async as comments; else noComments">
+        <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2 flex items-start">
+          <img [src]="comment.profilePicture || 'default-avatar.png'"
+               alt="{{ comment.username }}"
+               class="w-12 h-12 rounded-full mr-4">
+          <div>
+            <p class="text-gray-300">{{ comment.commentText }}</p>
+            <small class="text-gray-400">Recensito da: {{ comment.username }} il {{ comment.createDate | date:'short' }}</small>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noComments>
+        <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
+      </ng-template>
+
+
+      <!-- Lascio una nuova recensione -->
+      <div class="mt-4">
+        <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
+        <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+          Invia Recensione
+        </button>
       </div>
     </div>
-
-    <!-- Messaggio di fallback per nessuna recensione -->
-    <ng-template #noComments>
-      <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
-    </ng-template>
-
-    <!-- Lascio una nuova recensione -->
-    <div class="mt-4">
-      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
-      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-        Invia Recensione
-      </button>
-    </div>
+  </div>
 
     <!-- Pulsante per tornare alla pagina della categoria -->
     <div class="mt-6">
@@ -122,4 +132,3 @@
       </button>
     </div>
   </div>
-</div>

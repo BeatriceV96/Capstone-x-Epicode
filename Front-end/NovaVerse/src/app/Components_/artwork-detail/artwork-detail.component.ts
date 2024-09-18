@@ -5,12 +5,13 @@ import { AuthService } from '../../services/auth.service';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { Artwork } from '../../Models/artwork';
-import { switchMap, filter } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { switchMap, filter, tap, catchError, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CommentService } from '../../services/comment-service.service';
 import { CartItem } from '../../Models/cart';
 import { Favorite } from '../../Models/favorite';
+import { CommentDto } from '../../Models/CommentDto';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -19,6 +20,7 @@ import { Favorite } from '../../Models/favorite';
 })
 export class ArtworkDetailComponent implements OnInit {
   artwork$: Observable<Artwork | null> | null = null;
+  comments$: Observable<CommentDto[]> | undefined;
   artist: any = null;
   category: any = null;
   comments: any[] = [];
@@ -66,14 +68,6 @@ export class ArtworkDetailComponent implements OnInit {
   // Caricamento dell'immagine selezionata
   onImageSelected(event: any): void {
     this.selectedImage = event.target.files[0];
-  }
-
-  // Carica i commenti associati all'opera d'arte
-  loadComments(artworkId: number): void {
-    this.commentService.getCommentsByArtwork(artworkId).subscribe(
-      (comments) => this.comments = comments,
-      (error) => console.error('Errore nel caricamento dei commenti:', error)
-    );
   }
 
   // Verifica se l'utente è l'artista dell'opera
@@ -144,34 +138,51 @@ export class ArtworkDetailComponent implements OnInit {
     );
   }
 
-  // Lascia una recensione per l'opera
-  leaveReview(content: string): void {
-    if (this.artwork$) {
-      this.artwork$.subscribe((artwork) => {
-        if (artwork && artwork.id) {
-          const userId = this.getCurrentUserId();
+  // Carica i commenti associati all'opera d'arte
+  loadComments(artworkId: number): void {
+    this.comments$ = this.commentService.getCommentsByArtwork(artworkId).pipe(
+      tap((comments) => {
+        console.log('Commenti caricati:', comments);  // Log per il debugging
+      }),
+      catchError(error => {
+        console.error('Errore nel caricamento dei commenti:', error);
+        return of([]);  // Ritorna un array vuoto in caso di errore
+      })
+    );
+  }
 
+
+// Aggiunge una recensione
+leaveReview(content: string): void {
+  if (this.artwork$) {
+    this.artwork$.subscribe((artwork) => {
+      if (artwork && artwork.id) {
+        const user = this.authService.getCurrentUser();  // Recupera l'utente corrente
+
+        if (user) {
           const commentDto = {
             artworkId: artwork.id,
-            userId: userId,
+            userId: user.id,  // Aggiungi l'ID dell'utente
+            username: user.username,  // Aggiungi anche il nome utente
             commentText: content,
             createDate: new Date()
           };
 
           this.commentService.addComment(commentDto).subscribe(
-            () => {
-              this.comments.push({ commentText: content, user: { username: 'Tu' } });
-              this.newComment = '';
-              console.log('Recensione inviata con successo');
+            (newComment) => {
+              this.comments.push(newComment);  // Aggiungi il nuovo commento alla lista
+              this.newComment = '';  // Svuota il campo di testo
             },
             (error) => console.error('Errore nell\'invio della recensione', error)
           );
         } else {
-          console.error('Errore: L\'artwork non è caricato correttamente.');
+          console.error('Utente non autenticato');
         }
-      });
-    }
+      }
+    });
   }
+}
+
 
   // Metodo per aggiungere l'opera al carrello
   addToCart(artwork: Artwork | null): void {

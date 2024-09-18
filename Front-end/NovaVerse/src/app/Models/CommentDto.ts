@@ -3,6 +3,7 @@ export interface CommentDto {
   artworkId: number;
   userId: number;
   username?: string;
+  profilePicture?: string;
   commentText: string;
   createDate?: Date;
 }
