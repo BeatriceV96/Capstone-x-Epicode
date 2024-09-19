@@ -13,8 +13,6 @@
     <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency:'EUR' }}</p>
     <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
     <p><strong>Creato da:</strong> {{ (artwork$ | async)?.artistName }}</p>
-    <p><strong>Data di creazione:</strong> {{ (artwork$ | async)?.createDate | date:'medium' }}</p>
-    <p><strong>Visualizzazioni:</strong> {{ (artwork$ | async)?.viewCount }}</p>
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
@@ -83,12 +81,30 @@
         Aggiungi al Carrello
       </button>
 
-      <!-- Elimina l'opera solo se l'utente è l'artista -->
-      <div *ngIf="isArtist(artwork)">
-        <button (click)="deleteArtwork(artwork.id)" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
-          Elimina Opera
-        </button>
-      </div>
+      <!-- Pulsante per confermare l'eliminazione -->
+      <button (click)="prepareDeleteArtwork(currentArtwork?.id ?? null)" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+        Elimina Opera
+      </button>
+
+
+<!-- Popup di conferma -->
+<div *ngIf="showConfirmDelete" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+  <div class="bg-white p-4 rounded-lg shadow-lg text-black">
+    <p>Sei sicuro di voler eliminare questa opera?</p>
+    <button (click)="confirmDeleteArtwork()" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+      Sì, Elimina
+    </button>
+    <!-- Notifica di successo per l'eliminazione -->
+<div *ngIf="showDeleteSuccess" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-500 ease-out" role="alert">
+  Opera eliminata con successo!
+</div>
+
+    <button (click)="cancelDelete()" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg">
+      Annulla
+    </button>
+  </div>
+</div>
+
     </div>
     <!-- Modale di conferma per eliminare l'opera -->
 <div *ngIf="showConfirmDelete" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">

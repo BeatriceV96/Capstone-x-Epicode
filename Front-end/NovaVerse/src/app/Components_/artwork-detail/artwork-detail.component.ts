@@ -126,46 +126,61 @@ export class ArtworkDetailComponent implements OnInit {
         );
   }
 
+  // Apre la finestra di conferma per l'eliminazione
+  deleteArtwork(artworkId: number): void {
+    // Naviga immediatamente alla lista delle opere della categoria
+    this.router.navigate(['/categories', this.currentArtwork?.categoryId, 'artworks']);
 
-   // Apre la finestra di conferma per l'eliminazione
-   deleteArtwork(artworkId: number): void {
+    // Effettua la richiesta di eliminazione
     this.artworkService.deleteArtwork(artworkId).subscribe(
       () => {
-        this.showDeleteSuccess = true; // Mostra il pop-up di successo
-        setTimeout(() => this.showDeleteSuccess = false, 3000); // Nascondi dopo 3 secondi
-        this.router.navigate(['/categories', this.currentArtwork?.categoryId, 'artworks']); // Reindirizza alla lista delle opere
+        // Puoi anche loggare un messaggio se necessario per confermare il successo dell'eliminazione
+        console.log('Opera eliminata con successo');
       },
+      (error) => {
+        console.error('Errore durante l\'eliminazione dell\'opera:', error);
+      }
     );
   }
 
-  // Conferma l'eliminazione dell'opera
-  confirmDeleteArtwork(): void {
-    if (this.artworkToDelete !== null) {
-      this.artworkService.deleteArtwork(this.artworkToDelete).subscribe(
-        () => {
-          this.showConfirmDelete = false;  // Chiude il modale di conferma
-          this.showDeleteSuccess = true;  // Mostra la notifica di successo
 
-          // Nascondi la notifica dopo 3 secondi
-          setTimeout(() => {
-            this.showDeleteSuccess = false;
-          }, 3000);
-
-          // Resetta l'ID dell'opera da eliminare
-          this.artworkToDelete = null;
-        },
-        (error) => {
-          console.error('Errore durante l\'eliminazione dell\'opera', error);
-          this.showConfirmDelete = false;  // Chiudi il modale in caso di errore
-        }
-      );
+  prepareDeleteArtwork(artworkId: number | null): void {
+    if (artworkId !== null) {
+      this.artworkToDelete = artworkId;
+      this.showConfirmDelete = true;  // Mostra il popup di conferma
     }
   }
 
+// Conferma l'eliminazione dell'opera
+confirmDeleteArtwork(): void {
+  if (this.artworkToDelete !== null) {
+    this.artworkService.deleteArtwork(this.artworkToDelete).subscribe(
+      () => {
+        this.showConfirmDelete = false;  // Chiudi il modale di conferma
+        this.showDeleteSuccess = true;   // Mostra la notifica di successo
 
-  // Annulla l'eliminazione
+        // Nascondi la notifica dopo 3 secondi
+        setTimeout(() => {
+          this.showDeleteSuccess = false;
+
+          // Reindirizza alla lista delle opere della categoria
+          this.router.navigate(['/categories', this.currentArtwork?.categoryId, 'artworks']);
+        }, 3000); // Durata della notifica 3 secondi
+
+        // Resetta l'ID dell'opera da eliminare
+        this.artworkToDelete = null;
+      },
+      (error) => {
+        console.error('Errore durante l\'eliminazione dell\'opera', error);
+        this.showConfirmDelete = false;  // Chiudi il modale in caso di errore
+      }
+    );
+  }
+}
+
+
   cancelDelete(): void {
-    this.showConfirmDelete = false;
+    this.showConfirmDelete = false;  // Chiudi il popup di conferma
     this.artworkToDelete = null;  // Resetta l'ID dell'opera
   }
 

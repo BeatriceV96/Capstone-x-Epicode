@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Artwork } from '../Models/artwork';
 
@@ -86,16 +86,17 @@ updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
 
 
   // Elimina un'opera
-  deleteArtwork(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
-      .pipe(
-        tap(() => {
-          const updatedArtworks = this.artworkSubject.value.filter(artwork => artwork.id !== id);
-          this.artworkSubject.next(updatedArtworks);  // Rimuove l'opera in tempo reale
-        }),
-        catchError(this.handleError)
-      );
-  }
+// Elimina un'opera
+deleteArtwork(id: number): Observable<boolean> {
+  return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { withCredentials: true })
+    .pipe(
+      map(() => true),  // Se la chiamata ha successo, ritorna true
+      catchError(error => {
+        console.error('Errore nel servizio ArtworkService:', error);
+        return of(false);  // In caso di errore, ritorna false
+      })
+    );
+}
 
   // Gestione degli errori
   private handleError(error: any): Observable<never> {
