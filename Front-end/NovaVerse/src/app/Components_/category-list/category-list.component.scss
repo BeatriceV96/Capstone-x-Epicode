@@ -1,0 +1,89 @@
+/* Contenitore principale per il layout */
+.container {
+  margin: 0 auto;
+  padding: 40px;
+  max-width: 1200px;
+  color: #ffffff;
+}
+
+/* Titolo della sezione */
+.container h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* Griglia delle opere d'arte */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Singola card */
+.grid .card {
+  background-color: #1c1c1c;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.grid .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Immagine delle opere */
+.grid .card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Dettagli dell'opera */
+.grid .card .details {
+  padding: 20px;
+}
+
+.grid .card h2 {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.grid .card p {
+  color: #999999;
+  font-size: 16px;
+}
+
+.grid .card p.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 10px;
+}
+
+/* Pulsanti di filtro */
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  background-color: #292929;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-buttons button:hover {
+  background-color: #ffffff;
+  color: #292929;
+}
+

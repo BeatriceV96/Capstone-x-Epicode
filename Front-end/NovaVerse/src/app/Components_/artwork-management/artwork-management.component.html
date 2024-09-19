@@ -1,32 +1,33 @@
-<div class="container mx-auto mt-8">
-  <div class="max-w-md mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-semibold text-white mb-6">Crea una nuova opera</h2>
+<div class="w-full min-h-screen flex justify-center items-center" style="background: radial-gradient(circle, rgba(205,174,238,1) 0%, rgba(9,17,43,1) 83%);">
+  <div class="max-w-2xl w-full bg-gray-800 p-8 rounded-lg shadow-lg">
+    <h2 class="text-3xl font-semibold text-white mb-6 text-center">Crea una nuova opera</h2>
 
     <form class="contact-form" (ngSubmit)="createArtwork()">
       <!-- Titolo -->
       <div class="form-group mb-4">
         <label for="title" class="block text-sm text-white mb-2">Titolo</label>
         <input type="text" id="title" name="title" placeholder="Inserisci il titolo" [(ngModel)]="artworkForm.title"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required />
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:ring-blue-500 focus:border-blue-500" required />
       </div>
 
       <!-- Descrizione -->
       <div class="form-group mb-4">
         <label for="description" class="block text-sm text-white mb-2">Descrizione</label>
         <textarea id="description" name="description" placeholder="Descrivi l'opera" [(ngModel)]="artworkForm.description"
-                  class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required></textarea>
+                  class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:ring-blue-500 focus:border-blue-500" required></textarea>
       </div>
 
       <!-- Prezzo -->
-      <div class="form-group mb-4"></div>
+      <div class="form-group mb-4">
         <label for="price" class="block text-sm text-white mb-2">Prezzo (EUR)</label>
         <input type="number" id="price" name="price" step="0.01" placeholder="Inserisci il prezzo in EUR" [(ngModel)]="artworkForm.price"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" required />
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:ring-blue-500 focus:border-blue-500" required />
+      </div>
 
       <!-- Categoria -->
       <div class="form-group mb-4">
         <label for="categoryId" class="block text-sm text-white mb-2">Categoria</label>
-        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" id="categoryId"
+        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-blue-500 focus:border-blue-500" id="categoryId"
                 [(ngModel)]="artworkForm.categoryId" name="categoryId" required>
           <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
         </select>
@@ -35,7 +36,7 @@
       <!-- Tipo di Opera -->
       <div class="form-group mb-4">
         <label for="type" class="block text-sm text-white mb-2">Tipo di Opera</label>
-        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600" id="type"
+        <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-blue-500 focus:border-blue-500" id="type"
                 [(ngModel)]="artworkForm.type" name="type" required>
           <option *ngFor="let type of artworkTypes" [value]="type">{{ type }}</option>
         </select>
@@ -45,14 +46,14 @@
       <div class="form-group mb-4">
         <label for="photoFile" class="block text-sm text-white mb-2">Carica Immagine</label>
         <input (change)="onFileSelected($event)" id="photoFile" name="photoFile" type="file" accept="image/*"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" />
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:ring-blue-500 focus:border-blue-500" />
       </div>
 
       <!-- Immagine URL -->
       <div class="form-group mb-4">
         <label for="imageUrl" class="block text-sm text-white mb-2">O inserisci URL immagine</label>
         <input [(ngModel)]="artworkForm.imageUrl" name="imageUrl" id="imageUrl" type="text" placeholder="https://example.com/immagine.jpg"
-               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600" />
+               class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:ring-blue-500 focus:border-blue-500" />
       </div>
 
       <!-- Bottone di caricamento -->
@@ -70,4 +71,4 @@
       </button>
     </div>
   </div>
-
+</div>

@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { Artwork } from '../../Models/artwork';
 import { ArtworkService } from '../../services/artwork.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +25,7 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private artworkService: ArtworkService,
+    private router: Router,
     public sanitizer: DomSanitizer)
     { }
 
@@ -111,4 +113,9 @@ export class ProfileComponent implements OnInit {
       );
     }
   }
+
+  goToHome(): void {
+    this.router.navigate(['/']);  // Naviga alla home
+  }
+
 }

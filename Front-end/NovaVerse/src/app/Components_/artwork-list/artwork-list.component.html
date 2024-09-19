@@ -1,9 +1,9 @@
-<div class="container mx-auto mt-5 mb-20"> <!-- Aggiunta di mb-20 per il distacco -->
+<div class="w-full min-h-screen bg-gradient-to-b from-purple-300 to-gray-900 p-8">
   <!-- Sezione per mostrare le opere associate -->
-  <div *ngIf="artworks$ | async as artworks; else noArtworks">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <div *ngIf="artworks$ | async as artworks; else noArtworks" class="w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-screen-xl mx-auto">
       <!-- Ciclo attraverso le opere ricevute -->
-      <div *ngFor="let artwork of artworks" class="relative bg-white shadow-md rounded-lg p-4">
+      <div *ngFor="let artwork of artworks" class="relative bg-gray-900 shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 duration-300">
         <!-- Naviga alla pagina di dettaglio dell'opera -->
         <a [routerLink]="['/artworks', artwork.id]" class="block">
           <!-- Immagine dell'opera -->
@@ -16,8 +16,8 @@
           </div>
 
           <!-- Dettagli dell'opera -->
-          <h4 class="text-xl font-bold mb-2">{{ artwork.title }}</h4>
-          <p class="text-gray-600">{{ artwork.price | currency:'EUR' }}</p> <!-- Modifica qui per mostrare in EUR -->
+          <h4 class="text-2xl font-bold text-white mb-2">{{ artwork.title }}</h4>
+          <p class="text-gray-300">{{ artwork.price | currency:'EUR' }}</p> <!-- Testo in bianco o grigio chiaro -->
         </a>
       </div>
     </div>
@@ -25,7 +25,7 @@
 
   <!-- Messaggio di fallback se non ci sono opere -->
   <ng-template #noArtworks>
-    <p class="text-center text-gray-500">Non ci sono opere associate a questa categoria.</p>
+    <p class="text-center text-white">Non ci sono opere associate a questa categoria.</p>
   </ng-template>
 
   <!-- Bottone per tornare alla pagina delle categorie -->

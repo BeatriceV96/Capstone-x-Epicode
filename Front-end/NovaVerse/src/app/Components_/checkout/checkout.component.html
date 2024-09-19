@@ -1,0 +1,23 @@
+<div class="container mx-auto mt-5 mb-20">
+  <h2 class="text-2xl font-bold mb-5">Riepilogo Ordine</h2>
+  <div *ngIf="cart$ | async as cart; else noItems">
+    <div class="grid grid-cols-1 gap-4">
+      <div *ngFor="let item of cart.items">
+        <h4>{{ item.artworkTitle }}</h4>
+        <p>Prezzo: {{ item.priceAtAddTime | currency:'EUR' }}</p>
+        <p>Quantità: {{ item.quantity }}</p>
+      </div>
+    </div>
+    <div class="mt-5">
+      <h3 class="text-xl font-bold">Totale: {{ totalCost$ | async | currency:'EUR' }}</h3>
+    </div>
+    <div class="mt-5">
+      <button (click)="payWithStripe()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+        Procedi al pagamento con Stripe
+      </button>
+    </div>
+  </div>
+  <ng-template #noItems>
+    <p>Il carrello è vuoto.</p>
+  </ng-template>
+</div>

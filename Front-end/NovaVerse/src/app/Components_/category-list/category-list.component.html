@@ -1,29 +1,29 @@
-<div class="container mx-auto mt-8">
+<div class="w-full min-h-screen" style="background: radial-gradient(circle, rgba(205,174,238,1) 0%, rgba(9,17,43,1) 83%);">
   <!-- Header della pagina categorie -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-extrabold text-gray-800">Categorie Disponibili</h1>
+  <div class="flex justify-between items-center mb-6 px-4 py-2">
+    <h1 class="text-3xl font-extrabold text-white">Categorie Disponibili</h1>
 
     <!-- Mostra il pulsante di gestione categorie se l'utente è un artista -->
     <ng-container *ngIf="isArtist">
-      <a routerLink="/category-management" class="text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-300 py-2 px-4 rounded-full shadow-md flex items-center">
+      <a routerLink="/category-management" class="text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-300 py-2 px-4 rounded-full shadow-md flex items-center cursor-pointer">
         <i class="fas fa-edit mr-2"></i> Gestisci Categorie
       </a>
     </ng-container>
   </div>
 
   <!-- Lista delle categorie -->
-  <div *ngIf="categories.length > 0 && !loading; else noCategories">
-    <div *ngFor="let category of categories" class="bg-white shadow-md rounded-lg overflow-hidden mb-6 transition-transform transform hover:scale-105 duration-300">
-      <div class="flex justify-between items-center p-4">
+  <div *ngIf="categories.length > 0 && !loading; else noCategories" class="px-4 space-y-4">
+    <div *ngFor="let category of categories" class="bg-gray-800 shadow-md rounded-lg overflow-hidden transition-transform transform duration-300 hover:bg-gray-700 cursor-pointer">
+      <div class="flex justify-between items-center p-4 text-white">
         <!-- Nome della categoria -->
-        <a [routerLink]="['/categories', category.id, 'artworks']" class="block hover:underline text-xl font-semibold text-blue-600">
+        <a [routerLink]="['/categories', category.id, 'artworks']" class="block text-xl font-semibold cursor-pointer no-underline">
           {{ category.name }}
         </a>
 
-        <!-- Matite per la gestione, visibili solo per gli artisti -->
+        <!-- Matita tonda per la gestione, visibile solo per gli artisti -->
         <ng-container *ngIf="isArtist">
-          <a (click)="navigateToManage(category.id)" class="text-blue-500 hover:text-blue-700 transition-colors duration-300">
-            <i class="fas fa-edit"></i> Crea Opera
+          <a (click)="navigateToManage(category.id)" class="text-white bg-gray-700 hover:bg-gray-400 rounded-full p-2 cursor-pointer">
+            <i class="fas fa-pencil-alt text-white"></i>
           </a>
         </ng-container>
       </div>
@@ -39,6 +39,6 @@
 
   <!-- Messaggio se non ci sono categorie disponibili -->
   <ng-template #noCategories>
-    <p class="text-center text-gray-500">Non ci sono categorie disponibili al momento.</p>
+    <p class="text-center text-gray-400">Non ci sono categorie disponibili al momento.</p>
   </ng-template>
 </div>

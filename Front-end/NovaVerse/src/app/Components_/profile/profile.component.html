@@ -1,6 +1,6 @@
-<div class="bg-gray-900 text-white min-h-screen">
+<div class="w-full min-h-screen bg-gradient-to-b from-purple-300 to-gray-900 p-8">
   <div class="container mx-auto py-10">
-    <div class="bg-gray-800 shadow-md rounded-lg p-8 max-w-4xl mx-auto">
+    <div class="bg-gray-800 shadow-lg rounded-lg p-8 max-w-4xl mx-auto">
       <div class="flex flex-col items-center">
         <!-- Immagine del profilo -->
         <div class="relative mb-8">
@@ -24,34 +24,33 @@
 
         <!-- Informazioni del profilo utente -->
         <div class="w-full text-center mb-6">
-          <h2 class="text-3xl font-bold mb-4">{{ user?.username }}</h2>
-          <p class="text-gray-400 mb-4"><strong>Email:</strong> {{ user?.email }}</p>
-          <p class="text-gray-400 mb-4"><strong>Ruolo:</strong> {{ user?.role }}</p>
-          <p class="text-gray-400"><strong>Creato il:</strong> {{ user?.createDate | date: 'medium' }}</p>
+          <h2 class="text-3xl font-bold text-white mb-4">{{ user?.username }}</h2>
+          <p class="text-gray-300 mb-4"><strong>Email:</strong> {{ user?.email }}</p>
+          <p class="text-gray-300 mb-4"><strong>Ruolo:</strong> {{ user?.role }}</p>
+          <p class="text-gray-300"><strong>Creato il:</strong> {{ user?.createDate | date: 'medium' }}</p>
         </div>
-
 
         <!-- Modifica biografia -->
         <div class="mt-6 w-full text-center mb-8">
-          <strong class="text-lg">Biografia:</strong>
+          <strong class="text-lg text-white">Biografia:</strong>
           <div *ngIf="!isEditingBio" class="mt-2">
             <p class="mt-2 text-gray-300">{{ user?.bio || 'Nessuna biografia fornita.' }}</p>
             <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mt-4" (click)="enableBioEdit()">Modifica Biografia</button>
           </div>
           <div *ngIf="isEditingBio" class="mt-4">
-            <textarea [(ngModel)]="updatedBio" class="form-control w-full bg-gray-700 text-gray-700 p-3 rounded-lg"></textarea>
+            <textarea [(ngModel)]="updatedBio" class="form-control w-full bg-gray-700 text-white p-3 rounded-lg"></textarea>
             <div class="flex space-x-2 mt-4 justify-center">
               <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full" (click)="saveBio()">Salva</button>
-              <button class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4  rounded-full" (click)="cancelBioEdit()">Annulla</button>
+              <button class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-full" (click)="cancelBioEdit()">Annulla</button>
             </div>
           </div>
         </div>
 
         <!-- Opere create (solo per artisti) -->
         <div class="mt-8 w-full" *ngIf="user?.role === 'Artist'">
-          <strong class="text-lg">Opere create ({{ artworks.length }}):</strong>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6" *ngIf="artworks.length > 0; else noArtworks">
-            <div *ngFor="let artwork of artworks" class="relative bg-gray-700 shadow-md rounded-lg p-4">
+          <strong class="text-lg text-white">Opere create ({{ artworks.length }}):</strong>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6" *ngIf="artworks.length > 0; else noArtworks">
+            <div *ngFor="let artwork of artworks" class="relative bg-gray-700 shadow-lg rounded-lg p-4 hover:bg-gray-600 transition duration-300">
               <img [src]="artwork.photo || artwork.imageUrl" alt="{{ artwork.title }}" class="w-full h-48 object-cover rounded-lg">
               <p class="mt-2 text-white">{{ artwork.title }}</p>
             </div>
@@ -59,6 +58,13 @@
           <ng-template #noArtworks>
             <p class="text-center text-gray-400 mt-4">L'utente non ha creato nessuna opera.</p>
           </ng-template>
+        </div>
+
+        <!-- Bottone per tornare alla home -->
+        <div class="mt-10">
+          <button (click)="goToHome()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+            Torna alla Home
+          </button>
         </div>
       </div>
     </div>

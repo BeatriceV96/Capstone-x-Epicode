@@ -31,6 +31,7 @@ const routes: Routes = [
   { path: 'cart', loadChildren: () => import('./Components_/cart/cart.module').then(m => m.CartModule) },
 
   { path: 'favorite-list', loadChildren: () => import('./Components_/favorite-list/favorite-list.module').then(m => m.FavoriteListModule) },
+  { path: 'checkout', loadChildren: () => import('./Components_/checkout/checkout.module').then(m => m.CheckoutModule) },
 
 
   { path: '**', redirectTo: '', pathMatch: 'full' }
