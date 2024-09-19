@@ -25,13 +25,17 @@ namespace NovaVerse.Services
         public async Task<bool> Register(RegisterDto registerDto)
         {
             // Verifica se c'è un URL immagine fornito o se l'utente ha caricato un'immagine
-            string profilePicturePath = registerDto.ProfilePictureUrl;
+            var profilePicturePath = registerDto.ProfilePictureUrl;
 
-            if (!string.IsNullOrEmpty(registerDto.ProfilePicture))  // Controlla se è stato caricato un file
+            if (!string.IsNullOrEmpty(registerDto.ProfilePicture))
             {
-                // Se il file è stato caricato, salva l'immagine e aggiorna il percorso
-                profilePicturePath = "/uploads/" + registerDto.ProfilePicture;  // Esempio di percorso del server
+                // Evita la duplicazione del percorso "/uploads"
+                profilePicturePath = registerDto.ProfilePicture.StartsWith("/uploads")
+                    ? registerDto.ProfilePicture
+                    : "/uploads/" + registerDto.ProfilePicture;
             }
+
+
 
             var user = new User
             {
@@ -82,7 +86,7 @@ namespace NovaVerse.Services
                 Username = user.Username,
                 Email = user.Email,
                 Bio = user.Bio,
-                ProfilePicture = user.ProfilePicture,
+                ProfilePicture = string.IsNullOrEmpty(user.ProfilePicture) ? null : $"http://localhost:5034{user.ProfilePicture}",
                 CreateDate = user.CreateDate
             };
         }

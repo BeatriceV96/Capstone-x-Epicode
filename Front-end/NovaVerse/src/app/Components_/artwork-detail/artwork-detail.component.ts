@@ -162,8 +162,9 @@ leaveReview(content: string): void {
         if (user) {
           const commentDto = {
             artworkId: artwork.id,
-            userId: user.id,  // Aggiungi l'ID dell'utente
-            username: user.username,  // Aggiungi anche il nome utente
+            userId: user.id,
+            profilePicture: user.profilePicture,
+            username: user.username,
             commentText: content,
             createDate: new Date()
           };
@@ -181,6 +182,18 @@ leaveReview(content: string): void {
       }
     });
   }
+}
+
+getProfilePictureUrl(profilePicturePath: string | null): string {
+  if (!profilePicturePath) {
+    return 'http://localhost:5034/uploads/default-profile.png';
+  }
+
+  if (profilePicturePath.startsWith('/uploads')) {
+    return 'http://localhost:5034' + profilePicturePath;
+  }
+
+  return 'http://localhost:5034/uploads/' + profilePicturePath;
 }
 
 

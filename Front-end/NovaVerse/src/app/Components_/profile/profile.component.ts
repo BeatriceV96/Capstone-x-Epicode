@@ -27,33 +27,30 @@ export class ProfileComponent implements OnInit {
     public sanitizer: DomSanitizer)
     { }
 
-  ngOnInit(): void {
-    this.loadUserProfile();
-  }
+    ngOnInit(): void {
+      this.loadUserProfile();  // Call this when the component is initialized
+    }
 
-  loadUserProfile(): void {
-    this.userService.getUserProfile().subscribe(
-      (response: iUser) => {
-        this.user = response;
+    loadUserProfile(): void {
+      this.userService.getUserProfile().subscribe(
+        (response: iUser) => {
+          this.user = response;
 
-        // Verifica se il percorso dell'immagine inizia già con '/uploads'
-        if (this.user.profilePicture?.startsWith('/uploads')) {
-          this.profileImageUrl = 'http://localhost:5034' + this.user.profilePicture;
-        } else {
-          // Nel caso in cui ci sia qualche altro problema, fornisci un valore di fallback
-          this.profileImageUrl = 'http://localhost:5034/uploads/' + this.user.profilePicture;
+          // Assicurati che l'URL dell'immagine sia completo
+          if (this.user.profilePicture?.startsWith('/uploads')) {
+            this.profileImageUrl = 'http://localhost:5034' + this.user.profilePicture;
+          } else if (this.user.profilePicture) {
+            this.profileImageUrl = 'http://localhost:5034/uploads/' + this.user.profilePicture;
+          }
+
+          console.log("Profile Image URL:", this.profileImageUrl);  // Aggiungi questo log per vedere il percorso dell'immagine
+        },
+        (error) => {
+          console.error('Errore durante il caricamento del profilo', error);
         }
+      );
+    }
 
-        // Imposta il ruolo dell'utente
-        if (this.user.role) {
-          console.log(`Ruolo utente: ${this.user.role}`);
-        }
-      },
-      (error) => {
-        console.error('Errore durante il caricamento del profilo', error);
-      }
-    );
-  }
 
 
 

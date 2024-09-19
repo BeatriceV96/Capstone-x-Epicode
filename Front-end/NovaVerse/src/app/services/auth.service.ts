@@ -51,21 +51,27 @@ export class AuthService {
   login(authData: IAuthData): Observable<iAuthResponse> {
     return this.http.post<iAuthResponse>(`${this.baseUrl}/auth/login`, authData, { withCredentials: true }).pipe(
       tap((res) => {
+        let profilePictureUrl = res.user.profilePicture;
+
+        // Controlla se il percorso è vuoto o non corretto
+        if (profilePictureUrl && !profilePictureUrl.startsWith('http')) {
+          profilePictureUrl = 'http://localhost:5034' + profilePictureUrl;
+        }
+
         const user: iUser = {
           id: res.user.id,
           username: res.user.username,
           email: res.user.email,
           role: res.user.role,
-          bio: res.user.bio,  // Bio dell'utente
-          profilePicture: res.user.profilePicture,  // Ora è byte[] non URL
-          createDate: res.user.createDate  // Data di creazione dell'account
+          bio: res.user.bio,
+          profilePicture: profilePictureUrl,
+          createDate: res.user.createDate
         };
 
-        this.authSubject.next(user);  // Aggiorna lo stato dell'utente
-        localStorage.setItem('user', JSON.stringify(user));  // Salva l'utente in localStorage
+        this.authSubject.next(user);
+        localStorage.setItem('user', JSON.stringify(user));
         this.userLoggedIn = true;
 
-        // Redirigi l'utente in base al suo ruolo
         if (res.user.role === 'Artist') {
           this.router.navigate(['/artist-dashboard']);
         } else if (res.user.role === 'Buyer') {
@@ -78,6 +84,8 @@ export class AuthService {
       })
     );
   }
+
+
 
   // Effettua il logout e reimposta lo stato dell'utente
   logout(): void {
@@ -109,8 +117,13 @@ export class AuthService {
 
   // Restituisce l'utente corrente dal BehaviorSubject
   getCurrentUser(): iUser | null {
-    return this.authSubject.value;
+    const user = this.authSubject.value;
+    if (user?.profilePicture && !user.profilePicture.startsWith('http')) {
+      user.profilePicture = 'http://localhost:5034' + user.profilePicture;  // Aggiorna l'URL completo
+    }
+    return user;
   }
+
 
   getUserById(userId: number): Observable<iUser> {
     return this.http.get<iUser>(`${this.baseUrl}/users/${userId}`);
@@ -120,6 +133,11 @@ export class AuthService {
   restoreUser(): void {
     this.http.get<iUser>(`${this.baseUrl}/auth/currentUser`, { withCredentials: true }).subscribe(
       (user) => {
+        // Controlla e costruisci l'URL dell'immagine del profilo
+        if (user.profilePicture && !user.profilePicture.startsWith('http')) {
+          user.profilePicture = 'http://localhost:5034' + user.profilePicture;
+        }
+
         this.authSubject.next(user);  // Aggiorna il BehaviorSubject con i dati dell'utente
         localStorage.setItem('user', JSON.stringify(user));  // Salva nuovamente nel localStorage
         this.userLoggedIn = true;

@@ -20,13 +20,14 @@ public class CommentService : ICommentService
     public async Task<List<CommentDto>> GetCommentsByArtworkAsync(int artworkId)
     {
         var comments = await _context.Comments
-            .Include(c => c.User)  // Include per ottenere il nome dell'utente
+            .Include(c => c.User)  // Include l'utente per ottenere il profilo
             .Where(c => c.ArtworkId == artworkId)
             .Select(c => new CommentDto
             {
                 Id = c.Id,
                 UserId = c.UserId,
-                Username = c.User.Username,  // Nome dell'utente
+                Username = c.User.Username,
+                ProfilePicture = c.User.ProfilePicture,  
                 ArtworkId = c.ArtworkId,
                 CommentText = c.CommentText,
                 CreateDate = c.CreateDate
@@ -35,6 +36,8 @@ public class CommentService : ICommentService
 
         return comments;
     }
+
+
 
     // Restituisce un singolo commento per ID
     public async Task<CommentDto> GetCommentByIdAsync(int commentId)

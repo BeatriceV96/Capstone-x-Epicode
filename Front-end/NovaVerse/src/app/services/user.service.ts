@@ -46,9 +46,10 @@ export class UserService {
 getUserProfile(): Observable<iUser> {
   return this.http.get<iUser>(`${this.apiUrl}/profile`, { withCredentials: true })
     .pipe(
-      catchError(this.handleError)
+      catchError(this.handleError)  // Handle any error that occurs
     );
 }
+
   // Aggiunge un'opera ai preferiti
   addFavorite(artworkId: number): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/favorites/${artworkId}`, {}, { withCredentials: true })

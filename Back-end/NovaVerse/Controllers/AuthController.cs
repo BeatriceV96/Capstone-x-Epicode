@@ -20,6 +20,7 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPost("register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto registerDto, IFormFile profilePicture)
         {
             string profilePictureUrl = null;
@@ -37,6 +38,7 @@ namespace NovaVerse.Controllers
 
                 // Salva solo il percorso relativo
                 profilePictureUrl = $"/uploads/{fileName}";
+                Console.WriteLine("Profile Picture Path: " + profilePictureUrl); 
             }
 
             // Se non esiste un file, usa l'URL dell'immagine fornito
@@ -45,7 +47,6 @@ namespace NovaVerse.Controllers
                 profilePictureUrl = registerDto.ProfilePictureUrl;
             }
 
-            // Aggiungi l'URL o il percorso dell'immagine al DTO
             registerDto.ProfilePicture = profilePictureUrl;
 
             // Esegui la registrazione
@@ -57,8 +58,9 @@ namespace NovaVerse.Controllers
 
             var user = await _userService.Login(new LoginDto { Username = registerDto.Username, Password = registerDto.Password });
 
-            return Ok(user);  // Restituisci i dettagli dell'utente
+            return Ok(user); 
         }
+
 
 
 

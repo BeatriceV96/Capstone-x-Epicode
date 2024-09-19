@@ -21,18 +21,40 @@ export class CommentService {
     );
   }
 
-  // Aggiunge un nuovo commento
+  getProfilePictureUrl(profilePicture: string): string {
+    if (profilePicture?.startsWith('/uploads')) {
+      return 'http://localhost:5034' + profilePicture; // Aggiungi l'URL base se è un percorso relativo
+    }
+    return profilePicture;
+  }
+
+
   addComment(commentDto: CommentDto): Observable<CommentDto> {
-    return this.http.post<CommentDto>(`${this.baseUrl}/add`, commentDto, { withCredentials: true });
+    return this.http.post<CommentDto>(`${this.baseUrl}/add`, commentDto, { withCredentials: true }).pipe(
+      catchError(error => {
+        console.error('Errore durante l\'aggiunta del commento:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   // Aggiorna un commento esistente
   updateComment(commentId: number, commentDto: CommentDto): Observable<CommentDto> {
-    return this.http.put<CommentDto>(`${this.baseUrl}/update/${commentId}`, commentDto, { withCredentials: true });
+    return this.http.put<CommentDto>(`${this.baseUrl}/update/${commentId}`, commentDto, { withCredentials: true }).pipe(
+      catchError(error => {
+        console.error('Errore durante l\'aggiornamento del commento:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   // Cancella un commento esistente
   deleteComment(commentId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/delete/${commentId}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.baseUrl}/delete/${commentId}`, { withCredentials: true }).pipe(
+      catchError(error => {
+        console.error('Errore durante l\'eliminazione del commento:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }
