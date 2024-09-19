@@ -12,6 +12,7 @@ import { CommentService } from '../../services/comment-service.service';
 import { CartItem } from '../../Models/cart';
 import { Favorite } from '../../Models/favorite';
 import { CommentDto } from '../../Models/CommentDto';
+import { Category } from '../../Models/category';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -39,6 +40,7 @@ export class ArtworkDetailComponent implements OnInit {
   showConfirmDelete = false;  // Per mostrare o nascondere il modale di conferma
   artworkToDelete: number | null = null;  // ID dell'opera da eliminare
   showDeleteSuccess = false;
+  categories: Category[] = [];
 
 
 
@@ -55,7 +57,7 @@ export class ArtworkDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carica i dettagli dell'opera e assegna a `currentArtwork`
+    // Carica i dettagli dell'opera
     this.artwork$ = this.route.paramMap.pipe(
       switchMap(params => {
         const id = +params.get('id')!;
@@ -65,15 +67,24 @@ export class ArtworkDetailComponent implements OnInit {
 
     this.artwork$.subscribe(artwork => {
       if (artwork) {
-        this.currentArtwork = artwork;  // Assegna l'opera corrente a `currentArtwork`
+        this.currentArtwork = artwork;
         this.artworkData = { ...artwork };
-        this.loadComments(artwork.id);  // Carica i commenti associati all'opera
+        this.loadComments(artwork.id);
       } else {
         console.error('Opera non trovata');
       }
     });
-  }
 
+    // Carica le categorie
+    this.categoryService.getAllCategories().subscribe(
+      (categories) => {
+        this.categories = categories;  // Salva le categorie nella variabile
+      },
+      (error) => {
+        console.error('Errore durante il caricamento delle categorie:', error);
+      }
+    );
+  }
   // Gestione della modalità di modifica
   toggleEdit(): void {
     this.editMode = !this.editMode;
@@ -109,21 +120,22 @@ export class ArtworkDetailComponent implements OnInit {
     formData.append('artistName', this.artworkData.artistName || '');
     formData.append('artistId', this.artworkData.artistId?.toString() || '');
 
-    // Se c'è un'immagine selezionata, la aggiungiamo al form
     if (this.selectedImage) {
-        formData.append('photoFile', this.selectedImage);
+      formData.append('photoFile', this.selectedImage);
     }
 
     this.artworkService.updateArtwork(artwork.id, formData)
-        .subscribe(
-            () => {
-                this.toggleEdit(); // Disattiva la modalità di modifica
-                console.log('Opera aggiornata con successo');
-            },
-            error => {
-                console.error('Errore durante l\'aggiornamento dell\'opera:', error);
-            }
-        );
+      .subscribe(
+        (updatedArtwork) => {
+          this.currentArtwork = updatedArtwork;  // Aggiorna il modello corrente con i dati modificati
+          this.artworkData = { ...updatedArtwork };  // Aggiorna anche il form con i nuovi dati
+          this.toggleEdit(); // Disattiva la modalità di modifica
+          console.log('Opera aggiornata con successo');
+        },
+        error => {
+          console.error('Errore durante l\'aggiornamento dell\'opera:', error);
+        }
+      );
   }
 
   // Apre la finestra di conferma per l'eliminazione

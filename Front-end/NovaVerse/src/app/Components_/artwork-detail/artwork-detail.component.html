@@ -42,10 +42,14 @@
           <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
         </div>
 
-        <div>
-          <label for="categoryId" class="block text-gray-300">Categoria</label>
-          <input id="categoryId" type="number" [(ngModel)]="artworkData.categoryId" name="categoryId" class="w-full bg-gray-700 p-2 rounded-lg" required />
+        <div class="form-group mb-4">
+          <label for="categoryId" class="block text-sm text-white mb-2">Categoria</label>
+          <select class="form-control w-full px-4 py-2 rounded-lg bg-gray-700 text-black border border-gray-600" id="categoryId"
+                  [(ngModel)]="artworkData.categoryId" name="categoryId" required>
+            <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+          </select>
         </div>
+
 
         <div>
           <label for="artistName" class="block text-gray-300">Creato da</label>
