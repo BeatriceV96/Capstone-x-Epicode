@@ -92,55 +92,80 @@
     </div>
   </ng-container>
 
- <!-- Sezione commenti/recensioni -->
-  <div class="mt-6 space-y-4"><!-- Sezione commenti/recensioni -->
-    <div class="mt-6 space-y-4">
-      <h2 class="text-2xl font-semibold">Recensioni</h2>
+  <div class="mt-6 space-y-4">
+    <h2 class="text-2xl font-semibold">Recensioni</h2>
 
-      <!-- Mostra i commenti se presenti, altrimenti visualizza un messaggio -->
-      <div *ngIf="comments$ | async as comments; else noComments">
-        <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2 flex items-start">
-          <!-- Avatar dell'utente -->
-          <img *ngIf="comment.profilePicture"
-          [src]="getProfilePictureUrl(comment.profilePicture)"
-          alt="Immagine profilo di {{ comment.username }}"
-          class="w-12 h-12 rounded-full mr-4">
+    <!-- Mostra i commenti se presenti, altrimenti visualizza un messaggio -->
+    <div *ngIf="comments$ | async as comments; else noComments">
+      <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2 flex items-start">
+        <!-- Avatar dell'utente -->
+        <img *ngIf="comment.profilePicture"
+             [src]="getProfilePictureUrl(comment.profilePicture)"
+             alt="Immagine profilo di {{ comment.username }}"
+             class="w-12 h-12 rounded-full mr-4">
+
+        <div *ngIf="!comment.profilePicture" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
+          <p>Nessuna immagine</p>
+        </div>
+
+        <!-- Contenuto del commento -->
+        <div>
+          <p class="text-gray-300">{{ comment.commentText }}</p>
+          <small class="text-gray-400">Recensito da: {{ comment.username }} il {{ comment.createDate | date:'short' }}</small>
+
+          <!-- Pulsanti di modifica ed eliminazione (visibili solo se l'utente è l'autore del commento) -->
+          <div *ngIf="isCurrentUser(comment.userId)" class="flex space-x-2 mt-2">
+            <!-- Modifica con icona matita -->
+            <button (click)="enableEditComment(comment)" class="text-white bg-gray-400 hover:bg-gray-600 rounded-full p-2">
+              <i class="fas fa-pencil-alt"></i> <!-- Icona della matita -->
+            </button>
 
 
-          <!-- Se l'utente non ha una foto profilo, mostra un'icona o un'immagine di default -->
-          <div *ngIf="!comment.profilePicture" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
-            <p>Nessuna immagine</p>
+            <!-- Elimina con icona cestino -->
+<button *ngIf="comment.id !== undefined" (click)="deleteComment(comment.id!)" class="text-white bg-gray-400 hover:bg-gray-600 rounded-full p-2">
+  <span *ngIf="deletingCommentId === comment.id">
+    <i class="fas fa-spinner fa-spin"></i> <!-- Spinner mentre elimina -->
+  </span>
+  <span *ngIf="deletingCommentId !== comment.id">
+    <i class="fas fa-trash-alt"></i> <!-- Icona del cestino -->
+  </span>
+</button>
+<!-- Notifica di successo per l'eliminazione -->
+<div *ngIf="showDeleteSuccess" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-500 ease-out" role="alert">
+  Il tuo commento è stato eliminato con successo!
+</div>
+
+
+
           </div>
 
-          <!-- Contenuto del commento -->
-          <div>
-            <p class="text-gray-300">{{ comment.commentText }}</p>
-            <small class="text-gray-400">Recensito da: {{ comment.username }} il {{ comment.createDate | date:'short' }}</small>
+          <!-- Modalità di modifica -->
+          <div *ngIf="comment.id === editingCommentId">
+            <textarea [(ngModel)]="editedCommentText" class="w-full p-2 mt-2 bg-gray-600 rounded-lg text-white"></textarea>
+            <button (click)="saveEditedComment(comment.id)" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-full mt-2">Salva</button>
+            <button (click)="cancelEdit()" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded-full mt-2">Annulla</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <ng-template #noComments>
-        <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
-      </ng-template>
+    <!-- Template per il caso in cui non ci sono commenti -->
+    <ng-template #noComments>
+      <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
+    </ng-template>
+
+    <!-- Form per lasciare una nuova recensione -->
+    <div class="mt-4">
+      <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
+      <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Invia Recensione</button>
+    </div>
+  </div>
 
 
-
-<!-- Form per lasciare una nuova recensione -->
-<div class="mt-4">
-  <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..."
-            class="w-full p-4 bg-gray-600 text-white rounded-lg">
-  </textarea>
-  <button (click)="leaveReview(newComment)"
-          class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-    Invia Recensione
-  </button>
-</div>
-
-<!-- Pulsante per tornare alla lista delle opere -->
-<div class="mt-6">
-  <button (click)="goBackToCategory()"
-          class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
-    Torna alla Lista delle Opere
-  </button>
+  <!-- Pulsante per tornare alla lista delle opere -->
+  <div class="mt-6">
+    <button (click)="goBackToCategory()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
+      Torna alla Lista delle Opere
+    </button>
+  </div>
 </div>

@@ -20,7 +20,8 @@ import { CommentDto } from '../../Models/CommentDto';
 })
 export class ArtworkDetailComponent implements OnInit {
   artwork$: Observable<Artwork | null> | null = null;
-  comments$: Observable<CommentDto[]> | undefined;
+  comments$: Observable<CommentDto[]> = of([]);
+  currentArtwork: Artwork | null = null;
   artist: any = null;
   category: any = null;
   comments: any[] = [];
@@ -28,10 +29,18 @@ export class ArtworkDetailComponent implements OnInit {
   loading: boolean = true;
   artistName: string = '';
   editMode = false;
-  artworkData: Partial<Artwork> = {}; // Contiene i dati modificabili dell'opera
+  artworkData: Partial<Artwork> = {};
   selectedImage: File | null = null;
   selectedArtwork: Artwork | null = null;
   showPopup = false;
+  editingCommentId: number | null = null;  // Per tracciare il commento che si sta modificando
+  editedCommentText: string = '';  // Contiene il testo modificato del commento
+  deletingCommentId: number | null = null;
+  showDeleteNotification: boolean = false;
+  showDeleteSuccess = false;  // Per mostrare la notifica di eliminazione
+deleteNotificationMessage: string = '';
+
+
 
   constructor(
     private artworkService: ArtworkService,
@@ -45,17 +54,21 @@ export class ArtworkDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carica i dettagli dell'opera
+    // Carica i dettagli dell'opera e assegna a `currentArtwork`
     this.artwork$ = this.route.paramMap.pipe(
       switchMap(params => {
         const id = +params.get('id')!;
         return this.artworkService.getArtworkById(id);
       })
     );
+
     this.artwork$.subscribe(artwork => {
       if (artwork) {
+        this.currentArtwork = artwork;  // Assegna l'opera corrente a `currentArtwork`
         this.artworkData = { ...artwork };
-        this.loadComments(artwork.id); // Carica i commenti associati all'opera
+        this.loadComments(artwork.id);  // Carica i commenti associati all'opera
+      } else {
+        console.error('Opera non trovata');
       }
     });
   }
@@ -142,7 +155,7 @@ export class ArtworkDetailComponent implements OnInit {
   loadComments(artworkId: number): void {
     this.comments$ = this.commentService.getCommentsByArtwork(artworkId).pipe(
       tap((comments) => {
-        console.log('Commenti caricati:', comments);  // Log per il debugging
+        console.log('Commenti caricati:', comments);
       }),
       catchError(error => {
         console.error('Errore nel caricamento dei commenti:', error);
@@ -151,42 +164,119 @@ export class ArtworkDetailComponent implements OnInit {
     );
   }
 
-
 // Aggiunge una recensione
 leaveReview(content: string): void {
-  if (this.artwork$) {
-    this.artwork$.subscribe((artwork) => {
-      if (artwork && artwork.id) {
-        const user = this.authService.getCurrentUser();  // Recupera l'utente corrente
+  // Verifica che `currentArtwork` sia stato caricato correttamente
+  if (!this.currentArtwork) {
+    console.error('Opera non caricata correttamente.');
+    return;
+  }
 
-        if (user) {
-          const commentDto = {
-            artworkId: artwork.id,
-            userId: user.id,
-            profilePicture: user.profilePicture,
-            username: user.username,
-            commentText: content,
-            createDate: new Date()
-          };
+  const user = this.authService.getCurrentUser();  // Recupera l'utente corrente
 
-          this.commentService.addComment(commentDto).subscribe(
-            (newComment) => {
-              this.comments.push(newComment);  // Aggiungi il nuovo commento alla lista
-              this.newComment = '';  // Svuota il campo di testo
-            },
-            (error) => console.error('Errore nell\'invio della recensione', error)
-          );
-        } else {
-          console.error('Utente non autenticato');
-        }
-      }
-    });
+  if (user) {
+    const commentDto: CommentDto = {
+      artworkId: this.currentArtwork.id,  // Usa `currentArtwork` che ora è sicuramente definito
+      userId: user.id,
+      profilePicture: user.profilePicture ? this.getProfilePictureUrl(user.profilePicture) : undefined, // Usa `undefined` invece di `null`
+      username: user.username,
+      commentText: content,
+      createDate: new Date()
+    };
+
+    // Aggiungi il nuovo commento
+    this.commentService.addComment(commentDto).subscribe(
+      () => {
+        // Ricarica i commenti dal backend per assicurarsi che il nuovo commento sia incluso e non venga duplicato
+        this.loadComments(this.currentArtwork!.id);
+        this.newComment = '';  // Svuota il campo di testo
+      },
+      (error) => console.error('Errore nell\'invio della recensione', error)
+    );
+  } else {
+    console.error('Utente non autenticato');
   }
 }
 
+// Controlla se l'utente corrente è l'autore del commento
+isCurrentUser(userId: number): boolean {
+  const user = this.authService.getCurrentUser();
+  return user ? user.id === userId : false;
+}
+
+// Abilita la modalità di modifica per un commento
+enableEditComment(comment: CommentDto): void {
+  this.editingCommentId = comment.id!;
+  this.editedCommentText = comment.commentText;  // Precompila il testo attuale
+}
+
+// Annulla la modifica del commento
+cancelEdit(): void {
+  this.editingCommentId = null;  // Resetta l'ID del commento in modifica
+  this.editedCommentText = '';  // Svuota il campo di testo
+}
+
+// Salva il commento modificato
+saveEditedComment(commentId: number | undefined): void {
+  if (commentId === undefined) {
+    console.error('Comment ID is undefined');
+    return;
+  }
+
+  const updatedComment: CommentDto = {
+    id: commentId,
+    artworkId: this.currentArtwork?.id || 0,
+    userId: this.authService.getCurrentUser()?.id || 0,
+    commentText: this.editedCommentText,
+    username: this.authService.getCurrentUser()?.username || '',
+    profilePicture: this.authService.getCurrentUser()?.profilePicture || ''
+  };
+
+  this.commentService.updateComment(commentId, updatedComment).subscribe(
+    (response) => {
+      console.log('Comment updated successfully:', response);
+      this.editingCommentId = null; // Clear edit mode
+      this.loadComments(this.currentArtwork?.id || 0); // Reload comments
+    },
+    (error) => {
+      console.error('Error updating comment:', error);
+    }
+  );
+}
+
+deleteComment(commentId: number): void {
+  this.deletingCommentId = commentId;
+
+  this.commentService.deleteComment(commentId).subscribe(
+    () => {
+      // Aggiorna l'elenco dei commenti in tempo reale
+      this.comments$ = this.comments$.pipe(
+        map(comments => comments.filter(comment => comment.id !== commentId))
+      );
+
+      this.deletingCommentId = null;
+
+      // Mostra la notifica di successo
+      this.showDeleteSuccess = true;
+
+      // Nascondi la notifica dopo 3 secondi
+      setTimeout(() => {
+        this.showDeleteSuccess = false;
+      }, 3000); // Durata della notifica 3 secondi
+
+    },
+    (error) => {
+      console.error('Errore durante l\'eliminazione del commento', error);
+      this.deletingCommentId = null;
+    }
+  );
+}
+
+
+
 getProfilePictureUrl(profilePicturePath: string | null): string {
   if (!profilePicturePath) {
-    return 'http://localhost:5034/uploads/default-profile.png';
+    return 'http://localhost:5034/uploads/default-profile.png';  // Immagine di default
   }
 
   if (profilePicturePath.startsWith('/uploads')) {
@@ -195,6 +285,7 @@ getProfilePictureUrl(profilePicturePath: string | null): string {
 
   return 'http://localhost:5034/uploads/' + profilePicturePath;
 }
+
 
 
   // Metodo per aggiungere l'opera al carrello
