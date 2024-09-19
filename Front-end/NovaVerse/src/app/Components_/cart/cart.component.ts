@@ -3,6 +3,7 @@ import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { Cart, CartItem } from '../../Models/cart';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { map, Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -26,7 +27,10 @@ export class CartComponent implements OnInit {
   cart$: Observable<Cart | null>; // Observable per il carrello
   totalCost$: Observable<number>; // Observable per il totale in tempo reale
 
-  constructor(private shoppingCartService: ShoppingCartService) {
+  constructor(private shoppingCartService:
+    ShoppingCartService,
+    private router: Router,
+  ) {
     // Inizializziamo gli Observable
     this.cart$ = this.shoppingCartService.cart$;
     this.totalCost$ = this.cart$.pipe(
@@ -68,6 +72,7 @@ export class CartComponent implements OnInit {
   checkout(): void {
     this.shoppingCartService.checkout().subscribe(() => {
       console.log('Checkout completato con successo');
+      this.router.navigate(['/checkout']); // Naviga alla pagina di checkout
     });
   }
 }
