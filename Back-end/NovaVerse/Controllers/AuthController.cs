@@ -20,7 +20,6 @@ namespace NovaVerse.Controllers
         }
 
         [HttpPost("register")]
-        [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto registerDto, IFormFile profilePicture)
         {
             string profilePictureUrl = null;

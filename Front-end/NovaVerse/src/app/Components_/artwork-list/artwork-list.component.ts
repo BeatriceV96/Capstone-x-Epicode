@@ -50,6 +50,7 @@ export class ArtworkListComponent implements OnInit {
     }
   }
 
+
   goToCategories(): void {
     this.router.navigate(['/categories']);
   }

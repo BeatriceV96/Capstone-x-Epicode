@@ -31,6 +31,7 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
+        [AllowAnonymous] // Consenti l'accesso a chiunque, incluso il Cliente
         [HttpGet("category/{categoryId}/artworks")]
         public async Task<IActionResult> GetArtworksByCategory(int categoryId)
         {
@@ -41,6 +42,8 @@ namespace NovaVerse.Controllers
             return Ok(artworks);
         }
 
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetArtworkById(int id)
         {

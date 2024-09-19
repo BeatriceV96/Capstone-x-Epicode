@@ -85,10 +85,13 @@
         Aggiungi al Carrello
       </button>
 
-      <!-- Pulsante per confermare l'eliminazione -->
-      <button (click)="prepareDeleteArtwork(currentArtwork?.id ?? null)" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
-        Elimina Opera
-      </button>
+      <!-- Pulsante per confermare l'eliminazione - Solo per l'artista -->
+<div *ngIf="isArtist(artwork)">
+  <button (click)="prepareDeleteArtwork(currentArtwork?.id ?? null)" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+    Elimina Opera
+  </button>
+</div>
+
 
 
 <!-- Popup di conferma -->

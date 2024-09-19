@@ -4,7 +4,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <!-- Ciclo attraverso le opere ricevute -->
       <div *ngFor="let artwork of artworks" class="relative bg-white shadow-md rounded-lg p-4">
-        <!-- Aggiungi il routerLink per navigare alla pagina di dettaglio -->
+        <!-- Naviga alla pagina di dettaglio dell'opera -->
         <a [routerLink]="['/artworks', artwork.id]" class="block">
           <!-- Immagine dell'opera -->
           <div class="relative h-48 mb-4">
