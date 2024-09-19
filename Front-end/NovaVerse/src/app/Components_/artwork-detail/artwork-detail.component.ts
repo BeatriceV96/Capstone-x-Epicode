@@ -36,9 +36,10 @@ export class ArtworkDetailComponent implements OnInit {
   editingCommentId: number | null = null;  // Per tracciare il commento che si sta modificando
   editedCommentText: string = '';  // Contiene il testo modificato del commento
   deletingCommentId: number | null = null;
-  showDeleteNotification: boolean = false;
-  showDeleteSuccess = false;  // Per mostrare la notifica di eliminazione
-deleteNotificationMessage: string = '';
+  showConfirmDelete = false;  // Per mostrare o nascondere il modale di conferma
+  artworkToDelete: number | null = null;  // ID dell'opera da eliminare
+  showDeleteSuccess = false;
+
 
 
 
@@ -126,14 +127,46 @@ deleteNotificationMessage: string = '';
   }
 
 
-  // Elimina l'opera
-  deleteArtwork(artworkId: number): void {
+   // Apre la finestra di conferma per l'eliminazione
+   deleteArtwork(artworkId: number): void {
     this.artworkService.deleteArtwork(artworkId).subscribe(
       () => {
-        console.log('Opera eliminata');
+        this.showDeleteSuccess = true; // Mostra il pop-up di successo
+        setTimeout(() => this.showDeleteSuccess = false, 3000); // Nascondi dopo 3 secondi
+        this.router.navigate(['/categories', this.currentArtwork?.categoryId, 'artworks']); // Reindirizza alla lista delle opere
       },
-      error => console.error('Errore durante l\'eliminazione dell\'opera', error)
     );
+  }
+
+  // Conferma l'eliminazione dell'opera
+  confirmDeleteArtwork(): void {
+    if (this.artworkToDelete !== null) {
+      this.artworkService.deleteArtwork(this.artworkToDelete).subscribe(
+        () => {
+          this.showConfirmDelete = false;  // Chiude il modale di conferma
+          this.showDeleteSuccess = true;  // Mostra la notifica di successo
+
+          // Nascondi la notifica dopo 3 secondi
+          setTimeout(() => {
+            this.showDeleteSuccess = false;
+          }, 3000);
+
+          // Resetta l'ID dell'opera da eliminare
+          this.artworkToDelete = null;
+        },
+        (error) => {
+          console.error('Errore durante l\'eliminazione dell\'opera', error);
+          this.showConfirmDelete = false;  // Chiudi il modale in caso di errore
+        }
+      );
+    }
+  }
+
+
+  // Annulla l'eliminazione
+  cancelDelete(): void {
+    this.showConfirmDelete = false;
+    this.artworkToDelete = null;  // Resetta l'ID dell'opera
   }
 
   // Segna l'opera come venduta/non venduta

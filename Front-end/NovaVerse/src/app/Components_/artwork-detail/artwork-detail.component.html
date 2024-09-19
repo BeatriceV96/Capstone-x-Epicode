@@ -18,7 +18,7 @@
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
-  <!-- Bottone per attivare il form di modifica solo se l'utente è l'artista -->
+  <!-- Sezione azioni utente -->
   <ng-container *ngIf="artwork$ | async as artwork">
     <div *ngIf="isArtist(artwork)">
       <button (click)="toggleEdit()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg mt-4">
@@ -74,8 +74,8 @@
         Aggiungi ai Preferiti
       </button>
 
-      <!-- Pop-up di conferma -->
-      <div *ngIf="showPopup" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+      <!-- Popup di conferma -->
+      <div *ngIf="showPopup" class="fixed top-5 right-5 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg opacity-90">
         L'articolo è stato aggiunto ai preferiti!
       </div>
 
@@ -90,15 +90,38 @@
         </button>
       </div>
     </div>
+    <!-- Modale di conferma per eliminare l'opera -->
+<div *ngIf="showConfirmDelete" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">Sei sicuro di voler eliminare questa opera?</h3>
+    <p class="text-gray-600">Questa azione non può essere annullata.</p>
+    <div class="mt-6 flex justify-between">
+      <!-- Passa l'ID dell'opera al metodo -->
+      <!-- Rimuovi l'argomento passato -->
+<button (click)="confirmDeleteArtwork()" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">
+  Elimina Opera
+</button>
+
+      <button (click)="cancelDelete()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notifica di successo per l'eliminazione -->
+<div *ngIf="showDeleteSuccess" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg">
+  L'opera è stata eliminata con successo!
+</div>
+
   </ng-container>
 
+  <!-- Sezione Commenti -->
   <div class="mt-6 space-y-4">
     <h2 class="text-2xl font-semibold">Recensioni</h2>
 
-    <!-- Mostra i commenti se presenti, altrimenti visualizza un messaggio -->
+    <!-- Mostra i commenti -->
     <div *ngIf="comments$ | async as comments; else noComments">
       <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2 flex items-start">
-        <!-- Avatar dell'utente -->
+        <!-- Avatar utente -->
         <img *ngIf="comment.profilePicture"
              [src]="getProfilePictureUrl(comment.profilePicture)"
              alt="Immagine profilo di {{ comment.username }}"
@@ -113,33 +136,19 @@
           <p class="text-gray-300">{{ comment.commentText }}</p>
           <small class="text-gray-400">Recensito da: {{ comment.username }} il {{ comment.createDate | date:'short' }}</small>
 
-          <!-- Pulsanti di modifica ed eliminazione (visibili solo se l'utente è l'autore del commento) -->
+          <!-- Pulsanti di modifica ed eliminazione (se l'utente è l'autore) -->
           <div *ngIf="isCurrentUser(comment.userId)" class="flex space-x-2 mt-2">
-            <!-- Modifica con icona matita -->
             <button (click)="enableEditComment(comment)" class="text-white bg-gray-400 hover:bg-gray-600 rounded-full p-2">
-              <i class="fas fa-pencil-alt"></i> <!-- Icona della matita -->
+              <i class="fas fa-pencil-alt"></i> <!-- Icona matita -->
             </button>
 
-
-            <!-- Elimina con icona cestino -->
-<button *ngIf="comment.id !== undefined" (click)="deleteComment(comment.id!)" class="text-white bg-gray-400 hover:bg-gray-600 rounded-full p-2">
-  <span *ngIf="deletingCommentId === comment.id">
-    <i class="fas fa-spinner fa-spin"></i> <!-- Spinner mentre elimina -->
-  </span>
-  <span *ngIf="deletingCommentId !== comment.id">
-    <i class="fas fa-trash-alt"></i> <!-- Icona del cestino -->
-  </span>
-</button>
-<!-- Notifica di successo per l'eliminazione -->
-<div *ngIf="showDeleteSuccess" class="fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg transition-opacity duration-500 ease-out" role="alert">
-  Il tuo commento è stato eliminato con successo!
-</div>
-
-
-
+            <button (click)="deleteComment(comment.id!)" class="text-white bg-gray-400 hover:bg-gray-600 rounded-full p-2">
+              <i *ngIf="deletingCommentId === comment.id" class="fas fa-spinner fa-spin"></i>
+              <i *ngIf="deletingCommentId !== comment.id" class="fas fa-trash-alt"></i> <!-- Icona cestino -->
+            </button>
           </div>
 
-          <!-- Modalità di modifica -->
+          <!-- Modalità di modifica commento -->
           <div *ngIf="comment.id === editingCommentId">
             <textarea [(ngModel)]="editedCommentText" class="w-full p-2 mt-2 bg-gray-600 rounded-lg text-white"></textarea>
             <button (click)="saveEditedComment(comment.id)" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-full mt-2">Salva</button>
@@ -149,18 +158,17 @@
       </div>
     </div>
 
-    <!-- Template per il caso in cui non ci sono commenti -->
+    <!-- Nessun commento -->
     <ng-template #noComments>
       <p class="text-gray-400">Non ci sono recensioni per questa opera.</p>
     </ng-template>
 
-    <!-- Form per lasciare una nuova recensione -->
+    <!-- Form per aggiungere una recensione -->
     <div class="mt-4">
       <textarea [(ngModel)]="newComment" placeholder="Lascia la tua recensione..." class="w-full p-4 bg-gray-600 text-white rounded-lg"></textarea>
       <button (click)="leaveReview(newComment)" class="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">Invia Recensione</button>
     </div>
   </div>
-
 
   <!-- Pulsante per tornare alla lista delle opere -->
   <div class="mt-6">

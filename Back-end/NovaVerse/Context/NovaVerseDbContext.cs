@@ -77,7 +77,7 @@ namespace NovaVerse.Context
                 .HasOne(ci => ci.Artwork)
                 .WithMany(a => a.ShoppingCartItems)
                 .HasForeignKey(ci => ci.ArtworkId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);  //SE UN ARTICOLO CHE ELIMINI É PRESENTE NEL TUO CARRELLO, COSI LO ELIMINI ANCHE DAL CARRELLO
 
             // Relazione uno-a-uno tra Artwork e NFTMetadata
             modelBuilder.Entity<Artwork>()

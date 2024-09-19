@@ -161,26 +161,52 @@ namespace NovaVerse.Controllers
         }
 
 
-
         [HttpDelete("delete/{id}")]
+        [Authorize(Policy = "ArtistOnly")]
         public async Task<IActionResult> DeleteArtwork(int id)
         {
+            // Recupera l'ID dell'utente autenticato
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            // Recupera l'opera dal servizio
             var artwork = await _artworkService.GetArtworkByIdAsync(id);
+
+            // Verifica se l'opera esiste e appartiene all'utente
+            if (artwork == null)
+            {
+                return NotFound("Opera non trovata.");
+            }
 
             if (artwork.ArtistId != userId)
             {
                 return Unauthorized("Non sei autorizzato a eliminare questa opera.");
             }
 
-            var success = await _artworkService.DeleteArtworkAsync(id);
-            if (!success)
+            // Tenta di eliminare l'opera
+            try
             {
-                return BadRequest("Failed to delete artwork.");
+                var success = await _artworkService.DeleteArtworkAsync(id);
+                if (!success)
+                {
+                    return BadRequest("Non è stato possibile eliminare l'opera. Verifica che non ci siano dipendenze.");
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Gestione specifica degli errori di vincolo referenziale
+                return BadRequest($"Errore durante l'eliminazione: {dbEx.Message}. " +
+                                  "Potrebbe essere presente una dipendenza (come articoli nel carrello) che impedisce l'eliminazione.");
+            }
+            catch (Exception ex)
+            {
+                // Gestione degli errori generici
+                return StatusCode(500, $"Si è verificato un errore imprevisto: {ex.Message}");
             }
 
-            return Ok("Artwork deleted successfully.");
+            // Se tutto va bene, ritorna il messaggio di successo
+            return Ok("Opera eliminata con successo.");
         }
+
 
         [AllowAnonymous] // Per permettere l'accesso anche agli utenti non autenticati
         [HttpGet("random")]
