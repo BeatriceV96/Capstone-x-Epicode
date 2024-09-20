@@ -75,15 +75,20 @@ export class ShoppingCartService {
     }
   }
 
-  removeItemFromCart(item: CartItem): void {
-    let currentCart = this.cartSubject.value;
+  // Aggiorna la quantità di un articolo nel carrello
+updateCartItemQuantity(item: CartItem): Observable<any> {
+  return this.http.put(`${this.baseUrl}/updateQuantity/${item.id}`, item, { withCredentials: true }).pipe(
+    catchError(this.handleError)
+  );
+}
 
-    if (currentCart) {
-      const index = currentCart.items.findIndex(cartItem => cartItem.artworkId === item.artworkId);
-      const newCart = currentCart.items.splice(index, 1);
-        this.cartSubject.next(currentCart); // Aggiorna il BehaviorSubject
-      }
-    }
+
+removeItemFromCart(item: CartItem): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/remove/${item.id}`, { withCredentials: true }).pipe(
+    tap(() => this.loadCart()),  // Ricarica il carrello dal backend dopo aver rimosso l'articolo
+    catchError(this.handleError)
+  );
+}
 
   // Rimuovi un elemento dal carrello
   // removeItemFromCart(itemId: number): Observable<any> {

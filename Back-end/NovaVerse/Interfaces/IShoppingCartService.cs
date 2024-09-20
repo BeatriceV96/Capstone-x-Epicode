@@ -10,6 +10,7 @@ namespace NovaVerse.Interfaces
         Task<ShoppingCartDto> GetShoppingCartByUserIdAsync(int userId); // Recupera il carrello per un determinato utente
         Task<ShoppingCartItemDto> AddItemToCartAsync(int userId, ShoppingCartItemDto itemDto); 
         Task<bool> RemoveItemFromCartAsync(int userId, int itemId);
+        Task<bool> UpdateItemQuantityAsync(int userId, int itemId, int quantity);
         Task<bool> CheckoutAsync(int userId); // Processa il pagamento e completa la transazione
     }
 }

@@ -42,19 +42,35 @@ export class CartComponent implements OnInit {
     this.shoppingCartService.loadCart();
   }
 
-  // Diminuisci la quantità di un articolo
-  decreaseQuantity(item: CartItem): void {
-    this.shoppingCartService.decreaseQuantity(item);
+  increaseQuantity(item: CartItem): void {
+    item.quantity++;
+    this.shoppingCartService.updateCartItemQuantity(item).subscribe(
+      () => console.log('Quantità aggiornata con successo'),
+      (error) => console.error('Errore durante l\'aggiornamento della quantità:', error)
+    );
   }
 
-  // Aumenta la quantità di un articolo
-  increaseQuantity(item: CartItem): void {
-    this.shoppingCartService.increaseQuantity(item);
+  decreaseQuantity(item: CartItem): void {
+    if (item.quantity > 1) {
+      item.quantity--;
+      this.shoppingCartService.updateCartItemQuantity(item).subscribe(
+        () => console.log('Quantità aggiornata con successo'),
+        (error) => console.error('Errore durante l\'aggiornamento della quantità:', error)
+      );
+    }
   }
+
 
   removeItem(item: CartItem): void {
-    this.shoppingCartService.removeItemFromCart(item);
+    this.shoppingCartService.removeItemFromCart(item).subscribe(
+      () => {
+        console.log('Articolo rimosso dal carrello');
+        this.shoppingCartService.loadCart();  // Ricarica il carrello dopo la rimozione
+      },
+      (error) => console.error('Errore durante la rimozione dell\'articolo dal carrello:', error)
+    );
   }
+
 
   // Rimuovi un elemento dal carrello con animazione
   // removeItem(itemId: number, index: number): void {

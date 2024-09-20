@@ -90,6 +90,30 @@ namespace NovaVerse.Services
             };
         }
 
+        public async Task<bool> UpdateItemQuantityAsync(int userId, int itemId, int newQuantity)
+        {
+            var cart = await _context.ShoppingCarts
+                .Include(c => c.ShoppingCartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return false;
+            }
+
+            var item = cart.ShoppingCartItems.FirstOrDefault(ci => ci.Id == itemId);
+            if (item == null)
+            {
+                return false;
+            }
+
+            item.Quantity = newQuantity;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
         public async Task<bool> RemoveItemFromCartAsync(int userId, int itemId)
         {
             var cart = await _context.ShoppingCarts
@@ -108,9 +132,10 @@ namespace NovaVerse.Services
             }
 
             cart.ShoppingCartItems.Remove(item);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();  
             return true;
         }
+
 
         public async Task<bool> CheckoutAsync(int userId)
         {
