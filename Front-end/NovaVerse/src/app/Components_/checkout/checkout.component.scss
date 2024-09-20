@@ -1,0 +1,23 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+button {
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.selected {
+    border: 2px solid black;  /* Cambia colore del bordo quando selezionato */
+    transform: scale(1.05);
+  }
+  &:hover {
+    transform: scale(1.03);  /* Effetto di hover */
+  }
+
+  img {
+    max-height: 40px;
+  }
+}

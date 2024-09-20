@@ -1,23 +1,125 @@
-<div class="container mx-auto mt-5 mb-20">
-  <h2 class="text-2xl font-bold mb-5">Riepilogo Ordine</h2>
+<div class="container mx-auto mt-10 mb-20 px-4">
+  <!-- Sezione dei prodotti nel carrello -->
+  <h2 class="text-2xl font-bold mb-6 mt-3">Resoconto: </h2>
   <div *ngIf="cart$ | async as cart; else noItems">
-    <div class="grid grid-cols-1 gap-4">
-      <div *ngFor="let item of cart.items">
-        <h4>{{ item.artworkTitle }}</h4>
-        <p>Prezzo: {{ item.priceAtAddTime | currency:'EUR' }}</p>
-        <p>Quantità: {{ item.quantity }}</p>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+      <!-- Cicla gli articoli nel carrello -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div *ngFor="let item of cart.items" class="flex items-center justify-between border-b border-gray-200 pb-4">
+          <div class="flex items-center">
+            <!-- Immagine del prodotto -->
+            <img [src]="item.artworkPhoto ? ('http://localhost:5034' + item.artworkPhoto) : (item.artworkImageUrl || 'assets/images/placeholder.png')"
+                 alt="{{ item.artworkTitle }}"
+                 class="w-20 h-20 object-cover mr-4 rounded-lg">
+            <!-- Dettagli del prodotto -->
+            <div>
+              <h4 class="text-lg font-semibold">{{ item.artworkTitle }}</h4>
+              <p class="text-gray-600">Quantità: {{ item.quantity }}</p>
+            </div>
+          </div>
+          <!-- Prezzo -->
+          <p class="text-gray-800 font-semibold">{{ item.priceAtAddTime | currency:'EUR' }}</p>
+        </div>
       </div>
     </div>
-    <div class="mt-5">
-      <h3 class="text-xl font-bold">Totale: {{ totalCost$ | async | currency:'EUR' }}</h3>
+
+    <!-- Sezione Metodi di Pagamento -->
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <h3 class="text-lg font-semibold mb-4">Scegli il metodo di pagamento</h3>
+
+      <!-- Pulsanti PayPal e Google Pay -->
+      <div class="flex space-x-4 mb-4">
+        <button
+          (click)="selectPaymentMethod('paypal')"
+          [ngClass]="{'selected': selectedPaymentMethod === 'paypal'}"
+          class="bg-white border-2 border-gray-300 p-3 rounded-lg flex items-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-8">
+        </button>
+
+        <button
+          (click)="selectPaymentMethod('gpay')"
+          [ngClass]="{'selected': selectedPaymentMethod === 'gpay'}"
+          class="bg-white border-2 border-gray-300 p-3 rounded-lg flex items-center">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUYAAACbCAMAAAAp3sKHAAABaFBMVEX///9fY2jqQzU0qFNChfT7vARWWmDv7/BcYGVOU1lZXWJIivSIi49VWl+eoaM+g/Tz9/5mm/Z8f4PAwcOTlZlXkfVlaW37uADqPi8tpk7pMyH39/e0trjm5+jpOir5+fnd3t/LzM0fo0bpLxzwhn+Qk5ZucnZ3en4se/OGiIzub2b62NWur7L97Ov2ubX8wQDpOjfm8+nsV0zrTUD4x8TzoJr85OPvd2/509HS09WMsfid0amuyPq43sE9kcNyv4VFrmDT69ntY1j0rKfyl5Dvfnbzm5XwhHz4t3j95a7xfCP7wy/2nBf+67/sWC/8y1Hvbyf+9+L93ZT4qBDxeiT5rgzrTCb914H/+u/8x0bc5/395avJ2/z92Iqkv/n+8tCowvl6qSV2pffpug5NqkzItiOasTVrrERct3PYuBuvsy6Brj7P3vyGxpUsoW06huA6mZ4+jtA7lbA3n4M5nJQ1pGdvtqKt2LfdIQiLAAAO/0lEQVR4nO2di1/bRhLHZRxkWUEisV3jt2U52BgMFMgDH+XCK73r0Vwu3KPpu9f2Wq5X2nv1+PdPso01K+17BbZb/T75tJ8EW5a+zO7MzsyuNS1RokSJEiVKlChRokSJEiVKlChRokSJpqvmtG9gnrW5v3X6aP3k5GR3b29392T90enjzWnf03xpc//JeqldqTQaJV8LC/5/G41Ku/HsydNp39ycaHNrfaHS8NjhVGpUds82pn2LM6/m1km7QkA4IdkuJTZJ0+bZAoPhWI3Ks/1p3+ysauNZu8HDcGST7ZNkbGO0sd7mMkQA8kUytEPafMQ3mhE1KmcKIWXVZqlfa9XnKmbdavAPZwTk3mPpz8xkTZYsK2v2+k58z3mr2lyvSEH0VKo8kv3UjJ7ikaHrRbse5+PekmRNcWyQu5IzJCdGn6SZXXJifeRb0LttBYi+QTa2pD6XH6Mn01rNxPzcsap5Ij2gJ2qfyXyyEEYPZLYW97PHp81dlQF9o8q6hEMVxJhK6b1q/ABi0QZp7SyIUcbPCGNMmanZdDUbpelRlMDo+RonZgJx6OkUbVEKY8qwBjEzUNfmwjQpohgNvKIgs7PGsbk7VYoIRiOHVadoWCGUhjFj8+NJHD5aniKCMUt8US2XRUEaHdkPvBWdccSLpUZlrAbBGclT5MPoyemik6jVl/7I+LXFWruUKu29Z2en+/sbG/v7W+++2MVlxRUocmPUtL6FcNRnZ1hv0m2x1Givb20iMXXz6dZ6mKQKRQGMmqPDgW0uKXxqvDqhupfK7im2ltrc2oUglShqGYsbo5bpQI5ZR+VzY9QpzRgrC5Rcw+O9yVsrv1G6BxGMWiYFOJqrSh8cmzYpE2Op9IT+5q29Rgy2KDSoPdVN6K1nI9vzjDykK+vM1ojqi3YMFAUxajXwcj2v+NmxaJ88pCunPBfYqpQUR7QmjFED0+NsjGqifymVOKvP+8q2KI6xFbzeKCp/urp+S1q+lBa4e51iKK2KYtSKgTlmpx86vrfyu7fxFPfutGNMGKMdeBmrddt3x9T54vb7WI6Vu+27E8Y4CN6gT72g8HJlcXH7z7+PgmzccTOJMEYQ85iF2747ll4tDvWHMMc2l4+OUcIYqyBwnPZ68PXKCOP2+yFbVA5gRCWMEfgYI3fLN8fSxRjj4vYfF6BBlu68IVkJYxf383qrX8jlut1uLrdU6Odv05t/uHijbTiwK3IlexVJYEyRrbHez+m6ZZo35QfT9P7ay9/SqvFmTI9ATiKf0u7tfBxNwhgzQdxo9JCfVGtdS8cUbgxL70VCo2oeiDNwgm/xjfwCYgwGdnsKvbPCGJ3gDYinzth6uGIDSRbDC/COFSjLZa6t7OQNesrPwp4vItpeGUY+0zBGcYz9IOCBcWNNNzH4IMiOg1ynBTJ0JldFIhf8lnT/DW9WFkPa/tPbU5kZJTCC3ESwiql32eVuI1S+ARcyihxtMw7grvvm+zKCcRT5TGPfkChGJwtef+OFW+ThDGXlYPsPzLnxLCvtcNx/EcXoLWn+si7MIAaJYuxBGxr/m40Wu8gyiyD8aYJZgCMChS8f1S9eRSl6OqcvAx+Ii4OKKEaQJ5t4mAJ//4oBM+Z2BAxN+eB3NY4QzrEYP6Bf5uF9Ub3FpiKKESnG6KORuIqxRT9iNHFdK0YxGNd1MD+wl+dgKh198BssxZXP6Zd5a/memJaXecxRCGMTKQ0Ogw6MLZp6qrtasO3VbtEywyhNMHxXgTmajK5J4GDGk8lrzNTo6Q39OsIY763FjbGZg0HNyID6IYqGlbKdGyRVp98Jda3AKAnxvYykWwGkOUcvxThqTx8ynkEC40eMS/oSwFjtIKGh5U9zToiS1Qn73FY3NOitYHrsAn9FbwqqgosYo9/Sx1iMjKlRBuMnjEv64sc4KCIUx7PZoAhb0iycTdXQcAhUwmAITu/1A9GRaY/+CRfvLK58zHheCYzvMC7pixdjfTUUG058rj35gVF08O9FfwFWEPUUiQv0kMALb95+gfUwLxnPO02M9XwvG1rrZYM1cj03crlGh+QmcJPqUDVgjhZlYT2IRDua9qmMo5bAuPwZ45K+MkggiNFqr1s0I6sUE7GdVsr0bZHCAeU4WfplYDMLZWENfPpk8H9wVxh/xWKohZqWsVsGseFfB10EN23dsGgJ2iom4PQFQnDKwhrcZOCK8BhfM573LjDyyog2NzpFesSCW/5oaAhOXliD1kprMpnMrjXyUpTp/CYEN0vgn7E1CV/gswOTxbuY+cFomDL1lTzemwygiyNcdxCNdrS789S3hNHqSu12a8LhC2JEYKWkhTXIKoE8OTb8XnmPcRszgtHI2uyLYgV4WaCiAK00hf0F1YNXwCa297CrmE8Zd3EHAQ+H9JR03w5Mu8LYBrhw7CIIKVs4wT/j19SvGHchgfELjocT3E9tswd0xnFa+Xytls+3Bg44pQLQMKFF9yO5m5BATASzu/gMz3n8GR7RVQxdhmWuMnxLddDvetGQX7qz9OH/zFSn0BqhBysWtKQIzBG3sAahkg6HAiHfyAgc7yA1QWWY7fbpZdBma9WK5hc9v25le3mPZB7E0EifLgzBMV1BoCBoID/AZr9XLmLHKJoo8watro/+6L49+dZkWv7fzFyNZYh2EVfqHz++nuojGBFaSBY88quqExsBCbUYFkaK8BiF07b1et3xNPDUGs5vtX6/lh847Gp8TY/aISI9BQNt1OjCBWhE0FbRiRmbKVv86w71Rr98SBEW4/3YiwgkVXMcUwPAHMI4AOaYCl+b3E75OQbjV1+XD2SfQvtoDUNx+SHPW+PA6Jj0joko0dAU2A2XqwKBsDKc+4h2TSz+LZ0uH0k+haa9g8XIE33HgXHAGM9sjHDaDFWsgwEfrWWHfczKN2lP7qHcY3gDHjc5csU7MWB0+FomaBhh7sFykIsHtxc9mSE8OX7rU0yXL6UeQ9MeYF0Ml6NWx4hkEiechg7e/4O11AjGPjb5oEEHg6l5oQH438vpkdxjmefQtE+wY/oe16k8yhh7kXnR1Iu9vr+E8fx9zc4VTSv8kghGuAEUVqxBx4mF2VoHR/V36RvJzo7YkJLPwyhjzId7JizDdtBfYN2Ly9GYMhplR8vQo6uDSRNjFSBz+490IPda4kG073HGyLeiVscYtkSjhhsE1Rqsw2IwwqYIMHqDLg1spWYyqr/6Og3l0mNHvB4qTI2qGEPGaJFP3qrpxPDbFwjBA18CHIyOXQKcT+IcRDLDGjszesE337sVMXaRwYpPdI1VD0wLgxGE4EFSMRjqhN2yo5zjN+mw3CvRB3mAXwpyJRs1VYx1xBh1+iFHARRcBgJ2jI0tD3ScwEQjlAdx+9sIRY+j6FoGGzNyj2lFjLBjFnYAYNWjWSOcHm4W1kFqjVjtuliZxDkhjmJB+Gf4Ib3M1dyoqWJEWutYu9Spg1prgl/IOCEWdJwQa69vvsNTFOSIXQbe413CaKoYYb8jtdzvfxLAhNtsCFI5o4U16DiJJCwmOnAJGEXGNYkiX5Js+HBKGGG7HOu4LdiHg8OYCZzMaPkcmDqt+ZFEUcDPfEGiyJeWGN68CsYqTLiyKoYFepIbmSF8y86A11MSnodEc0y7lzzx44OHJIr3ljkdjCLGDKw9MxwMRI7H6KAL68DB0BvDL0mzoxc/cgzs6x9+VDfG+DCyjpOB+w4IG7FhCN4E6yP6mRY7ZHP0DPKInqc4PnLL5V+THAzvzKiIEXZCMJq30YOQ8BhbsOMpsE3Wphmylxka5CXRZTcPL13flN1/YmPvNc7Q25eai4HxDn1LBrLcIR0LEOTcjE5gmswjYCnDegjy6AA3Rx5fpd3xG90f7kc5cseMvtQwQjgG7YU2UqwhYQSlbAMQZd0FdViPSKavDncmLJs7x9fPyy6AX07/KzKw174XAKGGEU54tH1/NbTkRcJYTWHEcYYXxVsHJN300eVzT5eXadd1wwbs/jvEcflLERBqGFt8gWNk8wzprA8bUxvjuSvq9BigHAv7Q/c/yMBe5qqrTqSGMQOf1yJFjnY2RIaIMRPdOMeMR4d6zsWRKvcnGPkIDWnlRNkS9BxZbBN8cynChnzyzFLEHDkPf6W7GS6V3SDy4V5Mj6WI0UEMTe9Gn7lVjA5UMkYnbLi8Z782j9Q5pt3/jiOfNf7AeyTVIgKatzV0G123tcInXTMwwhB8KO4D73di4fjTjz7HNSH34ksVoxMasaZRmDx4vdYBNWxy8wlUC72ewPnisXAcLmnEKaoXWCNb+03L6BVsu5AzsrAeqPdtavb7RkXEHEVOLI2Fo7ekkaAYQ9dEJzpqjeG2JBRuTuPDGAoxhb4CJwZ/7XH8nwQEdYwZ3DauCNhihlGLuVEVXi3ap0fXVQxxj3A1bAghhlaosHfFUPS30vBhREJwfFmVokNCcM2rclmqVSCmxjyGPY62dXFihAdEih9CvHOpYpDukUyjgBZTm2i9Q20THZ8bw4kRnCUnddD9QWS9zG2KcgPaVywY4d70qPTcyE9wYmxxJxoJkjVINy3Ziqb5GMFOMumreAMbG2f7pjipLoAeCBrGLrusytJ1WhxkWaHb2U8uFCeyFK7jgexFd68blhFsSLInH5WizHmBw1I5V1wUpOtiU7v8agIpXcj7lfRz+mRrjGGYup6rQVfL9UHBalDtIOfrI+45suyWD2bryxObTq3Q9X1EsbPUb0mcIgqbyBQfza+0cJD0qzVz9cXRPAqK1XyJRqp2Do6ieW4UoZu+kncsMyvQohbPt0ztXD/3Jj6MVZY9hEfPD9VmxFkVCIqo5/KIqLlzfXXpQUNUvjw43PnZjeWxQBQb+zdC7hwfH15fXx8eHh/v/DxtcCLq/o1EnAIFVlZLUCKyQCG2OFuB3FyJcIxCIiGBzUR8B6onwglsJpr2V6jMscDZHDPzjZpzKLBTYdpfRDPHAiWdJNqRF+yXmPa9zK/gPv5Z+grxORPoJWMdpZ6IKHCm0fS/d29+BTYfzdDX2c+b4JasJNqRFvxm17gTjb8cVYExJolGacETqaf+/bhzqyZsE0iiHVmBAxKSRKO84DewJ4lGWeWz+o2ysZVVf3lqhb5bNVGiRIkSJUqUKFGi2PR/klWSPKo0wfkAAAAASUVORK5CYII=" alt="Google Pay" class="h-8">
+        </button>
+      </div>
+
+      <!-- Campi per il pagamento -->
+      <div class="mt-4">
+        <h4 class="text-lg font-semibold mb-2">Dettagli di Pagamento</h4>
+
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="block text-gray-700">Numero della Carta</label>
+            <input type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Inserisci il numero della carta">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-gray-700">Data di Scadenza</label>
+              <input type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="MM/YY">
+            </div>
+            <div>
+              <label class="block text-gray-700">CVV</label>
+              <input type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="CVV">
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nome sulla Carta</label>
+            <input type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Nome completo">
+          </div>
+        </div>
+      </div>
+
+      <!-- Mostra il metodo di pagamento selezionato -->
+      <div *ngIf="selectedPaymentMethod" class="mt-4">
+        <p class="text-lg font-semibold">Metodo selezionato:
+          <span *ngIf="selectedPaymentMethod === 'paypal'">PayPal</span>
+          <span *ngIf="selectedPaymentMethod === 'gpay'">Google Pay</span>
+        </p>
+      </div>
     </div>
-    <div class="mt-5">
-      <button (click)="payWithStripe()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
-        Procedi al pagamento con Stripe
-      </button>
+
+    <!-- Riepilogo Ordine -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mt-6">
+      <h3 class="text-2xl font-bold mb-4">Riepilogo Ordine</h3>
+      <div class="space-y-4">
+        <!-- Subtotale articoli (Totale del carrello senza spese di spedizione) -->
+        <div class="flex justify-between items-center">
+          <p class="text-lg">Subtotale:</p>
+          <p class="text-lg">{{ subtotal$ | async | currency:'EUR' }}</p>
+        </div>
+
+        <!-- Spese di spedizione (Costo fisso di 4 euro) -->
+        <div class="flex justify-between items-center">
+          <p class="text-lg">Spese di spedizione:</p>
+          <p class="text-lg">€ 4.00</p>
+        </div>
+
+        <!-- Totale (subtotale + spese di spedizione) -->
+        <div class="flex justify-between items-center font-bold">
+          <p class="text-xl">Totale:</p>
+          <p class="text-xl">{{ totalCost$ | async | currency:'EUR' }}</p>
+        </div>
+      </div>
+
+      <!-- Pulsanti per tornare indietro e confermare l'ordine -->
+      <div class="flex justify-between space-x-4 mt-6">
+        <!-- Pulsante Torna al Carrello -->
+        <button class="w-full bg-gray-300 hover:bg-gray-400 text-black font-bold py-3 rounded-lg shadow-md"
+                [routerLink]="['/cart']">
+          Torna al Carrello
+        </button>
+
+        <!-- Pulsante per confermare l'ordine -->
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md" (click)="placeOrder()">
+          Conferma Ordine
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Fallback se non ci sono articoli nel carrello -->
   <ng-template #noItems>
-    <p>Il carrello è vuoto.</p>
+    <p class="text-center text-lg text-gray-500">Il tuo carrello è vuoto.</p>
   </ng-template>
 </div>

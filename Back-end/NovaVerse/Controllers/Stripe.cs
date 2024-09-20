@@ -4,25 +4,21 @@ using Stripe;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
 namespace NovaVerse.Controllers
 {
-    public class Stripe : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class StripeController : ControllerBase
     {
-        [Route("api/[controller]")]
-        [ApiController]
+        [HttpPost("create-checkout-session")]
+        public async Task<IActionResult> CreateCheckoutSession()
+        {
+            StripeConfiguration.ApiKey = "clock_1Q0mphP6eLYMbApL2DqLM3Az"; // Chiave segreta di test di Stripe
 
-        public class StripeController : Controller {
-
-            [HttpPost("create-checkout-session")]
-            public async Task<IActionResult> CreateCheckoutSession()
+            var options = new SessionCreateOptions
             {
-                StripeConfiguration.ApiKey = "tuo-secret-key-di-stripe";
-
-                var options = new SessionCreateOptions
-                {
-                    PaymentMethodTypes = new List<string> { "card" },
-                    LineItems = new List<SessionLineItemOptions>
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
                 {
                     new SessionLineItemOptions
                     {
@@ -38,16 +34,15 @@ namespace NovaVerse.Controllers
                         Quantity = 1,
                     },
                 },
-                    Mode = "payment",
-                    SuccessUrl = "http://localhost:4200/success",
-                    CancelUrl = "http://localhost:4200/cancel",
-                };
+                Mode = "payment",
+                SuccessUrl = "http://localhost:4200/success",
+                CancelUrl = "http://localhost:4200/cancel",
+            };
 
-                var service = new SessionService();
-                Session session = await service.CreateAsync(options);
+            var service = new SessionService();
+            Session session = await service.CreateAsync(options);
 
-                return Ok(new { sessionId = session.Id });
-            }
+            return Ok(session.Id); // Restituisce l'ID della sessione
         }
     }
 }

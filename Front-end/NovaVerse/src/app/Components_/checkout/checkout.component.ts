@@ -4,21 +4,31 @@ import { Cart } from '../../Models/cart';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-declare var Stripe: any;  // Aggiungi Stripe come variabile globale
-
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.scss'],
+  styleUrls: ['./checkout.component.scss']
 })
 export class CheckoutComponent implements OnInit {
   cart$: Observable<Cart | null>;
+  subtotal$: Observable<number>;
   totalCost$: Observable<number>;
+  selectedPaymentMethod: string | null = null;
+
+  // Definisci una variabile per la consegna
+  deliveryCost: number = 4.00;
 
   constructor(private shoppingCartService: ShoppingCartService) {
     this.cart$ = this.shoppingCartService.cart$;
-    this.totalCost$ = this.cart$.pipe(
+
+    // Calcola il subtotale (solo il costo degli articoli)
+    this.subtotal$ = this.cart$.pipe(
       map(cart => cart ? cart.items.reduce((total, item) => total + item.priceAtAddTime * item.quantity, 0) : 0)
+    );
+
+    // Calcola il totale sommando il subtotale e il costo di consegna
+    this.totalCost$ = this.subtotal$.pipe(
+      map(subtotal => subtotal + this.deliveryCost)
     );
   }
 
@@ -26,32 +36,13 @@ export class CheckoutComponent implements OnInit {
     this.shoppingCartService.loadCart();
   }
 
-  // Inizializza il pagamento con Stripe
-  payWithStripe(): void {
-    this.totalCost$.subscribe(totalCost => {
-      const stripe = Stripe('tuo-pubblico-key-di-stripe');  // Chiave pubblica di Stripe
-
-      stripe.redirectToCheckout({
-        lineItems: [
-          {
-            price_data: {
-              currency: 'eur',
-              product_data: {
-                name: 'Acquisto opere d\'arte',
-              },
-              unit_amount: totalCost * 100,  // Converti in centesimi
-            },
-            quantity: 1,
-          },
-        ],
-        mode: 'payment',
-        successUrl: 'http://localhost:4200/success',
-        cancelUrl: 'http://localhost:4200/cancel',
-      }).then((result: any) => {
-        if (result.error) {
-          console.error('Errore durante il pagamento con Stripe:', result.error.message);
-        }
-      });
-    });
+  placeOrder(): void {
+    // Logica per confermare l'ordine
+    console.log("Ordine confermato");
+  }
+  // Metodo per selezionare il pagamento
+  selectPaymentMethod(method: string): void {
+    this.selectedPaymentMethod = method;
   }
 }
+
