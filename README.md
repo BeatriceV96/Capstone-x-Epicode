@@ -11,6 +11,10 @@ Benvenuti su **NovaVerse**! Una piattaforma e-commerce innovativa per la comprav
 - 🎨 **CRUD opere d'arte**: Crea, modifica ed elimina le tue opere.
 - 🏷️ **Categorie**: Gestisci le categorie delle tue opere d'arte.
 - 🔧 **Pannello di gestione**: Controllo completo su tutte le tue creazioni.
+- 🛒 **Acquisti e carrello**: Aggiungi opere al carrello e completa il processo di checkout con una simulazione di pagamento.
+- ❤️ **Preferiti**: Salva le opere preferite per future ispirazioni.
+- ✍️ **Recensioni**: Recensisci le opere che hai acquistato.
+
   
 👤 **CLIENTE** :
 - 🛒 **Acquisti e carrello**: Aggiungi opere al carrello e completa il processo di checkout con una simulazione di pagamento.
