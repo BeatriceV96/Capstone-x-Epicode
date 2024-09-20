@@ -6,6 +6,7 @@ export interface Artwork {
   photo?: string;
   imageUrl?: string;  // Per gestire un URL dell'immagine se è presente
   categoryId: number;
+  categoryName: string;
   type: ArtworkType;
   artistId: number;
   artistName: string; // Nome o username dell'artista (ora obbligatorio)

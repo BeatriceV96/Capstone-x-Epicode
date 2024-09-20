@@ -16,6 +16,7 @@ export class ArtworkListComponent implements OnInit {
   errorMessage: string | null = null;
   noArtworks: boolean = false;
   artworks$: Observable<Artwork[]> | undefined;
+  private allArtworks: Artwork[] = [];
 
   constructor(
     private artworkService: ArtworkService,
@@ -40,6 +41,7 @@ export class ArtworkListComponent implements OnInit {
           console.log('Artworks caricati:', artworks); // Controllo dei dati in console
           this.loading = false; // Imposta loading su false dopo il caricamento
           this.noArtworks = artworks.length === 0; // Controlla se non ci sono opere
+          this.allArtworks = artworks; // Salva tutte le opere per l'ordinamento
         }),
         catchError(error => {
           this.errorMessage = 'Errore nel caricamento delle opere.';
@@ -48,6 +50,37 @@ export class ArtworkListComponent implements OnInit {
         })
       );
     }
+  }
+
+  onSortChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const sortBy = selectElement.value;
+
+    const sortedArtworks = [...this.allArtworks];
+    switch (sortBy) {
+      case 'priceAsc':
+        sortedArtworks.sort((a, b) => a.price - b.price);
+        break;
+      case 'priceDesc':
+        sortedArtworks.sort((a, b) => b.price - a.price);
+        break;
+      case 'dateAsc':
+        sortedArtworks.sort((a, b) => a.createDate.getTime() - b.createDate.getTime());
+        break;
+      case 'dateDesc':
+        sortedArtworks.sort((a, b) => b.createDate.getTime() - a.createDate.getTime());
+        break;
+      case 'titleAsc':
+        sortedArtworks.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'titleDesc':
+        sortedArtworks.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      default:
+        break;
+    }
+
+    this.artworks$ = of(sortedArtworks);
   }
 
 

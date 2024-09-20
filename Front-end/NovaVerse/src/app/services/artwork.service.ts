@@ -15,7 +15,7 @@ export class ArtworkService {
   constructor(private http: HttpClient) {}
 
   // Ottieni opere per categoria con paginazione
-  getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
+   getArtworksByCategory(categoryId: number): Observable<Artwork[]> {
     return this.http.get<{ $values: Artwork[] }>(`${this.baseUrl}/category/${categoryId}/artworks`, { withCredentials: true }).pipe(
       map(response => response.$values),  // Estrai l'array degli artworks
       catchError(this.handleError)
@@ -26,6 +26,13 @@ export class ArtworkService {
   getArtworkById(id: number): Observable<Artwork> {
     return this.http.get<Artwork>(`${this.baseUrl}/${id}`, { withCredentials: true })
       .pipe(
+        map(artwork => {
+          // Converti il campo createDate in una vera data
+          if (artwork.createDate) {
+            artwork.createDate = new Date(artwork.createDate);
+          }
+          return artwork;
+        }),
         tap(artwork => {
           // Aggiorna la lista delle opere d'arte in tempo reale
           const currentArtworks = this.artworkSubject.value;
@@ -35,6 +42,7 @@ export class ArtworkService {
         catchError(this.handleError)
       );
   }
+
 
   // In artwork.service.ts
   getArtworksByUserId(userId: number): Observable<Artwork[]> {

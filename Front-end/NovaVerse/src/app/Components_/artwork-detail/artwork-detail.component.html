@@ -11,8 +11,9 @@
   <div class="space-y-4">
     <p><strong>Descrizione:</strong> {{ (artwork$ | async)?.description }}</p>
     <p><strong>Prezzo:</strong> {{ (artwork$ | async)?.price | currency:'EUR' }}</p>
-    <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryId }}</p>
     <p><strong>Creato da:</strong> {{ (artwork$ | async)?.artistName }}</p>
+    <p><strong>Categoria:</strong> {{ (artwork$ | async)?.categoryName }}</p>
+    <p><strong>Data di Creazione:</strong> {{ (artwork$ | async)?.createDate | date:'dd/MM/yyyy' }}</p> <!-- Data di creazione -->
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
@@ -39,8 +40,9 @@
 
         <div>
           <label for="price" class="block text-gray-300">Prezzo</label>
-          <input id="price" type="number" [(ngModel)]="artworkData.price" name="price" class="w-full bg-gray-700 p-2 rounded-lg" required />
+          <input id="price" [(ngModel)]="artworkData.price" name="price" type="number" class="w-full bg-gray-700 p-2 rounded-lg" required />
         </div>
+
 
         <div class="form-group mb-4">
           <label for="categoryId" class="block text-sm text-white mb-2">Categoria</label>

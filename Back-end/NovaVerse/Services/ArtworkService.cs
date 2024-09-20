@@ -23,7 +23,7 @@ namespace NovaVerse.Services
         public async Task<List<ArtworkDto>> GetAllArtworksAsync()
         {
             return await _context.Artworks
-                .Include(a => a.Category)
+                .Include(a => a.Category) // Assicurati di includere la categoria
                 .Include(a => a.Artist)
                 .Select(a => new ArtworkDto
                 {
@@ -32,14 +32,16 @@ namespace NovaVerse.Services
                     Description = a.Description,
                     Price = a.Price,
                     Photo = a.Photo,
-                    CategoryId = a.CategoryId,
+                    ImageUrl = a.ImageUrl,
+                    CategoryName = a.Category.Name, // Recupera il nome della categoria
+                    Type = a.Type,
                     ArtistId = a.ArtistId,
-                    ArtistName = a.Artist.Username  // Recupera il nome dell'artista
+                    ArtistName = a.Artist.Username,
+                    CreateDate = a.CreateDate // Recupera la data di creazione
                 })
                 .ToListAsync();
         }
 
-        // Restituisce un'opera specifica per ID come ArtworkDto
         public async Task<ArtworkDto> GetArtworkByIdAsync(int id)
         {
             var artwork = await _context.Artworks
@@ -59,12 +61,14 @@ namespace NovaVerse.Services
                 Description = artwork.Description,
                 Price = artwork.Price,
                 Photo = artwork.Photo,
-                CategoryId = artwork.CategoryId,
+                ImageUrl = artwork.ImageUrl,
+                CategoryName = artwork.Category.Name,
+                Type = artwork.Type,
                 ArtistId = artwork.ArtistId,
-                ArtistName = artwork.Artist.Username  
+                ArtistName = artwork.Artist.Username,
+                CreateDate = artwork.CreateDate
             };
         }
-
 
 
         // Restituisce tutte le opere di una categoria come ArtworkDto
@@ -97,7 +101,7 @@ namespace NovaVerse.Services
                 CategoryId = artworkDto.CategoryId,
                 Type = artworkDto.Type,
                 ArtistId = artworkDto.ArtistId,
-                CreateDate = DateTime.UtcNow
+                CreateDate = DateTime.UtcNow // Assicurati di impostare la data di creazione correttamente
             };
 
             _context.Artworks.Add(newArtwork);
@@ -112,9 +116,11 @@ namespace NovaVerse.Services
                 Photo = newArtwork.Photo,
                 CategoryId = newArtwork.CategoryId,
                 Type = newArtwork.Type,
-                ArtistId = newArtwork.ArtistId
+                ArtistId = newArtwork.ArtistId,
+                CreateDate = newArtwork.CreateDate // Passa la data di creazione correttamente
             };
         }
+
 
         // Aggiorna un'opera esistente
         public async Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto)

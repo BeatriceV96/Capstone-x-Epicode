@@ -41,6 +41,8 @@ export class ArtworkDetailComponent implements OnInit {
   artworkToDelete: number | null = null;  // ID dell'opera da eliminare
   showDeleteSuccess = false;
   categories: Category[] = [];
+  categoryName: string = '';  // Per visualizzare il nome della categoria
+  createDate: Date | null = null;
 
 
 
@@ -65,26 +67,45 @@ export class ArtworkDetailComponent implements OnInit {
       })
     );
 
+    // Sottoscrivi per ottenere i dettagli dell'opera
     this.artwork$.subscribe(artwork => {
       if (artwork) {
         this.currentArtwork = artwork;
         this.artworkData = { ...artwork };
-        this.loadComments(artwork.id);
+        this.loadComments(artwork.id); // Carica i commenti dell'opera
+        this.loadCategoryDetails(artwork.categoryId);  // Carica il nome e la data della categoria
       } else {
         console.error('Opera non trovata');
       }
     });
 
-    // Carica le categorie
+    // Carica tutte le categorie (se necessario per il dropdown o altre operazioni)
     this.categoryService.getAllCategories().subscribe(
       (categories) => {
-        this.categories = categories;  // Salva le categorie nella variabile
+        this.categories = categories;  // Salva tutte le categorie nella variabile
       },
       (error) => {
         console.error('Errore durante il caricamento delle categorie:', error);
       }
     );
   }
+
+
+  // Metodo per caricare il nome e la data di creazione della categoria
+loadCategoryDetails(categoryId: number): void {
+  this.categoryService.getCategoryById(categoryId).subscribe(
+    (category: Category) => {
+      this.categoryName = category.name;  // Salva il nome della categoria
+      this.createDate = new Date(category.id);  // Associa la data di creazione alla variabile
+    },
+    (error) => {
+      console.error('Errore nel caricamento della categoria:', error);
+    }
+  );
+}
+
+
+
   // Gestione della modalità di modifica
   toggleEdit(): void {
     this.editMode = !this.editMode;

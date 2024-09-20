@@ -5,6 +5,7 @@ using NovaVerse.Context;
 using NovaVerse.Dto;
 using NovaVerse.Interfaces;
 using NovaVerse.Models;
+using NovaVerse.Services;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -17,11 +18,13 @@ namespace NovaVerse.Controllers
     {
         private readonly IArtworkService _artworkService;
         private readonly NovaVerseDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public ArtistArtworkController(IArtworkService artworkService, NovaVerseDbContext context)
+        public ArtistArtworkController(IArtworkService artworkService, NovaVerseDbContext context, ICategoryService categoryService)
         {
             _artworkService = artworkService;
             _context = context;
+            _categoryService = categoryService;
         }
 
         [HttpGet("all")]
@@ -53,8 +56,26 @@ namespace NovaVerse.Controllers
                 return NotFound(new { message = $"Artwork with ID {id} not found." });
             }
 
-            return Ok(artwork);
+            // Includi il nome della categoria
+            var category = await _categoryService.GetCategoryByIdAsync(artwork.CategoryId);
+            var artworkDto = new ArtworkDto
+            {
+                Id = artwork.Id,
+                Title = artwork.Title,
+                Description = artwork.Description,
+                Price = artwork.Price,
+                Photo = artwork.Photo,
+                ImageUrl = artwork.ImageUrl,
+                CategoryId = artwork.CategoryId,
+                CategoryName = category?.Name, // Associa il nome della categoria
+                ArtistName = artwork.ArtistName,
+                CreateDate = artwork.CreateDate
+            };
+
+            return Ok(artworkDto);
         }
+
+
 
         [HttpPost("create")]
         public async Task<IActionResult> CreateArtwork([FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
