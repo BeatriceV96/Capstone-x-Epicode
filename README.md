@@ -71,7 +71,7 @@ Benvenuti su **NovaVerse**! Una piattaforma e-commerce innovativa per la comprav
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-📈 **Roadmap**
+📈 **Roadmap** (coming soon)
 - 📦 **Integrazione NFT**: Vendita e gestione di opere come NFT.
 - 💸 **Crypto Payments**: Aggiungere pagamenti con criptovalute per rendere gli acquisti ancora più flessibili!
 
