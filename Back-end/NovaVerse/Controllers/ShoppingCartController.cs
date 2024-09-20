@@ -36,23 +36,21 @@ namespace NovaVerse.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var item = await _shoppingCartService.AddItemToCartAsync(userId, itemDto);
-
-            [HttpPut("updateQuantity/{itemId}")]
-            public async Task<IActionResult> UpdateCartItemQuantity(int itemId, [FromBody] ShoppingCartItemDto itemDto)
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                var success = await _shoppingCartService.UpdateItemQuantityAsync(userId, itemId, itemDto.Quantity);
-
-                if (!success)
-                {
-                    return NotFound("Articolo non trovato o carrello non esistente.");
-                }
-
-                return Ok("Quantità aggiornata con successo.");
-            }
-
             return Ok(item);
         }
+
+        [HttpPut("updateQuantity/{itemId}")]
+        public async Task<IActionResult> UpdateCartItemQuantity(int itemId, [FromBody] ShoppingCartItemDto itemDto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var success = await _shoppingCartService.UpdateItemQuantityAsync(userId, itemId, itemDto.Quantity);
+            if (!success)
+            {
+                return NotFound(new { message = "Articolo non trovato o carrello non esistente." });
+            }
+            return Ok(new { message = "Quantità aggiornata con successo." });
+        }
+
 
         [HttpDelete("remove/{itemId}")]
         public async Task<IActionResult> RemoveItemFromCart(int itemId)

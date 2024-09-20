@@ -76,12 +76,11 @@ export class ShoppingCartService {
   }
 
   // Aggiorna la quantità di un articolo nel carrello
-updateCartItemQuantity(item: CartItem): Observable<any> {
-  return this.http.put(`${this.baseUrl}/updateQuantity/${item.id}`, item, { withCredentials: true }).pipe(
-    catchError(this.handleError)
-  );
-}
-
+  updateCartItemQuantity(item: CartItem): Observable<any> {
+    return this.http.put(`${this.baseUrl}/updateQuantity/${item.id}`, item, { withCredentials: true }).pipe(
+      catchError(this.handleError)
+    );
+  }
 
 removeItemFromCart(item: CartItem): Observable<any> {
   return this.http.delete(`${this.baseUrl}/remove/${item.id}`, { withCredentials: true }).pipe(

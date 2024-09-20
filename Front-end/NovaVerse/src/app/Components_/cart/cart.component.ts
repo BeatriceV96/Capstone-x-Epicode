@@ -45,7 +45,9 @@ export class CartComponent implements OnInit {
   increaseQuantity(item: CartItem): void {
     item.quantity++;
     this.shoppingCartService.updateCartItemQuantity(item).subscribe(
-      () => console.log('Quantità aggiornata con successo'),
+      () => {
+        this.shoppingCartService.loadCart();  // Ricarica il carrello per aggiornare il totale
+      },
       (error) => console.error('Errore durante l\'aggiornamento della quantità:', error)
     );
   }
@@ -54,12 +56,13 @@ export class CartComponent implements OnInit {
     if (item.quantity > 1) {
       item.quantity--;
       this.shoppingCartService.updateCartItemQuantity(item).subscribe(
-        () => console.log('Quantità aggiornata con successo'),
+        () => {
+          this.shoppingCartService.loadCart();  // Ricarica il carrello per aggiornare il totale
+        },
         (error) => console.error('Errore durante l\'aggiornamento della quantità:', error)
       );
     }
   }
-
 
   removeItem(item: CartItem): void {
     this.shoppingCartService.removeItemFromCart(item).subscribe(

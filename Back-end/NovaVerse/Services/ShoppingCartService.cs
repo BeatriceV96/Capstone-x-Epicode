@@ -107,11 +107,12 @@ namespace NovaVerse.Services
                 return false;
             }
 
-            item.Quantity = newQuantity;
+            item.Quantity = newQuantity;  // Aggiorna la quantità
+            await _context.SaveChangesAsync();  // Salva le modifiche nel database
 
-            await _context.SaveChangesAsync();
             return true;
         }
+
 
 
         public async Task<bool> RemoveItemFromCartAsync(int userId, int itemId)
