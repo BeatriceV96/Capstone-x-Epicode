@@ -1,3 +1,4 @@
+import { UserService } from './../../services/user.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ArtworkService } from '../../services/artwork.service';
@@ -5,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { FavoriteService } from '../../services/favorite.service';
 import { Artwork } from '../../Models/artwork';
-import { switchMap, filter, tap, catchError, map } from 'rxjs/operators';
+import { switchMap, filter, tap, catchError, map, shareReplay } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CommentService } from '../../services/comment-service.service';
@@ -13,6 +14,7 @@ import { CartItem } from '../../Models/cart';
 import { Favorite } from '../../Models/favorite';
 import { CommentDto } from '../../Models/CommentDto';
 import { Category } from '../../Models/category';
+import { iUser } from '../../Models/i-user';
 
 @Component({
   selector: 'app-artwork-detail',
@@ -43,60 +45,96 @@ export class ArtworkDetailComponent implements OnInit {
   categories: Category[] = [];
   categoryName: string = '';  // Per visualizzare il nome della categoria
   createDate: Date | null = null;
-
-
-
+  isAuthor: boolean = false;  // Variabile per controllare se l'utente è l'autore
 
   constructor(
     private artworkService: ArtworkService,
     private categoryService: CategoryService,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private userService: UserService,
     private favoriteService: FavoriteService,
     private shoppingCartService: ShoppingCartService,
     private commentService: CommentService,
     private router: Router,           // Aggiungi Router qui
   ) {}
 
+
   ngOnInit(): void {
+    // Recupera l'utente corrente
+    const currentUser = this.authService.getCurrentUser();
+
+    if (currentUser) {
+      console.log('ID utente corrente:', currentUser.id);  // Log dell'ID utente
+    } else {
+      console.error('Utente non autenticato o ID non disponibile');
+    }
+
     // Carica i dettagli dell'opera
     this.artwork$ = this.route.paramMap.pipe(
       switchMap(params => {
-        const id = +params.get('id')!;
-        return this.artworkService.getArtworkById(id);
-      })
-    );
+        const artworkId = Number(params.get('id'));
+        console.log('Artwork ID recuperato dalla URL:', artworkId);  // Log dell'ID dell'opera
+        return this.artworkService.getArtworkById(artworkId);
+      }),
+      tap(artwork => {
+        if (artwork) {
+          this.currentArtwork = artwork;
+          console.log('Opera ricevuta:', artwork);
 
-    // Sottoscrivi per ottenere i dettagli dell'opera
-    this.artwork$.subscribe(artwork => {
-      if (artwork) {
-        this.currentArtwork = artwork;
-        this.artworkData = { ...artwork };
-        this.loadComments(artwork.id); // Carica i commenti dell'opera
-        this.loadCategoryDetails(artwork.categoryId);  // Carica il nome e la data della categoria
-      } else {
-        console.error('Opera non trovata');
-      }
-    });
+          // Carica i commenti dell'opera
+          this.loadComments(artwork.id);
 
-    // Carica tutte le categorie (se necessario per il dropdown o altre operazioni)
-    this.categoryService.getAllCategories().subscribe(
-      (categories) => {
-        this.categories = categories;  // Salva tutte le categorie nella variabile
-      },
-      (error) => {
-        console.error('Errore durante il caricamento delle categorie:', error);
-      }
+          if (artwork.artistId !== 0) {
+            console.log('Caricamento dettagli artista con ID:', artwork.artistId);
+            this.loadArtistDetails(artwork.artistId);  // Carica i dettagli dell'artista
+          } else {
+            console.error('ID dell\'artista non valido: ', artwork.artistId);
+          }
+
+          // Verifica se l'utente corrente è l'autore dell'opera
+          if (currentUser && artwork.artistId === currentUser.id) {
+            console.log('L\'utente corrente è l\'autore dell\'opera.');
+            this.isAuthor = true;  // Imposta un flag per l'autore
+          } else {
+            console.log('L\'utente corrente non è l\'autore dell\'opera.');
+            this.isAuthor = false;  // Non è l'autore
+          }
+        }
+      }),
+      catchError(error => {
+        console.error('Errore durante il caricamento dell\'opera:', error);
+        return of(null);  // Ritorna un observable vuoto in caso di errore
+      }),
+      shareReplay(1)  // Condividi lo stesso observable con più subscriber
     );
   }
 
+  // Metodo per caricare i dettagli dell'artista
+  loadArtistDetails(artistId: number): void {
+    if (artistId === 0) {
+      console.error('L\'ID dell\'artista è 0, impossibile caricare i dettagli.');
+      return;
+    }
 
-  // Metodo per caricare il nome e la data di creazione della categoria
+    console.log('Caricamento dettagli per l\'artista con ID:', artistId);
+  }
+
+
+  // Verifica se l'utente è l'artista dell'opera
+  isArtist(artwork: Artwork): boolean {
+    const user = this.authService.getCurrentUser();
+    return !!(user && artwork.artistId === user.id);  // Utilizza !! per assicurarti che sia un booleano
+  }
+
+
+
+// Metodo per caricare il nome e la data di creazione della categoria
 loadCategoryDetails(categoryId: number): void {
   this.categoryService.getCategoryById(categoryId).subscribe(
     (category: Category) => {
-      this.categoryName = category.name;  // Salva il nome della categoria
-      this.createDate = new Date(category.id);  // Associa la data di creazione alla variabile
+      this.categoryName = category.name;  // Imposta il nome della categoria
+      this.createDate = new Date();  // Manteniamo la data impostata manualmente come hai richiesto
     },
     (error) => {
       console.error('Errore nel caricamento della categoria:', error);
@@ -104,24 +142,40 @@ loadCategoryDetails(categoryId: number): void {
   );
 }
 
-
-
   // Gestione della modalità di modifica
-  toggleEdit(): void {
-    this.editMode = !this.editMode;
+ toggleEdit(): void {
+  this.editMode = !this.editMode;
+
+  if (this.editMode && this.currentArtwork) {
+    // Popola il form con i dati attuali dell'opera
+    this.artworkData = {
+      title: this.currentArtwork.title,
+      description: this.currentArtwork.description,
+      price: this.currentArtwork.price,
+      categoryId: this.currentArtwork.categoryId,
+      categoryName: this.currentArtwork.categoryName,  // Popola con il nome della categoria
+      artistName: this.currentArtwork.artistName,
+      artistId: this.currentArtwork.artistId,
+    };
+
+    // Carica tutte le categorie per la tendina
+    this.categoryService.getAllCategories().subscribe(
+      (categories: Category[]) => {
+        this.categories = categories;  // Popola l'elenco delle categorie
+        console.log('Categorie caricate:', categories);
+      },
+      (error) => {
+        console.error('Errore nel caricamento delle categorie:', error);
+      }
+    );
   }
+}
+
 
   // Caricamento dell'immagine selezionata
   onImageSelected(event: any): void {
     this.selectedImage = event.target.files[0];
   }
-
-  // Verifica se l'utente è l'artista dell'opera
-  isArtist(artwork: Artwork): boolean {
-    const user = this.authService.getCurrentUser();
-    return !!user && artwork.artistId === user.id;
-  }
-
   // Aggiungi l'opera ai preferiti
   addToFavorites(artworkId: number): void {
     const favorite: Favorite = { artworkId: artworkId, artistId: null, id: 0, userId: 0, createDate: new Date() };
@@ -132,32 +186,39 @@ loadCategoryDetails(categoryId: number): void {
   }
 
   // Salva le modifiche all'opera
-  saveChanges(artwork: Artwork): void {
-    const formData = new FormData();
-    formData.append('title', this.artworkData.title || '');
-    formData.append('description', this.artworkData.description || '');
-    formData.append('price', this.artworkData.price?.toString() || '0');
-    formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
-    formData.append('artistName', this.artworkData.artistName || '');
-    formData.append('artistId', this.artworkData.artistId?.toString() || '');
-
-    if (this.selectedImage) {
-      formData.append('photoFile', this.selectedImage);
-    }
-
-    this.artworkService.updateArtwork(artwork.id, formData)
-      .subscribe(
-        (updatedArtwork) => {
-          this.currentArtwork = updatedArtwork;  // Aggiorna il modello corrente con i dati modificati
-          this.artworkData = { ...updatedArtwork };  // Aggiorna anche il form con i nuovi dati
-          this.toggleEdit(); // Disattiva la modalità di modifica
-          console.log('Opera aggiornata con successo');
-        },
-        error => {
-          console.error('Errore durante l\'aggiornamento dell\'opera:', error);
-        }
-      );
+// Salva le modifiche all'opera
+saveChanges(artwork: Artwork): void {
+  if (!this.currentArtwork) {
+    console.error('Opera non caricata correttamente.');
+    return;
   }
+
+  const formData = new FormData();
+  formData.append('title', this.artworkData.title || '');
+  formData.append('description', this.artworkData.description || '');
+  formData.append('price', this.artworkData.price?.toString() || '0');
+  formData.append('categoryId', this.artworkData.categoryId?.toString() || '');
+  formData.append('categoryName', this.artworkData.categoryName || '');
+  formData.append('artistName', this.artworkData.artistName || '');
+  formData.append('artistId', this.artworkData.artistId?.toString() || '');
+
+  if (this.selectedImage) {
+    formData.append('photoFile', this.selectedImage);
+  }
+
+  this.artworkService.updateArtwork(this.currentArtwork.id, formData)
+    .subscribe(
+      (updatedArtwork) => {
+        this.currentArtwork = updatedArtwork;  // Aggiorna il modello corrente con i dati modificati
+        this.artworkData = { ...updatedArtwork };  // Aggiorna anche il form con i nuovi dati
+        this.toggleEdit(); // Disattiva la modalità di modifica
+        console.log('Opera aggiornata con successo');
+      },
+      error => {
+        console.error('Errore durante l\'aggiornamento dell\'opera:', error);
+      }
+    );
+}
 
   // Apre la finestra di conferma per l'eliminazione
   deleteArtwork(artworkId: number): void {
@@ -325,33 +386,34 @@ saveEditedComment(commentId: number | undefined): void {
   );
 }
 
+
 deleteComment(commentId: number): void {
+  // Imposta l'ID del commento che sta per essere eliminato (per visualizzare lo spinner)
   this.deletingCommentId = commentId;
 
+  // Chiama il servizio per eliminare il commento
   this.commentService.deleteComment(commentId).subscribe(
     () => {
-      // Aggiorna l'elenco dei commenti in tempo reale
+      // Elimina il commento dalla lista locale immediatamente
       this.comments$ = this.comments$.pipe(
         map(comments => comments.filter(comment => comment.id !== commentId))
       );
 
+      // Rimuovi l'ID del commento in fase di eliminazione (per nascondere lo spinner)
       this.deletingCommentId = null;
 
-      // Mostra la notifica di successo
-      this.showDeleteSuccess = true;
-
-      // Nascondi la notifica dopo 3 secondi
-      setTimeout(() => {
-        this.showDeleteSuccess = false;
-      }, 3000); // Durata della notifica 3 secondi
-
+      // Log per confermare l'eliminazione
+      console.log('Commento eliminato con successo');
     },
     (error) => {
-      console.error('Errore durante l\'eliminazione del commento', error);
+      console.error('Errore durante l\'eliminazione del commento:', error);
+      // Rimuovi l'ID del commento in caso di errore per nascondere lo spinner
       this.deletingCommentId = null;
     }
   );
 }
+
+
 
 
 

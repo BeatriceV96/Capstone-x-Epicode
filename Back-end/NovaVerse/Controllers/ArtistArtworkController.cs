@@ -67,8 +67,9 @@ namespace NovaVerse.Controllers
                 Photo = artwork.Photo,
                 ImageUrl = artwork.ImageUrl,
                 CategoryId = artwork.CategoryId,
-                CategoryName = category?.Name, // Associa il nome della categoria
+                CategoryName = category?.Name,
                 ArtistName = artwork.ArtistName,
+                ArtistId = artwork.ArtistId,
                 CreateDate = artwork.CreateDate
             };
 
@@ -85,7 +86,7 @@ namespace NovaVerse.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Se il campo ArtistName è richiesto
+            // Verifica il nome dell'artista
             if (string.IsNullOrWhiteSpace(artworkDto.ArtistName))
             {
                 return BadRequest(new { errors = new { ArtistName = new[] { "The ArtistName field is required." } } });
@@ -121,6 +122,10 @@ namespace NovaVerse.Controllers
             var artistId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             artworkDto.ArtistId = artistId;
 
+
+            // Log per assicurarsi che l'ID dell'artista sia corretto
+            Console.WriteLine("ArtistId assegnato: " + artistId);
+
             // Crea l'opera nel database
             var createdArtwork = await _artworkService.AddArtworkAsync(artworkDto);
             if (createdArtwork == null)
@@ -131,58 +136,69 @@ namespace NovaVerse.Controllers
             return Ok(createdArtwork);
         }
 
+
         [HttpPut("update/{id}")]
+        [Authorize(Policy = "ArtistOnly")]
         public async Task<IActionResult> UpdateArtwork(int id, [FromForm] ArtworkDto artworkDto, [FromForm] IFormFile? photoFile = null)
-        {
-            // Log per vedere i dati ricevuti
-            Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}");
+{
+    // Log per vedere i dati ricevuti
+    Console.WriteLine($"Title: {artworkDto.Title}, Description: {artworkDto.Description}, Price: {artworkDto.Price}, CategoryId: {artworkDto.CategoryId}");
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var artwork = await _artworkService.GetArtworkByIdAsync(id);
+    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    var artwork = await _artworkService.GetArtworkByIdAsync(id);
 
-            if (artwork == null)
-            {
-                return NotFound(new { message = $"Artwork with ID {id} not found." });
-            }
+    if (artwork == null)
+    {
+        return NotFound(new { message = $"Artwork with ID {id} not found." });
+    }
 
-            if (artwork.ArtistId != userId)
-            {
-                return Unauthorized("Non sei autorizzato a modificare questa opera.");
-            }
+    if (artwork.ArtistId != userId)
+    {
+        return Unauthorized("Non sei autorizzato a modificare questa opera.");
+    }
 
             if (!ModelState.IsValid)
             {
+                Console.WriteLine("ModelState non valido:");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
                 return BadRequest(ModelState);
             }
 
-            // Gestisci il caricamento dell'immagine
+
+            // Se viene fornita una nuova immagine, gestiamo il caricamento dell'immagine
             if (photoFile != null && photoFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photoFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await photoFile.CopyToAsync(fileStream);
-                }
-
-                artworkDto.Photo = "/uploads/" + uniqueFileName;
-            }
-
-            var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
-            if (updatedArtwork == null)
-            {
-                return BadRequest("Errore durante l'aggiornamento dell'opera.");
-            }
-
-            return Ok(updatedArtwork);
+    {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+        if (!Directory.Exists(uploadsFolder))
+        {
+            Directory.CreateDirectory(uploadsFolder);
         }
+
+        var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photoFile.FileName);
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await photoFile.CopyToAsync(fileStream);
+        }
+
+        // Aggiorna il percorso dell'immagine nel DTO
+        artworkDto.Photo = "/uploads/" + uniqueFileName;
+    }
+
+    // Aggiorniamo l'opera tramite il servizio
+    var updatedArtwork = await _artworkService.UpdateArtworkAsync(id, artworkDto);
+    if (updatedArtwork == null)
+    {
+        return BadRequest("Errore durante l'aggiornamento dell'opera.");
+    }
+
+    return Ok(updatedArtwork);
+}
+
 
 
         [HttpDelete("delete/{id}")]

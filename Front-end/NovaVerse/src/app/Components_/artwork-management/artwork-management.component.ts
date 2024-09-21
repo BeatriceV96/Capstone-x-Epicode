@@ -23,7 +23,7 @@ export class ArtworkManagementComponent implements OnInit {
   success: boolean = true;
   selectedArtworkId: number | null = null;
   selectedFile: File | null = null;
-
+  isArtist: boolean = false;
   artworkTypes = Object.values(ArtworkType);
 
   constructor(
@@ -78,6 +78,10 @@ export class ArtworkManagementComponent implements OnInit {
     if (this.artworkForm.categoryId !== undefined) {
       formData.append('categoryId', this.artworkForm.categoryId.toString());
     }
+    const selectedCategory = this.categories.find(category => category.id === this.artworkForm.categoryId);
+    if (selectedCategory) {
+      formData.append('categoryName', selectedCategory.name);  // Aggiungi il nome della categoria
+    }
     if (this.artworkForm.type) {
       formData.append('type', this.artworkForm.type);
     }
@@ -113,6 +117,20 @@ export class ArtworkManagementComponent implements OnInit {
         console.error('Errore durante la creazione dell\'opera', error);
       }
     );
+  }
+
+  // Metodo per verificare se l'utente è l'artista dell'opera
+  checkIfArtist(): void {
+    const currentUser = this.authService.getCurrentUser();
+    // Supponiamo che tu abbia un metodo per ottenere l'opera attuale
+    const artworkId = this.route.snapshot.params['artworkId'];
+    if (artworkId) {
+      this.artworkService.getArtworkById(artworkId).subscribe((artwork) => {
+        if (currentUser && currentUser.id === artwork.artistId) {
+          this.isArtist = true;  // L'utente è l'artista
+        }
+      });
+    }
   }
 
   goBackToArtworkList(): void {

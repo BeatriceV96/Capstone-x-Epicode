@@ -10,7 +10,7 @@ namespace NovaVerse.Dto
         public decimal Price { get; set; }
         public string? Photo { get; set; }  // Percorso immagine o URL, opzionale
         public string? ImageUrl { get; set; }  // URL dell'immagine opzionale
-        public string CategoryName { get; set; } // Nome della categoria
+        public string? CategoryName { get; set; } // Nome della categoria
         public int CategoryId { get; set; } // ID della categoria
         public ArtworkType Type { get; set; }
         public int ArtistId { get; set; }

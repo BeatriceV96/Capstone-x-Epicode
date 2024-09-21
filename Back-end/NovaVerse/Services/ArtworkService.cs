@@ -33,7 +33,8 @@ namespace NovaVerse.Services
                     Price = a.Price,
                     Photo = a.Photo,
                     ImageUrl = a.ImageUrl,
-                    CategoryName = a.Category.Name, // Recupera il nome della categoria
+                    CategoryId = a.CategoryId,
+                    CategoryName = a.Category.Name,
                     Type = a.Type,
                     ArtistId = a.ArtistId,
                     ArtistName = a.Artist.Username,
@@ -45,8 +46,8 @@ namespace NovaVerse.Services
         public async Task<ArtworkDto> GetArtworkByIdAsync(int id)
         {
             var artwork = await _context.Artworks
-                .Include(a => a.Category)
-                .Include(a => a.Artist)
+                .Include(a => a.Artist)  // Includi l'artista
+                .Include(a => a.Category) // Includi la categoria
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (artwork == null)
@@ -62,13 +63,15 @@ namespace NovaVerse.Services
                 Price = artwork.Price,
                 Photo = artwork.Photo,
                 ImageUrl = artwork.ImageUrl,
-                CategoryName = artwork.Category.Name,
-                Type = artwork.Type,
+                CategoryId = artwork.CategoryId,
+                CategoryName = artwork.Category?.Name ?? "Unknown Category",
                 ArtistId = artwork.ArtistId,
-                ArtistName = artwork.Artist.Username,
+                ArtistName = artwork.Artist?.Username ?? "Unknown Artist",
                 CreateDate = artwork.CreateDate
             };
+
         }
+
 
 
         // Restituisce tutte le opere di una categoria come ArtworkDto
@@ -101,7 +104,7 @@ namespace NovaVerse.Services
                 CategoryId = artworkDto.CategoryId,
                 Type = artworkDto.Type,
                 ArtistId = artworkDto.ArtistId,
-                CreateDate = DateTime.UtcNow // Assicurati di impostare la data di creazione correttamente
+                CreateDate = DateTime.UtcNow 
             };
 
             _context.Artworks.Add(newArtwork);

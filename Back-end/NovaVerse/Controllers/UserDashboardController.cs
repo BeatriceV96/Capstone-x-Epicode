@@ -23,10 +23,11 @@ namespace NovaVerse.Controllers
             _context = context;
         }
 
-        private int GetUserId()
+        [HttpGet("users/{id}")]
+        public int GetUserId()
         {
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-            return claim != null ? int.Parse(claim.Value) : 0;
+            return claim != null && int.TryParse(claim.Value, out var userId) ? userId : 0;
         }
 
         [HttpGet("profile")]
