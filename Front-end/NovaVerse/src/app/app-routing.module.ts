@@ -34,6 +34,7 @@ const routes: Routes = [
   { path: 'checkout', loadChildren: () => import('./Components_/checkout/checkout.module').then(m => m.CheckoutModule) },
   //{ path: 'search-results', loadChildren: () => import('./Components_/search-results/search-results.module').then(m => m.SearchResultsModule) },
   { path: 'artist-profile/:id/:name', loadChildren: () => import('./Components_/artist-profile/artist-profile.module').then(m => m.ArtistProfileModule) },
+  { path: 'about-us', loadChildren: () => import('./Components_/about-us/about-us.module').then(m => m.AboutUsModule) },
 
 
 

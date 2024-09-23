@@ -264,7 +264,7 @@ namespace NovaVerse.Controllers
         }
 
 
-        [AllowAnonymous] // Per permettere l'accesso anche agli utenti non autenticati
+        [AllowAnonymous]
         [HttpGet("random")]
         public async Task<IActionResult> GetRandomArtworks()
         {
@@ -275,6 +275,7 @@ namespace NovaVerse.Controllers
             }
             return Ok(artworks);
         }
+
 
     }
 }

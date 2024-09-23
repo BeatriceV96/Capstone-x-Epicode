@@ -1,0 +1,72 @@
+.about-us-intro {
+  background: linear-gradient(to bottom, #784e9b, #1f2937); // Sfumatura simile a quella mostrata nell'immagine
+  padding: 4rem 0;
+
+  h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+
+  p {
+    font-size: 1.25rem;
+    color: #d1d5db;
+    margin-bottom: 2rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-item {
+    text-align: center;
+    color: #fff;
+
+    .feature-icon {
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      color: #fff;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #9ca3af;
+    }
+  }
+
+  .explore-button {
+    background-color: #3b82f6;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #2563eb;
+    }
+  }
+}
+
+.about-us-history {
+  background-color: #111827;
+  padding: 4rem 0;
+  text-align: center;
+
+  h2 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  p {
+    color: #d1d5db;
+    font-size: 1.125rem;
+    max-width: 768px;
+    margin: 0 auto;
+    line-height: 1.75;
+  }
+}

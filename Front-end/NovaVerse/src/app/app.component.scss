@@ -1,25 +1,33 @@
-html, body {
-  height: 100%; /* Imposta l'altezza di tutto il documento */
+html, body, app-root, .min-h-screen {
+  height: 100%;
   margin: 0;
   padding: 0;
 }
-
-.min-h-screen {
-  min-height: 100vh; /* Altezza minima per coprire tutto lo schermo */
-}
-
-.mySwiper {
-  height: 100vh; /* Altezza del carosello su tutto lo schermo */
-}
-
 .flex {
   display: flex;
-}
-
-.flex-col {
-  flex-direction: column; /* Disposizione degli elementi in colonna */
+  flex-direction: column;
+  min-height: 100vh; /* Aggiungi min-height al flex container */
 }
 
 .flex-grow {
-  flex-grow: 1; /* Il contenuto principale si espande per riempire lo spazio */
+  flex-grow: 1;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh; /* Assicura che il contenitore abbia altezza minima dello schermo */
+}
+
+.router-outlet {
+  display: flex;
+  flex-grow: 1;
+  min-height: calc(100vh - 100px); /* Sostituisci 100px con l'altezza della tua navbar + footer */
+}
+
+.component {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
