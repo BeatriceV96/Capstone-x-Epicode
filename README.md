@@ -26,7 +26,7 @@ Benvenuti su **NovaVerse**! Una piattaforma e-commerce innovativa per la comprav
 🌟 **FUNZIONALITÁ PRINCIPALI** :
 - 👩‍🏫 **Pagina Profilo**: Personalizza il tuo profilo con biografia e immagine.
 - 👀 **Visualizzazione Opere**: Naviga tra le opere d'arte disponibili.
-- 📌 **Sistema di filtri di ricerca per un'esperienza utente gradevole, mirata, e veloce. 
+- 📌 **Sistema di filtri di ricerca** per un'esperienza utente gradevole, mirata, e veloce. 
 - ✍️ **Recensioni e Commenti**: Lascia una recensione sulle opere che ti hanno ispirato.
 - 🛒 **Carrello e Checkout**: Simulazione di pagamento per completare l'acquisto.
 - 💾 **Gestione dei Preferiti**: Aggiungi e rimuovi opere dalla tua lista dei desideri.
@@ -80,7 +80,7 @@ Benvenuti su **NovaVerse**! Una piattaforma e-commerce innovativa per la comprav
 📈 **Roadmap** (coming soon)
 - 📦 **Integrazione NFT**: Vendita e gestione di opere come NFT.
 - 💸 **Crypto Payments**: Aggiungere pagamenti con criptovalute per rendere gli acquisti ancora più flessibili!
-- 📈 **Monitoraggio delle vendite per opera e visualizzazioni
+- 📈 **Monitoraggio delle vendite per opera e visualizzazioni**
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
