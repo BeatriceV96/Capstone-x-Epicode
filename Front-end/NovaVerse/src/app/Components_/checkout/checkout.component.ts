@@ -39,7 +39,11 @@ export class CheckoutComponent implements OnInit {
   placeOrder(): void {
     // Logica per confermare l'ordine
     console.log("Ordine confermato");
+
+    // Mostra un popup che conferma che l'ordine è stato effettuato
+    alert('Ordine effettuato con successo!');
   }
+
   // Metodo per selezionare il pagamento
   selectPaymentMethod(method: string): void {
     this.selectedPaymentMethod = method;

@@ -109,6 +109,7 @@ export class ArtworkManagementComponent implements OnInit {
     this.artworkService.createArtwork(formData).subscribe(
       () => {
         this.loading = false;
+        alert('Opera creata con successo!');  // Popup di conferma
         console.log('Opera creata con successo');
         this.resetForm();
       },
@@ -118,6 +119,7 @@ export class ArtworkManagementComponent implements OnInit {
       }
     );
   }
+
 
   // Metodo per verificare se l'utente è l'artista dell'opera
   checkIfArtist(): void {

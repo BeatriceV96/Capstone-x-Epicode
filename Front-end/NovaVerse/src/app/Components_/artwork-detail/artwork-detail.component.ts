@@ -187,6 +187,7 @@ loadCategoryDetails(categoryId: number): void {
 
   // Salva le modifiche all'opera
 // Salva le modifiche all'opera
+  // Salva le modifiche all'opera
 saveChanges(artwork: Artwork): void {
   if (!this.currentArtwork) {
     console.error('Opera non caricata correttamente.');
@@ -213,12 +214,16 @@ saveChanges(artwork: Artwork): void {
         this.artworkData = { ...updatedArtwork };  // Aggiorna anche il form con i nuovi dati
         this.toggleEdit(); // Disattiva la modalità di modifica
         console.log('Opera aggiornata con successo');
+
+        // Mostra un alert per confermare che l'opera è stata aggiornata
+        alert('Opera aggiornata con successo!');
       },
       error => {
         console.error('Errore durante l\'aggiornamento dell\'opera:', error);
       }
     );
 }
+
 
   // Apre la finestra di conferma per l'eliminazione
   deleteArtwork(artworkId: number): void {
@@ -451,12 +456,14 @@ getProfilePictureUrl(profilePicturePath: string | null): string {
     this.shoppingCartService.addItemToCart(cartItem).subscribe(
       () => {
         console.log('Opera aggiunta al carrello');
+        alert('Opera aggiunta al carrello con successo!');  // Popup di conferma
       },
       (error) => {
         console.error('Errore durante l\'aggiunta dell\'opera al carrello:', error);
       }
     );
   }
+
 
   // Funzione per tornare alla categoria
   goBackToCategory(): void {

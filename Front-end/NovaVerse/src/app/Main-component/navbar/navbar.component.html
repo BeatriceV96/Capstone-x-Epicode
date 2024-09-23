@@ -13,35 +13,44 @@
       <a href="#" class="hover:text-gray-400">NFT (coming soon)</a>
     </div>
 
-    <!-- Barra di ricerca -->
-    <div class="relative text-gray-400">
-      <input
-        type="text"
-        placeholder="Cerca artista..."
-        class="bg-gray-800 text-white py-2 px-4 rounded-full w-64"
-        (input)="onSearch($event)"
-      />
+      <!-- Barra di ricerca -->
+<div class="relative text-gray-400">
+  <input
+    type="text"
+    placeholder="Cerca artista..."
+    class="bg-gray-800 text-white py-2 px-4 rounded-full w-64"
+    (input)="onSearch($event)"
+    [value]="searchQuery.getValue()"
+  />
 
-      <!-- Mostra un loader durante la ricerca -->
-<!-- Mostra il loader durante il caricamento -->
-<div *ngIf="loading" class="absolute bg-gray-900 text-white mt-2 p-2 rounded">
-  Caricamento...
+  <!-- Aggiungi un'icona "X" per cancellare la ricerca -->
+  <button
+    *ngIf="(searchQuery.getValue()?.length ?? 0) > 0"
+    class="absolute right-3 top-2 text-gray-500 hover:text-white"
+    (click)="clearSearch()"
+  >
+    &#10005; <!-- HTML entity per "X" -->
+  </button>
+
+  <!-- Mostra un loader durante la ricerca -->
+  <div *ngIf="loading" class="absolute bg-gray-900 text-white mt-2 p-2 rounded">
+    Caricamento...
+  </div>
+
+  <!-- Visualizza i suggerimenti solo se ci sono risultati e la query non è vuota -->
+  <ul *ngIf="(suggestedArtists$ | async) as artistList" class="absolute bg-gray-900 text-white shadow-lg mt-1 w-full">
+    <!-- Mostra "Nessun risultato" se non ci sono artisti trovati e la query è presente -->
+    <li *ngIf="artistList.length === 0 && (searchQuery.getValue()?.length ?? 0) > 0" class="p-2 text-center text-gray-400">
+      Nessun risultato
+    </li>
+
+    <!-- Lista di artisti trovati -->
+    <li *ngFor="let artist of artistList" (click)="goToArtistProfile(artist.id, artist.username)" class="cursor-pointer hover:bg-gray-700 p-2">
+      <span [innerHTML]="highlightMatch(artist.username, searchQuery.getValue())"></span>
+    </li>
+  </ul>
 </div>
 
-<!-- Visualizza i suggerimenti solo se ci sono risultati e la query non è vuota -->
-<ul *ngIf="(suggestedArtists$ | async) as artistList" class="absolute bg-gray-900 text-white shadow-lg mt-1 w-full">
-  <!-- Mostra "Nessun risultato" se non ci sono artisti trovati e la query è presente -->
-  <li *ngIf="artistList.length === 0 && (searchQuery.getValue()?.length ?? 0) > 0" class="p-2 text-center text-gray-400">
-    Nessun risultato
-  </li>
-
-  <!-- Lista di artisti trovati -->
-  <li *ngFor="let artist of artistList" (click)="goToArtistProfile(artist.id, artist.username)" class="cursor-pointer hover:bg-gray-700 p-2">
-    <span [innerHTML]="highlightMatch(artist.username, searchQuery.getValue())"></span>
-  </li>
-</ul>
-
-    </div>
 
 
     <!-- Right Side Section -->

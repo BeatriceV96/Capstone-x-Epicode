@@ -46,19 +46,6 @@
           </div>
         </div>
 
-        <!-- Opere create (solo per artisti) -->
-        <div class="mt-8 w-full" *ngIf="user?.role === 'Artist'">
-          <strong class="text-lg text-white">Opere create ({{ artworks.length }}):</strong>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6" *ngIf="artworks.length > 0; else noArtworks">
-            <div *ngFor="let artwork of artworks" class="relative bg-gray-700 shadow-lg rounded-lg p-4 hover:bg-gray-600 transition duration-300">
-              <img [src]="artwork.photo || artwork.imageUrl" alt="{{ artwork.title }}" class="w-full h-48 object-cover rounded-lg">
-              <p class="mt-2 text-white">{{ artwork.title }}</p>
-            </div>
-          </div>
-          <ng-template #noArtworks>
-            <p class="text-center text-gray-400 mt-4">L'utente non ha creato nessuna opera.</p>
-          </ng-template>
-        </div>
 
         <!-- Bottone per tornare alla home -->
         <div class="mt-10">
