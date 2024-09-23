@@ -1,0 +1,7 @@
+<!-- search-results.component.html -->
+<h1>Risultati della ricerca</h1>
+<ul>
+  <li *ngFor="let artist of artists">
+    <a [routerLink]="['/artist-profile', artist.id]">{{ artist.username }}</a>
+  </li>
+</ul>

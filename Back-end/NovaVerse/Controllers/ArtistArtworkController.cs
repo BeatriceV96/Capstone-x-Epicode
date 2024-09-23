@@ -76,6 +76,22 @@ namespace NovaVerse.Controllers
             return Ok(artworkDto);
         }
 
+        [AllowAnonymous]
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetArtworksByUserId(int userId)
+        {
+            var artworks = await _context.Artworks
+                .Where(a => a.ArtistId == userId)
+                .ToListAsync();
+
+            if (artworks == null || !artworks.Any())
+            {
+                return NotFound(new { message = $"No artworks found for artist with ID {userId}" });
+            }
+
+            return Ok(artworks);
+        }
+
 
 
         [HttpPost("create")]

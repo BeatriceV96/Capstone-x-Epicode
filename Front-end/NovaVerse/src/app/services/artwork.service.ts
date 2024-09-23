@@ -12,6 +12,7 @@ export class ArtworkService {
   private artworkSubject = new BehaviorSubject<Artwork[]>([]);
   public artworks$ = this.artworkSubject.asObservable();
 
+
   constructor(private http: HttpClient) {}
 
   // Ottieni opere per categoria con paginazione

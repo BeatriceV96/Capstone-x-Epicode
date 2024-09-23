@@ -14,5 +14,7 @@ public interface IUserService
 
     Task<bool> UpdateProfilePictureAsync(int userId, string profilePictureBase64);
 
+    Task<List<UserDto>> GetArtistsByQueryAsync(string query);
+
     Task Logout();
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NovaVerse.Models;
 
 public class ArtistDashboardService : IArtistDashboardService
 {
@@ -29,6 +30,34 @@ public class ArtistDashboardService : IArtistDashboardService
                 TotalEarnings = a.TransactionArtworks.Sum(ta => ta.Transaction.Amount) // Guadagni totali
             })
             .ToListAsync();
+    }
+
+    public async Task<UserDto> GetArtistById(int id)
+    {
+        var artist = await _context.Users
+            .Include(u => u.Artworks)
+            .FirstOrDefaultAsync(u => u.Id == id && u.Role == User.UserRole.Artist);
+
+        if (artist == null)
+        {
+            return null;
+        }
+
+        return new UserDto
+        {
+            Id = artist.Id,
+            Username = artist.Username,
+            Bio = artist.Bio,
+            ProfilePicture = artist.ProfilePicture,
+            CreateDate = artist.CreateDate,
+            Artworks = artist.Artworks.Select(a => new ArtworkDto
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Photo = a.Photo,
+                Price = a.Price
+            }).ToList()
+        };
     }
 
     public async Task<List<SaleSummaryDto>> GetArtistSalesAsync(int artistId)
@@ -93,5 +122,29 @@ public class ArtistDashboardService : IArtistDashboardService
             Bio = user.Bio,
             ProfilePicture = user.ProfilePicture
         };
+    }
+
+    public async Task<List<ArtistSearchDto>> SearchArtistAsync(string query) //PER RICERCA ARTISTI PER NOME
+    {
+        var artists = await _context.Users
+            .Where(u => u.Role == User.UserRole.Artist && u.Username.Contains(query))
+            .Select(u => new ArtistSearchDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Bio = u.Bio,
+                ProfilePicture = u.ProfilePicture,
+                Artworks = u.Artworks.Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Photo = a.Photo,
+                    Price = a.Price,
+                    CreateDate = a.CreateDate
+                }).ToList()
+            })
+            .ToListAsync();
+
+        return artists;
     }
 }

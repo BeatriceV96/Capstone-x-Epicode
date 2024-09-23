@@ -32,13 +32,16 @@ const routes: Routes = [
 
   { path: 'favorite-list', loadChildren: () => import('./Components_/favorite-list/favorite-list.module').then(m => m.FavoriteListModule) },
   { path: 'checkout', loadChildren: () => import('./Components_/checkout/checkout.module').then(m => m.CheckoutModule) },
+  //{ path: 'search-results', loadChildren: () => import('./Components_/search-results/search-results.module').then(m => m.SearchResultsModule) },
+  { path: 'artist-profile/:id/:name', loadChildren: () => import('./Components_/artist-profile/artist-profile.module').then(m => m.ArtistProfileModule) },
+
 
 
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using static NovaVerse.Models.User;
 
 namespace NovaVerse.Services
 {
@@ -134,5 +135,22 @@ namespace NovaVerse.Services
         {
             await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
+
+
+        public async Task<List<UserDto>> GetArtistsByQueryAsync(string query)
+        {
+            return await _context.Users
+                .Where(u => u.Role == UserRole.Artist && u.Username.Contains(query))
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Bio = u.Bio,
+                    ProfilePicture = u.ProfilePicture,
+                    CreateDate = u.CreateDate
+                })
+                .ToListAsync();
+        }
+
     }
 }

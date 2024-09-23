@@ -43,6 +43,30 @@ namespace NovaVerse.Services
                 .ToListAsync();
         }
 
+        // Nuovo metodo per ottenere tutte le opere di un artista
+        public async Task<List<ArtworkDto>> GetArtworksByArtistIdAsync(int artistId)
+        {
+            return await _context.Artworks
+                .Where(a => a.ArtistId == artistId)  // Filtra per ID artista
+                .Include(a => a.Category)  // Includi la categoria per ogni opera
+                .Select(a => new ArtworkDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    Price = a.Price,
+                    Photo = a.Photo,
+                    ImageUrl = a.ImageUrl,
+                    CategoryId = a.CategoryId,
+                    CategoryName = a.Category.Name,
+                    Type = a.Type,
+                    ArtistId = a.ArtistId,
+                    ArtistName = a.Artist.Username,
+                    CreateDate = a.CreateDate
+                })
+                .ToListAsync();
+        }
+
         public async Task<ArtworkDto> GetArtworkByIdAsync(int id)
         {
             var artwork = await _context.Artworks

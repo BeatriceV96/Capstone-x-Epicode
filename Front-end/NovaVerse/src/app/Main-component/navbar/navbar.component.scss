@@ -1,5 +1,55 @@
-/* Aggiungi questo in `styles.css` o direttamente come configurazione in `tailwind.config.js` */
+/* Stili generali per il pulsante */
 .btn {
   @apply bg-gray-700 text-white rounded-lg px-4 py-2 transition duration-300 hover:bg-gray-600;
 }
 
+/* Placeholder degli input di ricerca */
+input[type="text"]::placeholder {
+  color: #cbd5e0;
+}
+
+/* Rimuove il bordo e lo sfondo quando l'input è attivo */
+input[type="text"]:focus {
+  outline: none;
+}
+
+/* Icone nel pulsante */
+button i {
+  color: #ffffff;
+}
+
+/* Cambia colore dell'icona quando passi sopra al pulsante */
+button:hover i {
+  color: #cbd5e0;
+}
+
+/* Lista dei risultati */
+ul {
+  border-radius: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #1f2937;  /* Colore sfondo uguale alla navbar */
+  color: #ffffff; /* Testo in bianco */
+  width: 100%; /* Larghezza piena della barra di ricerca */
+  position: absolute;
+  z-index: 10;
+}
+
+/* Singolo elemento della lista */
+li {
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+/* Hover sul singolo elemento */
+li:hover {
+  background-color: #374151;  /* Cambia il colore di sfondo al passaggio del mouse */
+}
+
+/* Sottolinea le lettere che corrispondono alla ricerca */
+strong {
+  font-weight: bold;
+  color: #10b981;  /* Colore evidenziato per le lettere */
+}

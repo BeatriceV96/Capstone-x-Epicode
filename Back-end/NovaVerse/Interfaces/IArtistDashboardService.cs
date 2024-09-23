@@ -8,4 +8,6 @@ public interface IArtistDashboardService
     Task<List<SaleSummaryDto>> GetArtistSalesAsync(int artistId); // Per ottenere le vendite dell'artista con i guadagni
     Task<UserDto> GetUserById(int id); // Per ottenere il profilo dell'artista
     Task<UserDto> UpdateArtistProfileAsync(UserDto userDto); // Per aggiornare il profilo dell'artista
+    Task<List<ArtistSearchDto>> SearchArtistAsync(string query);
+    Task<UserDto> GetArtistById(int id);
 }

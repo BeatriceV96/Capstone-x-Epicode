@@ -1,5 +1,6 @@
 <nav class="bg-gray-900 py-3 shadow-md">
   <div class="container mx-auto flex justify-between items-center">
+
     <!-- Logo Section -->
     <div class="flex items-center">
       <span class="text-xl font-semibold text-white">NovaVerse</span>
@@ -8,11 +9,41 @@
     <!-- Middle Navigation Links -->
     <div class="hidden md:flex space-x-6 text-white">
       <a routerLink="/" class="hover:text-gray-400">Home</a>
-      <a routerLink="/categories" class="hover:text-gray-400">Category</a>
-      <a href="#" class="hover:text-gray-400">Artists</a>
+      <a routerLink="/categories" class="hover:text-gray-400">Categorie</a>
+      <a href="#" class="hover:text-gray-400">Artisti</a>
       <a href="#" class="hover:text-gray-400">NFT (coming soon)</a>
-      <a href="#" class="hover:text-gray-400">Crypto</a>
     </div>
+
+    <!-- Barra di ricerca -->
+    <div class="relative text-gray-400">
+      <input
+        type="text"
+        placeholder="Cerca artista..."
+        class="bg-gray-800 text-white py-2 px-4 rounded-full w-64"
+        (input)="onSearch($event)"
+      />
+
+      <!-- Mostra un loader durante la ricerca -->
+<!-- Mostra il loader durante il caricamento -->
+<div *ngIf="loading" class="absolute bg-gray-900 text-white mt-2 p-2 rounded">
+  Caricamento...
+</div>
+
+<!-- Visualizza i suggerimenti solo se ci sono risultati e la query non è vuota -->
+<ul *ngIf="(suggestedArtists$ | async) as artistList" class="absolute bg-gray-900 text-white shadow-lg mt-1 w-full">
+  <!-- Mostra "Nessun risultato" se non ci sono artisti trovati e la query è presente -->
+  <li *ngIf="artistList.length === 0 && (searchQuery.getValue()?.length ?? 0) > 0" class="p-2 text-center text-gray-400">
+    Nessun risultato
+  </li>
+
+  <!-- Lista di artisti trovati -->
+  <li *ngFor="let artist of artistList" (click)="goToArtistProfile(artist.id, artist.username)" class="cursor-pointer hover:bg-gray-700 p-2">
+    <span [innerHTML]="highlightMatch(artist.username, searchQuery.getValue())"></span>
+  </li>
+</ul>
+
+    </div>
+
 
     <!-- Right Side Section -->
     <div class="flex items-center space-x-4">
@@ -23,10 +54,8 @@
         </a>
 
         <a routerLink="/favorite-list" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
-          <i class="fas fa-heart"></i> <!-- Icona del cuoricino per i preferiti -->
+          <i class="fas fa-heart"></i>
         </a>
-
-
 
         <a routerLink="/cart" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
           <i class="fas fa-shopping-cart"></i>
@@ -44,5 +73,6 @@
         </a>
       </ng-template>
     </div>
+
   </div>
 </nav>

@@ -13,6 +13,7 @@ namespace NovaVerse.Interfaces
         Task<ArtworkDto> UpdateArtworkAsync(int id, ArtworkDto artworkDto);
         Task<bool> DeleteArtworkAsync(int id);
         Task<List<ArtworkDto>> GetRandomArtworksAsync();
+        Task<List<ArtworkDto>> GetArtworksByArtistIdAsync(int artistId);
 
     }
 }
