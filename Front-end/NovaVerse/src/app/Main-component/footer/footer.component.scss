@@ -1,0 +1,17 @@
+footer {
+  width: 100%;
+  color: white;
+  padding: 2rem 1rem;
+  bottom: 0;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.router-outlet {
+  flex-grow: 1;
+}

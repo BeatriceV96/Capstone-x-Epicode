@@ -1,6 +1,143 @@
-@import 'bootstrap/scss/bootstrap'; /* Importare prima Bootstrap */
+@import 'bootstrap/scss/bootstrap'; /* Importa prima Bootstrap */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-//@import 'swiper/swiper-bundle.css';
 
+/* Navbar sticky */
+nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 50; /* Mantieni la navbar al di sopra del resto del contenuto */
+  background-color: #1a1a1a; /* Colore dello sfondo della navbar */
+}
+
+/* Stile base per tutto */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* Impostazioni generali per la visualizzazione a schermo intero */
+.min-h-screen {
+  min-height: calc(100vh - 100px); /* Assicurati che l'altezza minima tenga conto della navbar e del footer */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Gestione generale dei margini e padding per evitare spazi vuoti */
+.container {
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Impostazioni generali per navbar e footer */
+nav, footer {
+  width: 100%;
+  padding: 1rem;
+}
+
+/* Layout principale flessibile */
+.router-outlet {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  width: 100%;
+}
+
+/* Impostazioni per griglie responsive */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Responsività per griglie */
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Responsività delle immagini */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ridimensionamento delle immagini nel carosello */
+.carousel-inner img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Media queries per la gestione dei componenti su schermi piccoli */
+@media (max-width: 768px) {
+  nav, footer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .router-outlet {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-inner img {
+    height: 200px;
+  }
+
+  .text-xl {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .container, .router-outlet {
+    padding: 5px;
+  }
+
+  button {
+    font-size: 0.875rem;
+    padding: 8px 16px;
+  }
+}

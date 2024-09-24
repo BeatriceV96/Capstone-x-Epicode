@@ -1,15 +1,18 @@
 <div class="w-full min-h-screen bg-gradient-to-b from-purple-300 to-gray-900 p-8">
   <!-- Sezione per la selezione dell'ordinamento -->
   <div class="flex justify-end mb-4">
-    <select (change)="onSortChange($event)" class="bg-white text-gray-900 border border-gray-300 rounded-lg p-2">
-      <option value="priceAsc">Prezzo: Crescente</option>
-      <option value="priceDesc">Prezzo: Decrescente</option>
-      <option value="dateAsc">Data: Meno Recente</option>
-      <option value="dateDesc">Data: Più Recente</option>
-      <option value="titleAsc">Titolo: A a Z</option>
-      <option value="titleDesc">Titolo: Z a A</option>
-    </select>
+    <div class="relative">
+      <select (change)="onSortChange($event)" class="bg-gray-900 text-white border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+        <option value="priceAsc">Prezzo: Crescente</option>
+        <option value="priceDesc">Prezzo: Decrescente</option>
+        <option value="dateAsc">Data: Meno Recente</option>
+        <option value="dateDesc">Data: Più Recente</option>
+        <option value="titleAsc">Titolo: A a Z</option>
+        <option value="titleDesc">Titolo: Z a A</option>
+      </select>
+    </div>
   </div>
+
 
   <!-- Sezione per mostrare le opere associate -->
   <div *ngIf="artworks$ | async as artworks; else noArtworks" class="w-full">

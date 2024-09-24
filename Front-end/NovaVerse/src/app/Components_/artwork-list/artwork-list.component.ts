@@ -41,7 +41,14 @@ export class ArtworkListComponent implements OnInit {
           console.log('Artworks caricati:', artworks); // Controllo dei dati in console
           this.loading = false; // Imposta loading su false dopo il caricamento
           this.noArtworks = artworks.length === 0; // Controlla se non ci sono opere
-          this.allArtworks = artworks; // Salva tutte le opere per l'ordinamento
+
+          // Converte ogni createDate in un oggetto Date
+          this.allArtworks = artworks.map(artwork => {
+            return {
+              ...artwork,
+              createDate: new Date(artwork.createDate) // Assicurati che sia un oggetto Date
+            };
+          });
         }),
         catchError(error => {
           this.errorMessage = 'Errore nel caricamento delle opere.';
@@ -51,6 +58,7 @@ export class ArtworkListComponent implements OnInit {
       );
     }
   }
+
 
   onSortChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
