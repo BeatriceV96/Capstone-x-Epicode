@@ -149,10 +149,12 @@
     <div *ngIf="comments$ | async as comments; else noComments">
       <div *ngFor="let comment of comments" class="bg-gray-700 p-4 rounded-lg mb-2 flex items-start">
         <!-- Avatar utente -->
-        <img *ngIf="comment.profilePicture"
-             [src]="getProfilePictureUrl(comment.profilePicture)"
-             alt="Immagine profilo di {{ comment.username }}"
-             class="w-12 h-12 rounded-full mr-4">
+        <!-- Avatar utente -->
+<img *ngIf="comment.profilePicture"
+[src]="getProfilePictureUrl(comment.profilePicture)"
+alt="Immagine profilo di {{ comment.username }}"
+class="w-12 h-12 rounded-full mr-4 object-cover">
+
 
         <div *ngIf="!comment.profilePicture" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-400">
           <p>Nessuna immagine</p>
