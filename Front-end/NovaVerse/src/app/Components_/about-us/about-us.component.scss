@@ -1,5 +1,6 @@
+/* Sezione Esplora Ora */
 .about-us-intro {
-  background: linear-gradient(to bottom, #784e9b, #1f2937); // Sfumatura simile a quella mostrata nell'immagine
+  background: linear-gradient(to bottom, #784e9b, #1f2937);  // Sfumatura di viola a grigio scuro
   padding: 4rem 0;
 
   h1 {
@@ -38,21 +39,88 @@
       color: #9ca3af;
     }
   }
+}
 
-  .explore-button {
-    background-color: #3b82f6;
-    padding: 0.75rem 2rem;
-    border-radius: 9999px;
-    transition: background-color 0.3s;
+/* Sezione Supportiamo gli Artisti */
+.about-us-support {
+  background: linear-gradient(to bottom, #1e3a8a, #1f2937);  /* Sfumatura di blu a grigio scuro */
+  padding: 4rem 0;
 
-    &:hover {
-      background-color: #2563eb;
+  h1 {
+    font-size: 3rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-align: center;  /* Titolo centrato */
+  }
+
+  p {
+    font-size: 1.25rem;
+    color: #d1d5db;
+    text-align: center;  /* Testo centrato */
+    margin-bottom: 2rem;
+    line-height: 1.75;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;  /* Colonna singola per schermi piccoli */
+    gap: 2rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);  /* Due colonne su schermi medi */
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);  /* Tre colonne su schermi grandi */
+    }
+  }
+
+  /* Impostazioni per ciascun elemento */
+  .feature-item {
+    text-align: center;
+    color: #ffffff;
+
+    h3 {
+      font-size: 1.5rem;
+      color: #ffffff;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #d1d5db;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .feature-icon {
+      margin-bottom: 1.5rem;
+
+      img {
+        max-width: 50px;
+        margin: 0 auto;
+        display: block;  /* Centra l'immagine */
+      }
+    }
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    @media (min-width: 1024px) {
+      justify-content: center; /* Assicura che la colonna sia centrata su schermi più grandi */
     }
   }
 }
 
+
+
+/* Sezione La Nostra Storia */
 .about-us-history {
-  background-color: #111827;
+  background-color: #111827;  // Colore di sfondo scuro
   padding: 4rem 0;
   text-align: center;
 
@@ -69,4 +137,40 @@
     margin: 0 auto;
     line-height: 1.75;
   }
+}
+
+/* Stili comuni */
+.container {
+  display: flex;
+  flex-direction: column;  // Default su schermi piccoli
+  align-items: center;
+
+  @media (min-width: 1024px) {
+    flex-direction: row;  // Cambia a disposizione in fila per schermi grandi
+    justify-content: space-between;  // Spazio tra immagine e testo
+    text-align: left;
+  }
+}
+
+img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+p {
+  font-size: 1.125rem;
+  color: #d1d5db;
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+}
+
+/* Centrare verticalmente il testo */
+.lg\:w-1\/2.flex.items-center {
+  display: flex;
+  align-items: center;
 }
