@@ -1,0 +1,112 @@
+body {
+  background-color: #111827; /* Usa il codice esadecimale del colore selezionato dall'immagine */
+}
+
+.container {
+  max-width: 800px; /* Aumenta la larghezza massima per desktop */
+  margin: 10px auto;
+  background-color: #111827;
+  margin-bottom: 30px;
+}
+
+.bg-gray-900 {
+  background-color: #1a202c;
+}
+
+.neon-border {
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid transparent;
+  border-image: linear-gradient(90deg, #00e0ff, #ff00ff) 1;
+  box-shadow:
+    0 0 30px rgba(0, 224, 255, 0.6),
+    0 0 60px rgba(255, 0, 255, 0.6);
+}
+
+.max-w-lg {
+  max-width: 800px; /* Più largo per desktop */
+}
+
+@media (min-width: 768px) {
+  .container {
+    margin-top: 50px;
+  }
+}
+
+form {
+  margin-bottom: 40px; /* Aggiungi stacco dal footer */
+}
+
+
+
+/* Posiziona l'immagine sopra l'angolo del form */
+.stamp-logo-oscillate {
+  position: absolute;
+  top: 9px; /* Aggiusta la posizione per evitare la navbar */
+  left: 70%; /* Centra l'immagine sopra il form */
+  transform: translateX(-50%) rotate(-10deg); /* Assicurati che l'immagine sia centrata */
+  width: 120px; /* Dimensione dell'immagine */
+  height: auto;
+  z-index: 1000; /* Porta l'immagine in primo piano sopra tutto */
+  border: 4px solid transparent;
+  border-radius: 16px;
+  border-image: linear-gradient(90deg, #00e0ff, #ff00ff) 1;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.6), 0 0 30px rgba(255, 0, 255, 0.6); /* Ombra neon */
+  animation: swing 3s infinite ease-in-out; /* Animazione di oscillazione */
+}
+
+/* Animazione per far dondolare l'immagine */
+@keyframes swing {
+  0% {
+    transform: translateX(-50%) rotate(-10deg); /* Rotazione iniziale */
+  }
+  50% {
+    transform: translateX(-50%) rotate(10deg); /* Rotazione opposta */
+  }
+  100% {
+    transform: translateX(-50%) rotate(-10deg); /* Torna alla rotazione iniziale */
+  }
+}
+
+/* Per schermi medi (da 571px a 992px) */
+@media (min-width: 571px) and (max-width: 992px) {
+  .stamp-logo-oscillate {
+    right: 20px; /* Mantiene l'immagine sulla destra */
+    top: 0; /* Aggiusta il top per evitare la navbar */
+    left: auto; /* Rimuove il left per usare solo right */
+    transform: translateX(0) rotate(-10deg); /* Mantiene l'orientamento */
+    width: 100px; /* Riduce leggermente la dimensione dell'immagine su schermi medi */
+    margin-left: 0; /* Rimuove il margine */
+    margin-top: 0; /* Rimuove il margine */
+  }
+}
+
+/* Per schermi piccoli (max 570px) */
+@media (max-width: 570px) {
+  .stamp-logo-oscillate {
+    right: 10px; /* Mantiene l'immagine sulla destra anche sui dispositivi mobili */
+    top: -11px; /* Aggiusta il top per evitare la navbar */
+    left: 85%;
+    transform: translateX(0) rotate(-10deg); /* Mantiene l'orientamento */
+    margin-left: 0; /* Rimuove il margine a sinistra */
+    margin-top: 0; /* Rimuove il margine in alto */
+  }
+}
+
+/* Stile di base per schermi più grandi */
+.stamp-logo-oscillate {
+  position: absolute;
+  top: 15px; /* Posizionamento sopra il form */
+  right: -40px; /* Posiziona l'immagine a destra del form */
+  transform: translateX(0) rotate(-10deg); /* Assicurati che l'immagine resti al suo posto */
+  width: 120px; /* Dimensione dell'immagine */
+  height: auto;
+  z-index: 1000; /* Porta l'immagine in primo piano sopra tutto */
+  border: 4px solid transparent;
+  border-radius: 16px;
+  border-image: linear-gradient(90deg, #00e0ff, #ff00ff) 1;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.6), 0 0 30px rgba(255, 0, 255, 0.6); /* Ombra neon */
+  animation: swing 3s infinite ease-in-out; /* Animazione di oscillazione */
+}
