@@ -38,7 +38,7 @@
             <button class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mt-4" (click)="enableBioEdit()">Modifica Biografia</button>
           </div>
           <div *ngIf="isEditingBio" class="mt-4">
-            <textarea [(ngModel)]="updatedBio" class="form-control w-full bg-gray-700 text-white p-3 rounded-lg"></textarea>
+            <textarea [(ngModel)]="updatedBio" class="form-control w-full bg-gray-700 text-black p-3 rounded-lg"></textarea>
             <div class="flex space-x-2 mt-4 justify-center">
               <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full" (click)="saveBio()">Salva</button>
               <button class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-full" (click)="cancelBioEdit()">Annulla</button>
