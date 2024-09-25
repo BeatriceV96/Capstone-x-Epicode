@@ -13,16 +13,15 @@
     </div>
   </div>
 
-
   <!-- Sezione per mostrare le opere associate -->
   <div *ngIf="artworks$ | async as artworks; else noArtworks" class="w-full">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-screen-xl mx-auto">
       <!-- Ciclo attraverso le opere ricevute -->
-      <div *ngFor="let artwork of artworks" class="relative bg-gray-900 shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 duration-300">
+      <div *ngFor="let artwork of artworks" class="relative artwork-card-neon bg-gray-900 shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 duration-300">
         <!-- Naviga alla pagina di dettaglio dell'opera -->
         <a [routerLink]="['/artworks', artwork.id]" class="block">
           <!-- Immagine dell'opera -->
-          <div class="relative h-48 mb-4">
+          <div class="relative h-48 mb-4 artwork-image-neon">
             <img *ngIf="artwork.photo || artwork.imageUrl"
                  [src]="'http://localhost:5034' + artwork.photo"
                  alt="Opera"
