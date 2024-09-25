@@ -31,3 +31,33 @@ html, body, app-root, .min-h-screen {
   display: flex;
   flex-direction: column;
 }
+
+/* Bottone tondo in grigio con ombra e icona centrata */
+#scrollToTopBtn {
+  position: fixed;
+  color: white; /* Colore dell'icona */
+  font-size: 14px; /* Dimensione dell'icona */
+  border: 2px solid white; /* Bordi bianchi */
+  background-color: transparent; /* Colore di sfondo trasparente */
+  border-radius: 50%; /* Rende il bottone tondo */
+  cursor: pointer;
+
+  /* Centrare l'icona */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Rimuovi padding e margini che potrebbero interferire */
+  padding: 0;
+  margin: 0;
+
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  z-index: 1000;
+}
+
+#scrollToTopBtn:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Sfondo semi-trasparente al passaggio del mouse */
+  border-color: #ffffff; /* Mantiene i bordi bianchi */
+}
+

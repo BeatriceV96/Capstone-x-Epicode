@@ -1,4 +1,4 @@
-<div class="min-h-screen flex flex-col">
+<div class="min-h-screen flex flex-col relative">
   <!-- Navbar -->
   <app-navbar></app-navbar>
 
@@ -6,6 +6,12 @@
   <div class="flex-grow">
     <router-outlet></router-outlet>
   </div>
+
+  <!-- Bottone per tornare all'inizio della pagina -->
+  <button (click)="scrollToTop()" class="fixed bottom-5 right-5 p-4 bg-gray-600 text-white rounded-full shadow-lg hover:bg-gray-800" id="scrollToTopBtn" style="display: none;">
+    <i class="fas fa-arrow-up"></i> <!-- Icona con freccia verso l'alto -->
+  </button>
+
 
   <!-- Footer -->
   <app-footer></app-footer>
