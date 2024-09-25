@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Renderer2, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Renderer2, ElementRef, HostListener } from '@angular/core';
 import { ArtworkService } from '../../services/artwork.service';
 import { Subscription, interval } from 'rxjs';
 import { Artwork } from '../../Models/artwork';
@@ -11,11 +11,13 @@ import { Artwork } from '../../Models/artwork';
 export class HomeComponent implements OnInit, OnDestroy {
   randomArtworks: Artwork[] = [];
   private subscription!: Subscription;
+  private animatedSection!: HTMLElement;
 
   constructor(private artworkService: ArtworkService, private renderer: Renderer2, private el: ElementRef) { }
 
   ngOnInit(): void {
     this.loadRandomArtworks();
+    this.animatedSection = this.el.nativeElement.querySelector('.animated-section');
 
     // Cambia le opere ogni 3 secondi
     this.subscription = interval(3000).subscribe(() => {
@@ -63,4 +65,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll() {
+    this.checkScroll();
+  }
+
+  checkScroll() {
+    const parallaxSection = this.el.nativeElement.querySelector('.parallax-section');
+    const rect = parallaxSection.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+
+    if (rect.top < windowHeight && rect.bottom > 0) {
+      // Sezione visibile durante lo scroll
+      this.renderer.addClass(parallaxSection, 'scrolled');
+    } else {
+      // Sezione non visibile
+      this.renderer.removeClass(parallaxSection, 'scrolled');
+    }
+  }
 }

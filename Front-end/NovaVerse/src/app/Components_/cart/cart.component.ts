@@ -94,4 +94,12 @@ export class CartComponent implements OnInit {
       this.router.navigate(['/checkout']); // Naviga alla pagina di checkout
     });
   }
+
+  goToArtworkDetail(artworkId: number | undefined): void {
+    if (artworkId) {
+      this.router.navigate(['/artworks', artworkId]);
+    } else {
+      console.error('ID dell\'opera non valido.');
+    }
+  }
 }

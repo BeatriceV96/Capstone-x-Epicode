@@ -418,10 +418,6 @@ deleteComment(commentId: number): void {
   );
 }
 
-
-
-
-
 getProfilePictureUrl(profilePicturePath: string | null): string {
   if (!profilePicturePath) {
     return 'http://localhost:5034/uploads/default-profile.png';  // Immagine di default

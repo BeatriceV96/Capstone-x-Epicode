@@ -13,7 +13,7 @@
 
   <!-- Lista delle categorie -->
   <div *ngIf="categories.length > 0 && !loading; else noCategories" class="px-4 space-y-4">
-    <div *ngFor="let category of categories" class="bg-gray-800 shadow-md rounded-lg overflow-hidden transition-transform transform duration-300 hover:bg-gray-700 cursor-pointer">
+    <div *ngFor="let category of categories" class="category-card bg-gray-800 shadow-md rounded-lg overflow-hidden transition-transform transform duration-300 hover:bg-gray-700 cursor-pointer">
       <div class="flex justify-between items-center p-4 text-white">
         <!-- Nome della categoria -->
         <a [routerLink]="['/categories', category.id, 'artworks']" class="block text-xl font-semibold cursor-pointer no-underline">
@@ -29,11 +29,7 @@
       </div>
 
       <!-- Se hai delle immagini di categoria -->
-      <img *ngIf="category.image"
-           [src]="category.image"
-           alt="Categoria"
-           loading="lazy"
-           class="w-full h-48 object-cover mb-4">
+      <img *ngIf="category.image" [src]="category.image" alt="Categoria" loading="lazy" class="w-full h-48 object-cover mb-4">
     </div>
   </div>
 

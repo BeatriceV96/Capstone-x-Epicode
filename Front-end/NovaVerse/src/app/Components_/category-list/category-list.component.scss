@@ -14,76 +14,73 @@
   margin-bottom: 20px;
 }
 
-/* Griglia delle opere d'arte */
+/* Griglia delle categorie */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
-/* Singola card */
-.grid .card {
-  background-color: #1c1c1c;
+/* Aggiunta dei bordi neon alle card */
+
+/* Stile per le card delle categorie con bordo neon gradiente */
+.category-card {
+  position: relative;
+  border: 2px solid transparent;
   border-radius: 15px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-in-out;
+
+  /* Bordo neon con gradiente */
+  border-image: linear-gradient(90deg, #00e0ff, #ff00ff) 1;
+
+  /* Ombre neon */
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.4),  /* Ombra blu neon */
+              0 0 20px rgba(255, 0, 255, 0.4); /* Ombra fucsia neon */;
 }
 
-.grid .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+/* Hover sulle card per intensificare l'effetto neon */
+.category-card:hover {
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.6),
+              0 0 30px rgba(255, 0, 255, 0.6);
 }
 
-/* Immagine delle opere */
+
+
+/* Immagine delle categorie */
 .grid .card img {
   width: 100%;
-  height: 200px;
+  height: 150px;
   object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
-/* Dettagli dell'opera */
+/* Dettagli della categoria */
 .grid .card .details {
-  padding: 20px;
+  text-align: center;
+  padding: 10px;
 }
 
 .grid .card h2 {
-  font-size: 24px;
+  font-size: 20px;
   color: #ffffff;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
-.grid .card p {
-  color: #999999;
-  font-size: 16px;
-}
-
-.grid .card p.price {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ffffff;
-  margin-top: 10px;
-}
-
-/* Pulsanti di filtro */
-.filter-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.filter-buttons button {
-  background-color: #292929;
-  color: #ffffff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+/* Stile per l'icona di modifica */
+.grid .card .edit-icon {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease;
 }
 
-.filter-buttons button:hover {
-  background-color: #ffffff;
-  color: #292929;
+.grid .card .edit-icon:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.grid .card .edit-icon i {
+  color: #ffffff;
 }
 

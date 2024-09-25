@@ -1,35 +1,35 @@
+.carousel {
+  margin-top: 80px;
+}
+
+//SEZIONE DELLE CARD
+
 .artwork-card {
   width: 100%;
   height: 350px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background-color: black;
+  border-radius: 16px;
   padding: 16px;
+  position: relative;
+  overflow: hidden;
+
+  /* Bordo neon */
+  border: 4px solid transparent;
+  border-image: linear-gradient(90deg, #00e0ff, #ff00ff) 1;
+
+  /* Effetto neon che sfuma dai lati */
+  box-shadow:
+    0 0 30px rgba(0, 224, 255, 0.6), /* Ombra blu */
+    0 0 60px rgba(255, 0, 255, 0.6); /* Ombra fucsia */
+
   transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease-in-out;
-
-  &.card-leave {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-
-  &.card-enter {
-    transform: scale(1.05);
-    opacity: 0;
-  }
-
-  &.card-enter-active {
-    transform: scale(1);
-    opacity: 1;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease-in-out;
-  }
 }
-
 
 .artwork-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  border-radius: 8px;
   transition: opacity 0.6s ease-in-out, transform 0.4s ease-in-out;
 
   &.fade-enter {
@@ -42,4 +42,46 @@
     transform: scale(1);
     transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
   }
+}
+
+/* Stile per il testo */
+.artwork-card h4,
+.artwork-card p {
+  color: white;  /* Colore bianco per il testo */
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+.artwork-card p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+
+
+//SEZIONE CENTRALE CON IMMAGINE DI SFONDO
+
+.parallax-section {
+  position: relative;
+  overflow: hidden;
+  height: 90vh; /* Imposta un'altezza fissa per la sezione */
+}
+
+.parallax-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-size: cover;
+  background-image: url('../../../assets/fc12d05626f2b42b38dbfdb4cb911914.avif'); /* Percorso corretto */
+  transform: scale(1); /* Inizio con immagine alla sua scala normale */
+  filter: blur(0px); /* Nessuna sfocatura iniziale */
+  transition: transform 2.5s ease, filter 2.5s ease; /* Rallenta la transizione */
+}
+
+.parallax-section.scrolled .parallax-image {
+  transform: scale(1.2); /* Aumenta la scala quando si scorre */
+  filter: blur(6px); /* Aumenta la sfocatura quando si scorre */
 }
