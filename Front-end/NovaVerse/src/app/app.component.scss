@@ -35,9 +35,9 @@ html, body, app-root, .min-h-screen {
 /* Bottone tondo in grigio con ombra e icona centrata */
 #scrollToTopBtn {
   position: fixed;
-  color: white; /* Colore dell'icona */
-  font-size: 14px; /* Dimensione dell'icona */
-  border: 2px solid white; /* Bordi bianchi */
+  color: rgb(197, 96, 223); /* Colore del testo (icona) */
+  font-size: 24px; /* Dimensione dell'icona */
+  border: 2px solid rgb(197, 96, 223); /* Bordi con il colore specificato */
   background-color: transparent; /* Colore di sfondo trasparente */
   border-radius: 50%; /* Rende il bottone tondo */
   cursor: pointer;
@@ -58,6 +58,15 @@ html, body, app-root, .min-h-screen {
 
 #scrollToTopBtn:hover {
   background-color: rgba(255, 255, 255, 0.2); /* Sfondo semi-trasparente al passaggio del mouse */
-  border-color: #ffffff; /* Mantiene i bordi bianchi */
+  border-color: #ffffff; /* Cambia il bordo quando l'utente passa sopra con il mouse */
+}
+
+/* Cambia il colore dell'icona all'interno del pulsante */
+#scrollToTopBtn .icon-arrow {
+  color: rgb(197, 96, 223); /* Colore dell'icona */
+}
+
+#scrollToTopBtn:hover .icon-arrow {
+  color: white; /* Cambia il colore dell'icona al passaggio del mouse */
 }
 

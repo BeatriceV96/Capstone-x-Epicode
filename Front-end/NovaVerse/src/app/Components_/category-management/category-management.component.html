@@ -3,7 +3,7 @@
 
   <!-- Notifica di successo o errore -->
   <div *ngIf="message" class="mb-6">
-    <div [ngClass]="{'bg-green-500 text-white p-4 rounded-lg shadow-md': success, 'bg-red-500 text-white p-4 rounded-lg shadow-md': !success}">
+    <div [ngClass]="{'bg-cyan-600 p-10  text-white p-4 rounded-lg shadow-md': success, 'bg-red-500 text-white p-4 rounded-lg shadow-md': !success}">
       {{ message }}
     </div>
   </div>
