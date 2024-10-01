@@ -1,9 +1,9 @@
 <div class="w-full min-h-screen bg-gradient-to-b from-purple-300 to-gray-900 p-8">
-  <div class="container mx-auto py-10">
-    <div class="bg-gray-800 shadow-lg rounded-lg p-8 max-w-4xl mx-auto">
+  <div class="container mx-auto py-10 profile-container">
+    <div class="bg-gray-800 shadow-lg rounded-lg p-8">
       <div class="flex flex-col items-center">
         <!-- Immagine del profilo -->
-        <div class="relative mb-8">
+        <div class="relative mb-8 neon-border">
           <img *ngIf="profileImageUrl"
                [src]="profileImageUrl"
                alt="Immagine del profilo di {{ user?.username }}"
@@ -14,7 +14,7 @@
         </div>
 
         <!-- Cambia immagine del profilo -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-8 neon-border">
           <label for="file-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-full">
             Cambia immagine del profilo
           </label>
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Informazioni del profilo utente -->
-        <div class="w-full text-center mb-6">
+        <div class="w-full text-center mb-6 neon-border">
           <h2 class="text-3xl font-bold text-white mb-4">{{ user?.username }}</h2>
           <p class="text-gray-300 mb-4"><strong>Email:</strong> {{ user?.email }}</p>
           <p class="text-gray-300 mb-4"><strong>Ruolo:</strong> {{ user?.role }}</p>
@@ -31,7 +31,7 @@
         </div>
 
         <!-- Modifica biografia -->
-        <div class="mt-6 w-full text-center mb-8">
+        <div class="mt-6 w-full text-center mb-8 neon-border">
           <strong class="text-lg text-white">Biografia:</strong>
           <div *ngIf="!isEditingBio" class="mt-2">
             <p class="mt-2 text-gray-300">{{ user?.bio || 'Nessuna biografia fornita.' }}</p>
@@ -46,9 +46,8 @@
           </div>
         </div>
 
-
         <!-- Bottone per tornare alla home -->
-        <div class="mt-10">
+        <div class="mt-10 neon-border">
           <button (click)="goToHome()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
             Torna alla Home
           </button>

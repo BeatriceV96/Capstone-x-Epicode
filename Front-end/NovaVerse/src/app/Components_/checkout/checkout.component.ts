@@ -3,6 +3,7 @@ import { ShoppingCartService } from '../../services/shopping-cart.service';
 import { Cart } from '../../Models/cart';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
@@ -18,7 +19,7 @@ export class CheckoutComponent implements OnInit {
   // Definisci una variabile per la consegna
   deliveryCost: number = 4.00;
 
-  constructor(private shoppingCartService: ShoppingCartService) {
+  constructor(private shoppingCartService: ShoppingCartService, private router: Router) {
     this.cart$ = this.shoppingCartService.cart$;
 
     // Calcola il subtotale (solo il costo degli articoli)
@@ -42,8 +43,10 @@ export class CheckoutComponent implements OnInit {
 
     // Mostra un popup che conferma che l'ordine è stato effettuato
     alert('Ordine effettuato con successo!');
-  }
 
+    // Reindirizza alla home dopo aver confermato l'ordine
+    this.router.navigate(['/']);
+  }
   // Metodo per selezionare il pagamento
   selectPaymentMethod(method: string): void {
     this.selectedPaymentMethod = method;

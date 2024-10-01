@@ -64,7 +64,7 @@ export class RegisterComponent {
         (response) => {
           console.log('Registrazione avvenuta con successo', response);
           this.isLoading = false;
-          this.router.navigate(['/']);
+          this.router.navigate(['/auth/login']);
         },
         (error: any) => {
           console.error('Registrazione fallita', error);
