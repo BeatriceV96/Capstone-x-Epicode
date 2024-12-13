@@ -73,8 +73,9 @@ export class CategoryService {
       .pipe(
         catchError((error) => {
           console.error('Errore durante l\'eliminazione della categoria:', error);
-          return throwError(error);
+          return throwError(error); // Propaga l'errore al componente
         })
       );
   }
+
 }

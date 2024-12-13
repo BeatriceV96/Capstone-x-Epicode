@@ -92,3 +92,51 @@ nav .search-bar button {
     @apply flex flex-col space-y-2 mt-4 text-center;
   }
 }
+
+//notifiche
+.notification-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  z-index: 1000;
+}
+
+.notification-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-dropdown li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-dropdown li a {
+  text-decoration: none;
+  color: black;
+}
+
+.notification-dropdown li a:hover {
+  color: #007bff;
+}

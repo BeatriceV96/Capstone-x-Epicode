@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../Models/category';
@@ -113,23 +113,34 @@ export class CategoryManagementComponent implements OnInit {
   // Elimina una categoria
   deleteCategory(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questa categoria?')) {
-      this.loading = true;
+      this.loading = true; // Indica che è in corso un'operazione
       this.categoryService.deleteCategory(id).pipe(
         tap(() => {
-          console.log('Categoria eliminata:', id); // Log per il debug
-          this.categories = this.categories.filter(cat => cat.id !== id);  // Rimuovi la categoria dall'array locale
+          // Rimuove la categoria dall'elenco
+          this.categories = this.categories.filter(cat => cat.id !== id);
           this.message = 'Categoria eliminata con successo';
           this.success = true;
         }),
         catchError(error => {
-          console.error('Errore durante l\'eliminazione della categoria:', error); // Log per il debug
-          this.message = error.error.message || 'Errore durante l\'eliminazione della categoria';
-          this.success = false;
-          return of(null);  // Restituisce null in caso di errore
+          console.error('Errore durante l\'eliminazione della categoria:', error);
+
+          // Gestione errore specifico
+          if (error.error.message?.includes('opere associate')) {
+            alert('Non è possibile eliminare la categoria: ci sono opere associate.');
+          } else {
+            this.message = error.error.message || 'Errore durante l\'eliminazione della categoria';
+            this.success = false;
+          }
+
+          return throwError(error); // Propaga l'errore
         })
-      ).subscribe().add(() => this.loading = false);  // Fine caricamento
+      ).subscribe({
+        complete: () => this.loading = false // Fine operazione
+      });
     }
   }
+
+
 
   // Resetta il form e lo stato
   resetForm(): void {

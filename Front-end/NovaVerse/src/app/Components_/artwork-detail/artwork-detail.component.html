@@ -18,6 +18,13 @@
     <p *ngIf="(artwork$ | async)?.soldOut" class="text-red-500 font-bold">Questo articolo è stato venduto</p>
   </div>
 
+  <button
+  [routerLink]="['/chat', currentArtwork?.artistId]"
+  class="btn btn-primary"
+>
+  Contatta il Proprietario
+</button>
+
   <!-- Sezione azioni utente -->
   <ng-container *ngIf="artwork$ | async as artwork">
     <div *ngIf="isArtist(artwork)">
@@ -28,7 +35,7 @@
 
     <!-- Form di modifica -->
     <ng-container *ngIf="editMode">
-      <form (ngSubmit)="saveChanges(artwork)" class="mt-6 space-y-4" enctype="multipart/form-data">
+      <form (ngSubmit)="saveChanges()" class="mt-6 space-y-4" enctype="multipart/form-data">
         <div>
           <label for="title" class="block text-gray-300">Titolo</label>
           <input id="title" [(ngModel)]="artworkData.title" name="title" class="w-full bg-gray-700 p-2 rounded-lg" required />

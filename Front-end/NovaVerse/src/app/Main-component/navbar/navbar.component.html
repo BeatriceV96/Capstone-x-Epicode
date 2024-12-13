@@ -58,6 +58,16 @@
     <!-- Right Side Section -->
     <div class="flex items-center space-x-4">
       <ng-container *ngIf="isLoggedIn(); else guestLinks">
+         <!-- Icona Notifiche -->
+    <a routerLink="/notifications" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2 relative">
+      <i class="fas fa-bell"></i>
+      <span *ngIf="unreadNotifications > 0" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+        {{ unreadNotifications }}
+      </span>
+    </a>
+
+
+
         <!-- Icone Profilo, Carrello, Preferiti e Logout -->
         <a routerLink="/profile" class="text-white bg-gray-700 hover:bg-gray-600 rounded-full p-2">
           <i class="fas fa-user"></i>

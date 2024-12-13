@@ -3,6 +3,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './Pages/home/home.component';
 import { AuthGuard } from './guards/auth.guard';
 import { ArtistGuard } from './guards/artist.guard';
+import { ChatComponent } from './Components_/chat/chat.component';
+import { NotificationsComponent } from './Components_/notification/notification.component';
+
+
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -30,11 +34,16 @@ const routes: Routes = [
 
   { path: 'cart', loadChildren: () => import('./Components_/cart/cart.module').then(m => m.CartModule) },
 
+  { path: 'chat/:receiverId', component: ChatComponent },
+
+  { path: 'notifications', component: NotificationsComponent },
+
   { path: 'favorite-list', loadChildren: () => import('./Components_/favorite-list/favorite-list.module').then(m => m.FavoriteListModule) },
+
   { path: 'checkout', loadChildren: () => import('./Components_/checkout/checkout.module').then(m => m.CheckoutModule) },
   //{ path: 'search-results', loadChildren: () => import('./Components_/search-results/search-results.module').then(m => m.SearchResultsModule) },
   { path: 'artist-profile/:id/:name', loadChildren: () => import('./Components_/artist-profile/artist-profile.module').then(m => m.ArtistProfileModule) },
-  { path: 'about-us', loadChildren: () => import('./Components_/about-us/about-us.module').then(m => m.AboutUsModule) },
+  { path: 'about-us', loadChildren: () => import('./Pages/about-us/about-us.module').then(m => m.AboutUsModule) },
 
 
 

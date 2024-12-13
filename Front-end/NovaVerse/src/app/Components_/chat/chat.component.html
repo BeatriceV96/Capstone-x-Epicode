@@ -1,0 +1,63 @@
+<div class="flex flex-col h-screen transition-colors duration-300"
+     [ngClass]="{'dark-mode': isDarkMode, 'light-mode': !isDarkMode}">
+  <h2 class="text-2xl font-bold text-center py-4 bg-blue-500 text-white dark:bg-blue-700">
+    Chat
+    <button
+      (click)="toggleTheme()"
+      class="ml-4 bg-gray-200 hover:bg-gray-300 text-black dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white font-bold py-1 px-3 rounded-full"
+    >
+      {{ isDarkMode ? '🌙' : '☀️' }}
+    </button>
+  </h2>
+
+  <!-- Contenitore dei messaggi -->
+  <div class="flex-1 overflow-y-auto p-4">
+    <div
+      *ngFor="let message of messages"
+      class="flex mb-4"
+      [ngClass]="{'justify-end': message.senderId === currentUserId, 'justify-start': message.receiverId === currentUserId}">
+      <!-- Messaggi ricevuti -->
+      <div class="flex items-center space-x-4" *ngIf="message.receiverId === currentUserId">
+        <img
+          [src]="receiverProfilePicture || 'assets/default-profile.png'"
+          alt="Profile"
+          class="w-10 h-10 rounded-full">
+        <div class="p-3 rounded-lg shadow-md max-w-xs"
+             [ngClass]="{'bg-gray-800 text-white': isDarkMode, 'bg-white text-black': !isDarkMode}">
+          <p>{{ message.content }}</p>
+          <span class="text-xs block text-left">{{ message.timestamp | date: 'short' }}</span>
+        </div>
+      </div>
+
+      <!-- Messaggi inviati -->
+      <div class="flex items-center space-x-4" *ngIf="message.senderId === currentUserId">
+        <div class="p-3 rounded-lg shadow-md max-w-xs"
+             [ngClass]="{'bg-blue-700 text-white': isDarkMode, 'bg-blue-500 text-white': !isDarkMode}">
+          <p>{{ message.content }}</p>
+          <span class="text-xs block text-right">{{ message.timestamp | date: 'short' }}</span>
+        </div>
+        <img
+          [src]="currentUserProfilePicture || 'assets/default-profile.png'"
+          alt="Profile"
+          class="w-10 h-10 rounded-full">
+      </div>
+    </div>
+  </div>
+
+  <!-- Input per nuovo messaggio -->
+  <div class="flex items-center border-t p-4"
+       [ngClass]="{'bg-gray-700 border-gray-700': isDarkMode, 'bg-white border-gray-300': !isDarkMode}">
+    <textarea
+      [(ngModel)]="newMessageContent"
+      class="flex-1 border rounded-lg p-2 mr-4 resize-none focus:outline-none focus:ring-2"
+      [ngClass]="{'bg-gray-700 text-white': isDarkMode, 'bg-white text-black': !isDarkMode}"
+      rows="2"
+      placeholder="Scrivi un messaggio..."></textarea>
+    <button
+      (click)="sendMessage()"
+      class="font-bold py-2 px-4 rounded-lg"
+      [ngClass]="{'bg-blue-700 text-white': isDarkMode, 'bg-blue-500 text-white': !isDarkMode}">
+      Invia
+    </button>
+  </div>
+</div>

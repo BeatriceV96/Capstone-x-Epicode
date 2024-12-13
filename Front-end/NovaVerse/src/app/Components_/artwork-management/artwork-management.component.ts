@@ -25,6 +25,7 @@ export class ArtworkManagementComponent implements OnInit {
   selectedFile: File | null = null;
   isArtist: boolean = false;
   artworkTypes = Object.values(ArtworkType);
+  artworks: Artwork[] = [];
 
   constructor(
     private artworkService: ArtworkService,
@@ -32,18 +33,44 @@ export class ArtworkManagementComponent implements OnInit {
     private categoryService: CategoryService,
     private authService: AuthService,
     private router: Router,
-  ) {
+  )  {
     this.route.params.subscribe(params => {
       this.categoryId = params['id'] ? +params['id'] : null;
       if (this.categoryId) {
         this.artworkForm.categoryId = this.categoryId;
+        this.artworkService.getArtworksByCategory(this.categoryId).subscribe((artworks) => {
+          this.artworkService.updateArtworks(artworks); // Usa il metodo pubblico per aggiornare
+        });
       }
     });
   }
 
   ngOnInit(): void {
     this.loadCategories();
+    // Iscriviti agli aggiornamenti per gli artworks
+    this.artworkService.artworks$.subscribe((updatedArtworks) => {
+      this.artworks = updatedArtworks;
+    });
   }
+
+  saveChanges(id: number): void {
+    const formData = new FormData();
+    if (this.artworkForm.title) formData.append('title', this.artworkForm.title);
+    if (this.artworkForm.description) formData.append('description', this.artworkForm.description);
+    if (this.artworkForm.price !== undefined) formData.append('price', this.artworkForm.price.toString());
+    if (this.selectedFile) formData.append('photoFile', this.selectedFile, this.selectedFile.name);
+    if (this.artworkForm.imageUrl) formData.append('imageUrl', this.artworkForm.imageUrl);
+
+    this.artworkService.updateArtwork(id, formData).subscribe(
+      () => {
+        console.log('Opera aggiornata con successo');
+      },
+      (error) => {
+        console.error("Errore durante l'aggiornamento dell'opera:", error);
+      }
+    );
+  }
+
 
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
@@ -144,4 +171,5 @@ export class ArtworkManagementComponent implements OnInit {
     this.artworkForm = { title: '', description: '', price: 0, categoryId: undefined, type: ArtworkType.Opere, imageUrl: '' };
     this.selectedFile = null;
   }
+
 }

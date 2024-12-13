@@ -11,6 +11,11 @@ import { NavbarComponent } from './Main-component/navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { FooterComponent } from './Main-component/footer/footer.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatComponent } from './Components_/chat/chat.component';
+import { NbChatModule, NbLayoutModule, NbThemeModule } from '@nebular/theme';
+import { CommonModule } from '@angular/common';
+import { NotificationsComponent } from './Components_/notification/notification.component';
+
 
 @NgModule({
   declarations: [
@@ -18,15 +23,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HomeComponent,
     NavbarComponent,
     FooterComponent,
+    ChatComponent,
+    NotificationsComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     NgbModule,
     FormsModule,
+    CommonModule,
     AuthModule,
     RouterModule,
     BrowserAnimationsModule,
+    NbThemeModule.forRoot({ name: 'cosmic' }),
+    NbLayoutModule,
+    NbChatModule,
   ],
   providers: [
     provideHttpClient(withInterceptorsFromDi()),

@@ -11,6 +11,8 @@ export class ArtworkService {
   private baseUrl = 'http://localhost:5034/api/artistArtwork';
   private artworkSubject = new BehaviorSubject<Artwork[]>([]);
   public artworks$ = this.artworkSubject.asObservable();
+  private currentArtworkSubject = new BehaviorSubject<Artwork | null>(null);
+  public currentArtwork$ = this.currentArtworkSubject.asObservable();
 
 
   constructor(private http: HttpClient) {}
@@ -27,20 +29,7 @@ export class ArtworkService {
   getArtworkById(id: number): Observable<Artwork> {
     return this.http.get<Artwork>(`${this.baseUrl}/${id}`, { withCredentials: true })
       .pipe(
-        map(artwork => {
-          // Assicurati che il nome della categoria sia parte dell'oggetto Artwork
-          console.log('Artwork ricevuto:', artwork);  // Log per vedere il contenuto
-          if (artwork.createDate) {
-            artwork.createDate = new Date(artwork.createDate);  // Converte la data
-          }
-          return artwork;
-        }),
-        tap(artwork => {
-          // Aggiorna l'elenco degli artwork in tempo reale
-          const currentArtworks = this.artworkSubject.value;
-          const updatedArtworks = currentArtworks.map(a => a.id === artwork.id ? artwork : a);
-          this.artworkSubject.next(updatedArtworks);
-        }),
+        tap((artwork) => this.currentArtworkSubject.next(artwork)), // Aggiorna l'opera corrente
         catchError(this.handleError)
       );
   }
@@ -77,32 +66,17 @@ export class ArtworkService {
 
 
  // Aggiorna un'opera esistente
-updateArtwork(id: number, artworkData: FormData | Partial<Artwork>): Observable<Artwork> {
-  const options = { withCredentials: true };
+ updateArtwork(id: number, artworkData: FormData): Observable<Artwork> {
+  return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, { withCredentials: true })
+    .pipe(
+      tap((updatedArtwork) => this.currentArtworkSubject.next(updatedArtwork)), // Aggiorna l'opera corrente
+      catchError(this.handleError)
+    );
+}
 
-  if (artworkData instanceof FormData) {
-    return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, options)
-      .pipe(
-        tap((updatedArtwork: Artwork) => {
-          const currentArtworks = this.artworkSubject.value.map(artwork =>
-            artwork.id === id ? updatedArtwork : artwork
-          );
-          this.artworkSubject.next(currentArtworks);
-        }),
-        catchError(this.handleError)
-      );
-  } else {
-    return this.http.put<Artwork>(`${this.baseUrl}/update/${id}`, artworkData, options)
-      .pipe(
-        tap((updatedArtwork: Artwork) => {
-          const currentArtworks = this.artworkSubject.value.map(artwork =>
-            artwork.id === id ? updatedArtwork : artwork
-          );
-          this.artworkSubject.next(currentArtworks);
-        }),
-        catchError(this.handleError)
-      );
-  }
+// Metodo per aggiornare l'elenco delle opere nel BehaviorSubject
+updateArtworks(artworks: Artwork[]): void {
+  this.artworkSubject.next(artworks);
 }
 
 
