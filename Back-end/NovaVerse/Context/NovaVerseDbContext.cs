@@ -16,6 +16,9 @@ namespace NovaVerse.Context
         public virtual DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
         public virtual DbSet<PurchaseHistory> PurchaseHistories { get; set; }
         public virtual DbSet<TransactionArtworks> TransactionArtworks { get; set; }
+        public DbSet<Message> Messages { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
 
         public NovaVerseDbContext(DbContextOptions<NovaVerseDbContext> options) : base(options)
         {
@@ -120,6 +123,32 @@ namespace NovaVerse.Context
                 .WithMany()
                 .HasForeignKey(f => f.ArtistId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Notification>()
+         .HasOne(n => n.Sender)
+         .WithMany()
+         .HasForeignKey(n => n.SenderId)
+         .OnDelete(DeleteBehavior.Restrict); // Evita cancellazioni a cascata
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Receiver)
+                .WithMany()
+                .HasForeignKey(n => n.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
 
             base.OnModelCreating(modelBuilder);
         }

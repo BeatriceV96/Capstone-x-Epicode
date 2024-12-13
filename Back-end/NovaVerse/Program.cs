@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IUserDashboardService, UserDashboardService>();
 builder.Services.AddScoped<IArtistDashboardService, ArtistDashboardService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 

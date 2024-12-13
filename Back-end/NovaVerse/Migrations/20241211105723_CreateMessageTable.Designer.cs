@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NovaVerse.Context;
 
@@ -11,9 +12,11 @@ using NovaVerse.Context;
 namespace NovaVerse.Migrations
 {
     [DbContext(typeof(NovaVerseDbContext))]
-    partial class NovaVerseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211105723_CreateMessageTable")]
+    partial class CreateMessageTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,44 +247,6 @@ namespace NovaVerse.Migrations
                         .IsUnique();
 
                     b.ToTable("NFTMetadatas");
-                });
-
-            modelBuilder.Entity("NovaVerse.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("NovaVerse.Models.PurchaseHistory", b =>
@@ -595,25 +560,6 @@ namespace NovaVerse.Migrations
                         .IsRequired();
 
                     b.Navigation("Artwork");
-                });
-
-            modelBuilder.Entity("NovaVerse.Models.Notification", b =>
-                {
-                    b.HasOne("NovaVerse.Models.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NovaVerse.Models.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("NovaVerse.Models.PurchaseHistory", b =>
