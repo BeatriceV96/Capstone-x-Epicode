@@ -63,54 +63,66 @@ public class MessageController : ControllerBase
 
 
     [HttpPost("send")]
-    public async Task<IActionResult> SendMessage([FromBody] MessageDto messageDto)
+public async Task<IActionResult> SendMessage([FromBody] MessageDto messageDto)
+{
+    try
     {
-        try
+        // Controlla se il sender e il receiver esistono
+        var sender = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == messageDto.SenderId);
+        var receiver = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == messageDto.ReceiverId);
+
+        if (sender == null)
         {
-            var sender = await _dbContext.Users.FindAsync(messageDto.SenderId);
-            var receiver = await _dbContext.Users.FindAsync(messageDto.ReceiverId);
-
-            if (sender == null || receiver == null)
-            {
-                return BadRequest("Invalid sender or receiver.");
-            }
-
-            var message = new Message
-            {
-                SenderId = messageDto.SenderId,
-                ReceiverId = messageDto.ReceiverId,
-                Content = messageDto.Content,
-                Timestamp = DateTime.UtcNow,
-                IsRead = false
-            };
-
-            _dbContext.Messages.Add(message);
-            await _dbContext.SaveChangesAsync();
-
-            var sentMessage = new MessageDto
-            {
-                Id = message.Id,
-                SenderId = sender.Id,
-                ReceiverId = receiver.Id,
-                Content = message.Content,
-                Timestamp = message.Timestamp,
-                IsRead = message.IsRead,
-                SenderUsername = sender.Username,
-                ReceiverUsername = receiver.Username,
-                SenderProfilePicture = string.IsNullOrEmpty(sender.ProfilePicture) ?
-                    "/uploads/default-profile.png" : sender.ProfilePicture,
-                ReceiverProfilePicture = string.IsNullOrEmpty(receiver.ProfilePicture) ?
-                    "/uploads/default-profile.png" : receiver.ProfilePicture
-            };
-
-            return Ok(sentMessage);
+            return BadRequest(new { error = "Mittente non trovato." });
         }
-        catch (Exception ex)
+
+        if (receiver == null)
         {
-            _logger.LogError(ex, "Errore durante l'invio del messaggio.");
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return BadRequest(new { error = "Destinatario non trovato." });
         }
+
+        // Crea il messaggio
+        var message = new Message
+        {
+            SenderId = sender.Id,
+            ReceiverId = receiver.Id,
+            Content = messageDto.Content,
+            Timestamp = DateTime.UtcNow,
+            IsRead = false
+        };
+
+        // Salva il messaggio nel database
+        _dbContext.Messages.Add(message);
+        await _dbContext.SaveChangesAsync();
+
+        // Prepara la risposta
+        var sentMessage = new MessageDto
+        {
+            Id = message.Id,
+            SenderId = sender.Id,
+            ReceiverId = receiver.Id,
+            Content = message.Content,
+            Timestamp = message.Timestamp,
+            IsRead = message.IsRead,
+            SenderUsername = sender.Username,
+            ReceiverUsername = receiver.Username,
+            SenderProfilePicture = string.IsNullOrEmpty(sender.ProfilePicture)
+                ? "/uploads/default-profile.png"
+                : sender.ProfilePicture,
+            ReceiverProfilePicture = string.IsNullOrEmpty(receiver.ProfilePicture)
+                ? "/uploads/default-profile.png"
+                : receiver.ProfilePicture
+        };
+
+        return Ok(sentMessage);
     }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Errore durante l'invio del messaggio.");
+        return StatusCode(500, $"Errore interno del server: {ex.Message}");
+    }
+}
+
 
 
     [HttpGet("unread/{receiverId}")]

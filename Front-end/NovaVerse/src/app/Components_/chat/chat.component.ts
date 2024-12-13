@@ -69,22 +69,31 @@ export class ChatComponent implements OnInit {
   }
 
   loadReceiverProfile(): void {
-    this.userService.getUserById(this.receiverId).subscribe(
-      (response: iUser) => {
-        this.receiverUsername = response.username;
-        this.receiverProfilePicture =
-          response.profilePicture?.startsWith('/uploads')
-            ? 'http://localhost:5034' + response.profilePicture
-            : response.profilePicture || 'assets/default-profile.png';
+    if (!this.receiverId) {
+      console.error('ReceiverId non valido.');
+      return;
+    }
+
+    this.userService.getUserById(this.receiverId).subscribe({
+      next: (response: iUser) => {
+        this.receiverUsername = response.username || 'Utente sconosciuto';
+        this.receiverProfilePicture = response.profilePicture
+          ? (response.profilePicture.startsWith('/uploads')
+              ? `http://localhost:5034${response.profilePicture}`
+              : response.profilePicture)
+          : 'assets/default-profile.png';
 
         // Aggiorna immagine del destinatario nel servizio
         this.messageService.updateProfilePicture(this.receiverId, this.receiverProfilePicture);
       },
-      error => {
-        console.error('Errore durante il caricamento del profilo del destinatario:', error);
+      error: (err) => {
+        console.error('Errore durante il caricamento del profilo del destinatario:', err);
+        this.receiverUsername = 'Utente non trovato';
+        this.receiverProfilePicture = 'assets/default-profile.png'; // Immagine di fallback
       }
-    );
+    });
   }
+
 
 
   loadMessages(): void {
@@ -98,29 +107,57 @@ export class ChatComponent implements OnInit {
         this.messages = response.$values || [];
         console.log('Messaggi caricati:', this.messages);
 
-        // Assicurati che i dettagli del destinatario siano aggiornati dai messaggi
+        // Itera attraverso i messaggi per associare le immagini dei profili e i dettagli
+        this.messages.forEach((message) => {
+          if (message.senderId === this.currentUserId) {
+            message.senderProfilePicture = this.currentUserProfilePicture;
+            message.senderUsername = this.currentUserName;
+          } else if (message.senderId === this.receiverId) {
+            message.senderProfilePicture = message.senderProfilePicture
+              ? (message.senderProfilePicture.startsWith('/uploads')
+                  ? `http://localhost:5034${message.senderProfilePicture}`
+                  : message.senderProfilePicture)
+              : 'assets/default-profile.png';
+            message.senderUsername = this.receiverUsername;
+          }
+
+          if (message.receiverId === this.currentUserId) {
+            message.receiverProfilePicture = this.currentUserProfilePicture;
+            message.receiverUsername = this.currentUserName;
+          } else if (message.receiverId === this.receiverId) {
+            message.receiverProfilePicture = message.receiverProfilePicture
+              ? (message.receiverProfilePicture.startsWith('/uploads')
+                  ? `http://localhost:5034${message.receiverProfilePicture}`
+                  : message.receiverProfilePicture)
+              : 'assets/default-profile.png';
+            message.receiverUsername = this.receiverUsername;
+          }
+        });
+
+        // Aggiorna i dettagli del destinatario in base ai messaggi
         if (this.messages.length > 0) {
-          const firstMessage = this.messages.find(
-            (msg) => msg.receiverId === this.receiverId
-          );
+          const firstMessage = this.messages.find((msg) => msg.senderId === this.receiverId);
           if (firstMessage) {
-            this.receiverUsername = firstMessage.receiverUsername || this.receiverUsername;
-            this.receiverProfilePicture = firstMessage.receiverProfilePicture
-              ? (firstMessage.receiverProfilePicture.startsWith('/uploads')
-                  ? 'http://localhost:5034' + firstMessage.receiverProfilePicture
-                  : firstMessage.receiverProfilePicture)
-              : 'http://localhost:5034/default-profile-picture.png';
+            this.receiverUsername = firstMessage.senderUsername || this.receiverUsername;
+            this.receiverProfilePicture = firstMessage.senderProfilePicture || 'assets/default-profile.png';
           }
         }
       },
-      error: (err: any) => {
+      error: (err) => {
         console.error('Errore durante il caricamento della conversazione:', err);
-      }
+      },
     });
   }
 
+
   sendMessage(): void {
     if (!this.newMessageContent.trim()) {
+      console.error('Contenuto del messaggio vuoto.');
+      return;
+    }
+
+    if (!this.currentUserId || !this.receiverId) {
+      console.error('ID mittente o destinatario non valido.');
       return;
     }
 
@@ -133,10 +170,10 @@ export class ChatComponent implements OnInit {
       senderUsername: this.currentUserName,
       receiverUsername: this.receiverUsername,
       senderProfilePicture: this.currentUserProfilePicture,
-      receiverProfilePicture: this.receiverProfilePicture
+      receiverProfilePicture: this.receiverProfilePicture,
     };
 
-    console.log('Sending message payload:', message);
+    console.log('Payload del messaggio:', message);
 
     this.messageService.sendMessage(message).subscribe({
       next: (sentMessage: Message) => {
@@ -144,12 +181,15 @@ export class ChatComponent implements OnInit {
         this.messages.push(sentMessage);
         this.newMessageContent = '';
         this.cdr.detectChanges();
+
       },
       error: (err) => {
         console.error('Errore durante l\'invio del messaggio:', err);
-      }
+      },
     });
   }
+
+
 
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;

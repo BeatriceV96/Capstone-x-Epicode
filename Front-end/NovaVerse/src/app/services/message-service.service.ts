@@ -27,6 +27,7 @@ export class MessageService {
     return this.http.post<Message>(`${this.baseUrl}/send`, message, { withCredentials: true });
   }
 
+
   // Recupera messaggi non letti per un utente
   getUnreadNotifications(userId: number): Observable<Notification[]> {
     return this.http.get<Notification[]>(`http://localhost:5034/api/notifications/unread/${userId}`, {
@@ -47,10 +48,5 @@ export class MessageService {
   // Ottieni l'immagine del profilo di un utente specifico
   getProfilePicture(userId: number): string | undefined {
     return this.profilePictureSubject.getValue()[userId];
-  }
-
-  // Sincronizza immagini dal backend (opzionale)
-  syncProfilePictures(): void {
-    // Questo metodo può essere implementato per recuperare immagini dal backend, se necessario
   }
 }
