@@ -1,4 +1,5 @@
-import { NgModule } from '@angular/core';
+import { EmojiPickerEventMap } from './../../node_modules/emoji-picker-element/shared.d';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -15,6 +16,8 @@ import { ChatComponent } from './Components_/chat/chat.component';
 import { NbChatModule, NbLayoutModule, NbThemeModule } from '@nebular/theme';
 import { CommonModule } from '@angular/common';
 import { NotificationsComponent } from './Components_/notification/notification.component';
+import 'emoji-picker-element';
+
 
 
 @NgModule({
@@ -39,6 +42,7 @@ import { NotificationsComponent } from './Components_/notification/notification.
     NbLayoutModule,
     NbChatModule,
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], //questo per le emoji
   providers: [
     provideHttpClient(withInterceptorsFromDi()),
   ],

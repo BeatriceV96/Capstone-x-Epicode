@@ -1,10 +1,12 @@
 import { UserService } from './../../services/user.service';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '../../services/message-service.service';
 import { AuthService } from '../../services/auth.service';
 import { Message } from '../../Models/message';
 import { iUser } from '../../Models/i-user';
+import 'emoji-picker-element';
+
 
 @Component({
   selector: 'app-chat',
@@ -12,6 +14,7 @@ import { iUser } from '../../Models/i-user';
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
+
   currentUserId!: number;
   currentUserProfilePicture!: string;
   currentUserName!: string;
@@ -21,6 +24,10 @@ export class ChatComponent implements OnInit {
   messages: Message[] = [];
   newMessageContent: string = '';
   isDarkMode: boolean = false;
+
+  isEmojiPickerVisible: boolean = false;
+
+@ViewChild('messageInput') messageInput!: ElementRef;
 
   constructor(
     private messageService: MessageService,
@@ -209,5 +216,16 @@ export class ChatComponent implements OnInit {
       body.classList.remove('dark-mode');
     }
   }
+
+  toggleEmojiPicker(): void {
+    this.isEmojiPickerVisible = !this.isEmojiPickerVisible;
+  }
+
+  addEmoji(event: any): void {
+    const emoji = event.detail.unicode;
+    this.newMessageContent += emoji;
+    this.isEmojiPickerVisible = false; // Chiudi il selettore dopo aver selezionato un'emoji
+  }
+
 }
 

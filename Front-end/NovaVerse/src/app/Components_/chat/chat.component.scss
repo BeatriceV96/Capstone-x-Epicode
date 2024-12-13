@@ -32,3 +32,11 @@
 .bg-blue-500 {
   background-color: #1f2937;
 }
+
+
+emoji-picker {
+  position: absolute;
+  bottom: 70px;
+  right: 20px;
+  z-index: 1000;
+}

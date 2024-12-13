@@ -53,6 +53,21 @@
       [ngClass]="{'bg-gray-700 text-white': isDarkMode, 'bg-white text-black': !isDarkMode}"
       rows="2"
       placeholder="Scrivi un messaggio..."></textarea>
+
+      <button
+      class="absolute right-2 bottom-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-black dark:text-white p-2 rounded-full"
+      (click)="toggleEmojiPicker()"
+    >
+      😊
+    </button>
+
+    <!-- Emoji Picker -->
+  <emoji-picker
+  *ngIf="isEmojiPickerVisible"
+  (emoji-click)="addEmoji($event)"
+  class="absolute bottom-12 right-2 z-10"
+  ></emoji-picker>
+
     <button
       (click)="sendMessage()"
       class="font-bold py-2 px-4 rounded-lg"
