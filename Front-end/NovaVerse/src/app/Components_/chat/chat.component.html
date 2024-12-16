@@ -49,7 +49,8 @@
        [ngClass]="{'bg-gray-700 border-gray-700': isDarkMode, 'bg-white border-gray-300': !isDarkMode}">
     <textarea
       [(ngModel)]="newMessageContent"
-      class="flex-1 border rounded-lg p-2 mr-4 resize-none focus:outline-none fßocus:ring-2"
+      class="flex-1 border rounded-lg p-2 mr-4 resize-none focus:outline-none focus:ring-2
+      "
       [ngClass]="{'bg-gray-700 text-white': isDarkMode, 'bg-white text-black': !isDarkMode}"
       rows="2"
       placeholder="Scrivi un messaggio..."></textarea>

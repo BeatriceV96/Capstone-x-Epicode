@@ -38,8 +38,9 @@ export class UserService {
 
 
   getUserById(userId: number): Observable<iUser> {
-    return this.http.get<iUser>(`${this.apiUrl}/users/${userId}`);
-  }
+  return this.http.get<iUser>(`${this.apiUrl}/user/${userId}`, { withCredentials: true });
+}
+
 
 
 // Ottiene il profilo utente dal backend
