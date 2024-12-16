@@ -38,8 +38,10 @@ export class UserService {
 
 
   getUserById(userId: number): Observable<iUser> {
-  return this.http.get<iUser>(`${this.apiUrl}/user/${userId}`, { withCredentials: true });
-}
+    return this.http.get<iUser>(`${this.apiUrl}/user/${userId}`, { withCredentials: true });
+  }
+
+
 
 
 

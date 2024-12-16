@@ -76,12 +76,7 @@ export class ChatComponent implements OnInit {
   }
 
   loadReceiverProfile(): void {
-    if (!this.receiverId) {
-      console.error('ReceiverId non valido.');
-      return;
-    }
-
-    this.userService.getUserById(this.receiverId).subscribe({
+    this.userService.getUserProfile().subscribe({
       next: (response: iUser) => {
         this.receiverUsername = response.username || 'Utente sconosciuto';
         this.receiverProfilePicture = response.profilePicture
@@ -96,10 +91,11 @@ export class ChatComponent implements OnInit {
       error: (err) => {
         console.error('Errore durante il caricamento del profilo del destinatario:', err);
         this.receiverUsername = 'Utente non trovato';
-        this.receiverProfilePicture = 'assets/default-profile.png'; // Immagine di fallback
+        this.receiverProfilePicture = 'assets/default-profile.png';
       }
     });
   }
+
 
 
 
